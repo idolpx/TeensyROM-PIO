@@ -27,41 +27,53 @@
 
 #include "IOH_Swiftlink.h"
 
-#define MaxURLHostSize 100
-#define MaxURLPathSize 300
-
 // PETSCII Colors/Special Symbols
-#define PETSCIIpurple 0x9c
-#define PETSCIIwhite 0x05
-#define PETSCIIlightBlue 0x9a
-#define PETSCIIyellow 0x9e
-#define PETSCIIbrown 0x95
-#define PETSCIIpink 0x96
-#define PETSCIIlightGreen 0x99
-#define PETSCIIgreen 0x1e
-#define PETSCIIdarkGrey 0x97
-#define PETSCIIgrey 0x98
+#define PETSCIIpurple      0x9c
+#define PETSCIIwhite       0x05
+#define PETSCIIlightBlue   0x9a
+#define PETSCIIyellow      0x9e
+#define PETSCIIbrown       0x95
+#define PETSCIIpink        0x96
+#define PETSCIIlightGreen  0x99
+#define PETSCIIgreen       0x1e
+#define PETSCIIlightGrey   0x9b
+#define PETSCIIdarkGrey    0x97
+#define PETSCIIgrey        0x98
 
-#define PETSCIIreturn 0x0d
-#define PETSCIIrvsOn 0x12
-#define PETSCIIrvsOff 0x92
+#define PETSCIIreturn      0x0d
+#define PETSCIIrvsOn       0x12
+#define PETSCIIrvsOff      0x92
 #define PETSCIIclearScreen 0x93
-#define PETSCIIcursorUp 0x91
-#define PETSCIIhorizBar 0x60
-#define PETSCIIspace 0x20
+#define PETSCIIcursorUp    0x91
+#define PETSCIIhorizBar    0x60
+#define PETSCIIspace       0x20
+#define PETSCIIhiLoChrSet  0x0e
+#define PETSCIIupGfxChrSet 0x8e
+
+#define MaxURLHostSize      100
+#define MaxURLPathSize      300
+
+#define NumPageLinkBuffs    99
+#define NumPrevURLQueues    8
 
 #define RxQueueUsed ((RxQueueHead >= RxQueueTail) ? (RxQueueHead - RxQueueTail) : (RxQueueHead + RxQueueSize - RxQueueTail))
 
 struct stcURLParse
 {
-    char host[MaxURLHostSize];
-    // uint16_t port;
-    char path[MaxURLPathSize];
-    char postpath[MaxURLPathSize];
+   char host[MaxURLHostSize];
+   uint16_t port;
+   char path[MaxURLPathSize];
+   char postpath[MaxURLPathSize];
 };
 
+char *PageLinkBuff[NumPageLinkBuffs];        // hold links from tags for user selection in browser
+stcURLParse *PrevURLQueue[NumPrevURLQueues]; // For browse previous
+char CurrPageTitle[eepBMTitleSize];          // keep current page title, could move to RAM2
 
-void SendPETSCIICharImmediate(char CharToSend);
+uint8_t PrevURLQueueNum;   // current/latest in the link history queue
+uint8_t UsedPageLinkBuffs; // how many PageLinkBuff elements have been Used
+
+void SendPETSCIICharImmediate(uint8_t CharToSend);
 void SendASCIIStrImmediate(const char* CharsToSend);
 void SendASCIIErrorStrImmediate(const char* CharsToSend);
 
@@ -74,6 +86,8 @@ void UnPausePage();
 void ParseHTMLTag();
 void ParseURL(const char * URL, stcURLParse &URLParse);
 bool ReadClientLine(char* linebuf, uint16_t MaxLen);
+void ClearClientStop();
+void AddToPrevURLQueue(const stcURLParse *URL);
 bool WebConnect(const stcURLParse *DestURL, bool AddToHist);
 void DoSearch(const char *Term);
 

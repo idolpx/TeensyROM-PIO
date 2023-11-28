@@ -24,6 +24,7 @@
 #define SWIFTLINK_RXQUEUE_H
 
 #include <Arduino.h>
+#include <IPAddress.h>
 
 uint8_t PullFromRxQueue();
 bool ReadyToSendRx();

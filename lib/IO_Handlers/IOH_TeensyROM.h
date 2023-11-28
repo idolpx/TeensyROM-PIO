@@ -24,9 +24,13 @@
 #define IOH_TEENSYROM_H
 
 #include <Arduino.h>
+#include <FS.h>
 
 #include "IOH_struct.h"
 #include "TeensyROM.h"
+
+#include "Menu.h"
+#include "Menu_Regs.h"
 
 void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn);  
 void PollingHndlr_TeensyROM();                           

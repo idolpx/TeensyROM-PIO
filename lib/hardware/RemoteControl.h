@@ -29,7 +29,7 @@
 // C64: Executes command
 
 #ifndef REMOTECONTROL_H
-#endif REMOTECONTROL_H
+#define REMOTECONTROL_H
 
 #include "Menu_Regs.h"
 
@@ -40,4 +40,4 @@ bool DoC64IRQ();
 bool RemotePauseSID();
 void RemoteLaunch(bool SD_nUSB, const char *FileNamePath);
 
-#endif
+#endif // REMOTECONTROL_H

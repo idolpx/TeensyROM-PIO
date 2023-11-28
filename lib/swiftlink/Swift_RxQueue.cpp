@@ -23,8 +23,10 @@
 #include "Swift_RxQueue.h"
 
 #include <Arduino.h>
+#include <EEPROM.h>
 
 #include "IOH_Swiftlink.h"
+#include "IOH_TeensyROM.h"
 
 uint8_t PullFromRxQueue()
 {  //assumes queue data is available before calling

@@ -25,8 +25,6 @@
 
 #include <Arduino.h>
 
-#include <NativeEthernet.h>
-
 #include "../../include/TeensyROM.h"
 
 #include "IOH_struct.h"
@@ -35,7 +33,6 @@
 #include "Swift_ATcommands.h"
 #include "Swift_Browser.h"
 
-EthernetClient client;
 
 void FreeSwiftlinkBuffs();
 void IO1Hndlr_SwiftLink(uint8_t Address, bool R_Wn);
@@ -55,8 +52,7 @@ stcIOHandlers IOHndlr_SwiftLink =
     &CycleHndlr_SwiftLink,   // called at the end of EVERY c64 cycle
 };
 
-#define NumPageLinkBuffs    99
-#define NumPrevURLQueues    8
+
 #define MaxTagSize          300
 #define TxMsgMaxSize        128
 #define BytesPerDot         (25*1024) //dot every 25k when downloading
@@ -97,12 +93,7 @@ extern void EEPreadStr(uint16_t addr, char *buf);
 
 uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
 char *TxMsg = NULL;                          // to hold messages (AT/browser commands) when off line
-char *PageLinkBuff[NumPageLinkBuffs];        // hold links from tags for user selection in browser
-stcURLParse *PrevURLQueue[NumPrevURLQueues]; // For browse previous
-char CurrPageTitle[eepBMTitleSize];          // keep current page title, could move to RAM2
 
-uint8_t PrevURLQueueNum;   // current/latest in the link history queue
-uint8_t UsedPageLinkBuffs; // how many PageLinkBuff elements have been Used
 uint32_t RxQueueHead, RxQueueTail, TxMsgOffset;
 bool ConnectedToHost, BrowserMode, PagePaused, PrintingHyperlink;
 uint32_t PageCharsReceived;

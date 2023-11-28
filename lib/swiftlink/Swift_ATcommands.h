@@ -49,8 +49,6 @@ struct stcATCommand
   void (*Function)(char*); 
 };
 
-
-   
 void ProcessATCommand();
 
 #endif // SWIFTLINK_ATCOMMANDS_H

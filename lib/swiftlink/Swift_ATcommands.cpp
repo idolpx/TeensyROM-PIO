@@ -24,9 +24,14 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <NativeEthernet.h>
 
 #include "Swift_Browser.h"
 #include "Swift_RxQueue.h"
+
+EthernetClient client;
+
+#define MaxATcmdLength   20
 
 stcATCommand ATCommands[] =
 {
@@ -280,32 +285,7 @@ FLASHMEM void AT_HELP(char* CmdArg)
    AddToPETSCIIStrToRxQueueLN(" +++   Disconnect from host");
 }
 
-#define MaxATcmdLength   20
 
-struct stcATCommand
-{
-  char Command[MaxATcmdLength];
-  void (*Function)(char*); 
-};
-
-stcATCommand ATCommands[] =
-{
-   "dt"        , &AT_DT,
-   "c"         , &AT_C,
-   "+s"        , &AT_S,
-   "+rndmac"   , &AT_RNDMAC,
-   "+mac="     , &AT_MAC,
-   "+dhcp="    , &AT_DHCP,
-   "+dhcptime=", &AT_DHCPTIME,
-   "+dhcpresp=", &AT_DHCPRESP,
-   "+myip="    , &AT_MYIP,
-   "+dnsip="   , &AT_DNSIP,
-   "+gtwyip="  , &AT_GTWYIP,
-   "+maskip="  , &AT_MASKIP,
-   "+defaults" , &AT_DEFAULTS,
-   "?"         , &AT_HELP,
-   "browse"    , &AT_BROWSE,
-};
    
 void ProcessATCommand()
 {

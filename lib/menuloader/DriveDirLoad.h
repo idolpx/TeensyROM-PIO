@@ -210,6 +210,7 @@ void ParseP00File(StructMenuItem *MyMenuItem);
 bool ParseCRTHeader(StructMenuItem *MyMenuItem, uint8_t *EXROM, uint8_t *GAME);
 bool ParseChipHeader(uint8_t *ChipHeader);
 
+void FreeDriveDirMenu();
 void FreeCrtChips();
 bool ParseSIDHeader();
 void RedirectEmptyDriveDirMenu();

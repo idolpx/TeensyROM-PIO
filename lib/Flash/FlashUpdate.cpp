@@ -58,10 +58,10 @@
 
 #include "DriveDirLoad.h"
 
-#include "Flash/FXUtil.h" // read_ascii_line(), hex file support
+#include "FXUtil.h" // read_ascii_line(), hex file support
 extern "C"
 {
-#include "Flash/FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
+#include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
 }
 
 void DoFlashUpdate(FS *sourceFS, const char *FilePathName)

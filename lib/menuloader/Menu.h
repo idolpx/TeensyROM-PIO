@@ -12,4 +12,4 @@ void SetUpMainMenuROM();
 void SetNumItems(uint16_t NumItems);
 void PadSpace(char* StrToPad, uint8_t PadToLength);
 
-#endif // stcURLParse
+#endif // MENU_H

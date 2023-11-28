@@ -59,12 +59,12 @@
 //  #define FLASH_BASE_ADDR	(0x60000000)		// code starts here
 //#elif defined(__IMXRT1062__) && defined(ARDUINO_TEENSY41)
 #if defined(__IMXRT1062__) && defined(ARDUINO_TEENSY41)
-  #define FLASH_ID              "fw_t41_teensyrom_sensorium"		// target ID (in code): now done in main code 
-  #define FLASH_SIZE		(0x800000)		// 8MB
-  #define FLASH_SECTOR_SIZE	(0x1000)		// 4KB sector size
-  #define FLASH_WRITE_SIZE	(4)			// 4-byte/32-bit writes    
-  #define FLASH_RESERVE		(4*FLASH_SECTOR_SIZE)	// reserve top of flash: now done in main code 
-  #define FLASH_BASE_ADDR	(0x60000000)		// code starts here
+  #define FLASH_ID          "fw_t41_teensyrom_sensorium"		// target ID (in code): now done in main code 
+  #define FLASH_SIZE        (0x800000)            // 8MB
+  #define FLASH_SECTOR_SIZE (0x1000)              // 4KB sector size
+  #define FLASH_WRITE_SIZE  (4)                   // 4-byte/32-bit writes    
+  #define FLASH_RESERVE     (4*FLASH_SECTOR_SIZE)	// reserve top of flash: now done in main code 
+  #define FLASH_BASE_ADDR   (0x60000000)          // code starts here
 //#elif defined(__IMXRT1062__) && defined(ARDUINO_TEENSY_MICROMOD)
 //  #define FLASH_ID		"fw_teensyMM"		// target ID (in code)
 //  #define FLASH_SIZE		(0x1000000)		// 16MB
