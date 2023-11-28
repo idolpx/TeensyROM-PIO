@@ -6,6 +6,9 @@ extern "C" {
 #include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
 }
 
+#include "../../include/TeensyROM.h"
+#include "DriveDirLoad.h"
+
 //******************************************************************************
 // hex_info_t	struct for hex record and hex file info
 //******************************************************************************

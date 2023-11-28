@@ -25,14 +25,13 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <NativeEthernet.h>
 
-#include "TeensyROM.h"
+
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 #include "Swift_Browser.h"
 
-EthernetClient client;
 
 void FreeSwiftlinkBuffs()
 {

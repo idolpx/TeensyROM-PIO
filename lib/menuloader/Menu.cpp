@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 

@@ -19,7 +19,7 @@
 
 #include "IOH_ZaxxonSuper.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 void InitHndlr_ZaxxonSuper()

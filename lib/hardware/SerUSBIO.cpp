@@ -24,7 +24,7 @@
 
 //#include "main.h"
 #include "IOHandlers.h"
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "FlashTxx.h"
 #include "MainMenuItems.h"
 

@@ -26,7 +26,7 @@
 #include <NativeEthernet.h>
 #include <NativeEthernetUdp.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 EthernetUDP udp;

@@ -22,7 +22,11 @@
 #include "Swift_Browser.h"
 
 #include <Arduino.h>
+#include <EEPROM.h>
+#include <SD.h>
+#include <NativeEthernet.h>
 
+#include "IOHandlers.h"
 #include "IOH_Swiftlink.h"
 #include "IOH_TeensyROM.h"
 #include "Swift_RxQueue.h"

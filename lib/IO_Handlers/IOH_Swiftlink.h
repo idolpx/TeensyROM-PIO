@@ -24,6 +24,7 @@
 #define IOH_SWIFTLINK_H
 
 #include <Arduino.h>
+#include <NativeEthernet.h>
 
 #include "../../include/TeensyROM.h"
 
@@ -33,6 +34,7 @@
 #include "Swift_ATcommands.h"
 #include "Swift_Browser.h"
 
+extern EthernetClient client;
 
 void FreeSwiftlinkBuffs();
 void IO1Hndlr_SwiftLink(uint8_t Address, bool R_Wn);

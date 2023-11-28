@@ -19,7 +19,7 @@
 
 #include "IOH_SuperGames.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 bool WPLatched; 

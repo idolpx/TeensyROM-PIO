@@ -19,7 +19,7 @@
 
 #include "IOH_MIDI.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 #include <MIDI.h>

@@ -19,7 +19,7 @@
 
 #include "IOH_Dinamic.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 void IO1Hndlr_Dinamic(uint8_t Address, bool R_Wn)

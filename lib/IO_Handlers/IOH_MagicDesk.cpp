@@ -19,7 +19,7 @@
 
 #include "IOH_MagicDesk.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 void InitHndlr_MagicDesk()

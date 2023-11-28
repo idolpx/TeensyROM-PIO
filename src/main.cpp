@@ -29,7 +29,7 @@
 #include <NativeEthernet.h>
 #include <NativeEthernetUdp.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "ISRs.h"
 #include "IOHandlers.h"
 

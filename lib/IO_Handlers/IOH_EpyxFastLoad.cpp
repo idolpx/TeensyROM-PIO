@@ -19,7 +19,7 @@
 
 #include "IOH_EpyxFastLoad.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 #define EpyxMaxCycleCount  512 //Numer for C64 clock cycles to disable Epyx

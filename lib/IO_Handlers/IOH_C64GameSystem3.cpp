@@ -19,7 +19,7 @@
 
 #include "IOH_C64GameSystem3.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 void IO1Hndlr_C64GameSystem3(uint8_t Address, bool R_Wn)

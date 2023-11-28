@@ -22,7 +22,7 @@
 #include <MIDI.h>
 #include <MIDIUSB.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 
 //MIDI input handlers for Debug _________________________________________________________________________
 

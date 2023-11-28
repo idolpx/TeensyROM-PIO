@@ -21,7 +21,7 @@
 #include <MIDI.h>
 #include <MIDIUSB.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "IOHandlers.h"
 
 

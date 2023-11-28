@@ -19,7 +19,7 @@
 
 #include "IOH_FunPlay.h"
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 void IO1Hndlr_FunPlay(uint8_t Address, bool R_Wn)

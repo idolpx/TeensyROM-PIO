@@ -22,7 +22,7 @@
 #include "ISRs.h"
 
 #include "main.h"
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 
 FASTRUN void isrButton()
 {

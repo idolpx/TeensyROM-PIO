@@ -2,7 +2,7 @@
 #ifndef MAINMENUITEMS_H
 #define MAINMENUITEMS_H
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 
 //add PROGMEM to declaration of all main menu binaries:
 #include "ROMs/ccgms_2021_Swiftlink_DE_38400.prg.h"

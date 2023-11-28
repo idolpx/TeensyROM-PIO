@@ -26,7 +26,7 @@
 #include "Menu.h"
 #include "Menu_Regs.h"
 #include "MainMenuItems.h"
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "IOHandlers.h"
 #include "FlashUpdate.h"
 

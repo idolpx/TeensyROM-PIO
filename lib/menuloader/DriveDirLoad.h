@@ -25,7 +25,7 @@
 #include <Arduino.h>
 #include <FS.h>
 
-#include "TeensyROM.h"
+#include "../../include/TeensyROM.h"
 #include "IOHandlers.h"
 #include "Menu_Regs.h"
 
