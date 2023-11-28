@@ -26,6 +26,9 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
+#include <NativeEthernet.h>
+#include <NativeEthernetUdp.h>
+
 #include "TeensyROM.h"
 #include "ISRs.h"
 #include "IOHandlers.h"

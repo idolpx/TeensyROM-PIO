@@ -26,16 +26,15 @@
 #include <Arduino.h>
 
 #include <NativeEthernet.h>
-#include <NativeEthernetUdp.h>
+
+#include "../../include/TeensyROM.h"
 
 #include "IOH_struct.h"
-#include "TeensyROM.h"
 
 #include "Swift_RxQueue.h"
 #include "Swift_ATcommands.h"
 #include "Swift_Browser.h"
 
-EthernetUDP udp;
 EthernetClient client;
 
 void FreeSwiftlinkBuffs();

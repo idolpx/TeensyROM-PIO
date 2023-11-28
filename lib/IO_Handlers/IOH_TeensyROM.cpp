@@ -23,10 +23,13 @@
 
 #include <SD.h>
 #include <EEPROM.h>
+#include <NativeEthernet.h>
+#include <NativeEthernetUdp.h>
 
 #include "TeensyROM.h"
 #include "DriveDirLoad.h"
 
+EthernetUDP udp;
 
 void getNtpTime()
 {
