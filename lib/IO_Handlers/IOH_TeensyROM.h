@@ -26,7 +26,7 @@
 #include <Arduino.h>
 #include <FS.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 #include "../../include/TeensyROM.h"
 
 #include "Menu_Regs.h"
@@ -53,8 +53,11 @@ volatile uint16_t StreamOffsetAddr, StringOffset = 0;
 volatile char*    ptrSerialString; //pointer to selected serialstring
 char SerialStringBuf[MaxPathLength] = "err"; // used for message passing to C64, up to full path length
 volatile uint8_t doReset = true;
+
+uint16_t LOROM_Mask, HIROM_Mask;
 const unsigned char *HIROM_Image = NULL;
 const unsigned char *LOROM_Image = NULL;
+
 volatile uint8_t eepAddrToWrite, eepDataToWrite;
 StructMenuItem *MenuSource;
 uint16_t SelItemFullIdx = 0;  //logical full index into menu for selected item

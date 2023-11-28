@@ -23,10 +23,8 @@
 #include "midiDevName.h"
 
 #include <Arduino.h>
-#include <USBHost_t36.h>
 
-
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 #include "SerUSBIO.h"
 
 // IO Handler for MIDI (6580 ACIA interface) Emulation

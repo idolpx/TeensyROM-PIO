@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 #define NumDecodeBanks   64
 uint8_t *BankDecode[NumDecodeBanks][2];

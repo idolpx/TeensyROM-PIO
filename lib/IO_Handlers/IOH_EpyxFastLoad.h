@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 void InitHndlr_EpyxFastLoad();                           
 void IO1Hndlr_EpyxFastLoad(uint8_t Address, bool R_Wn);  

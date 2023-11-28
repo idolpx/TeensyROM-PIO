@@ -24,6 +24,8 @@
 
 #include "../../include/TeensyROM.h"
 
+#include "IOH_defs.h"
+
 //MIDI input handlers for Debug _________________________________________________________________________
 
 DEBUG_MEMLOC void DbgOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
@@ -125,6 +127,7 @@ DEBUG_MEMLOC void DbgOnRealTimeSystem(uint8_t realtimebyte)
 }
 
 //______________________________________________________________________________________________
+
 
 DEBUG_MEMLOC void InitHndlr_Debug()
 {

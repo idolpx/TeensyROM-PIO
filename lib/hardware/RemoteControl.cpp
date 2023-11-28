@@ -30,10 +30,15 @@
 
 #include "RemoteControl.h"
 
-#include "SD.h"
+#include <SD.h>
+
+#include "../../include/TeensyROM.h"
 
 #include "Menu.h"
 #include "DriveDirLoad.h"
+#include "IOHandlers.h"
+#include "IOH_TeensyROM.h"
+#include "IOH_Swiftlink.h"
 
 
 bool InterruptC64(RegIRQCommands IRQCommand)

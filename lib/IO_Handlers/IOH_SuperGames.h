@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 void InitHndlr_SuperGames();                           
 void IO2Hndlr_SuperGames(uint8_t Address, bool R_Wn);  

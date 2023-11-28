@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 stcIOHandlers IOHndlr_None =
 {

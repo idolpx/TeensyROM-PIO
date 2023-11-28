@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 #include "IOH_None.h"
 #include "IOH_MIDI.h"
@@ -39,12 +39,6 @@
 #include "IOH_EasyFlash.h"
 #include "IOH_ZaxxonSuper.h"
 
-USBHost myusbHost;
-USBHub hub1(myusbHost);
-USBHub hub2(myusbHost);
-MIDIDevice usbHostMIDI(myusbHost);
-USBDrive myDrive(myusbHost);
-USBFilesystem firstPartition(myusbHost);
 
 stcIOHandlers* IOHandler[] =  //Synch order/qty with enum enumIOHandlers
 {

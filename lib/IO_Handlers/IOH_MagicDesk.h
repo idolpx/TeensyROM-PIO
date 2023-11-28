@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 void InitHndlr_MagicDesk();                           
 void IO1Hndlr_MagicDesk(uint8_t Address, bool R_Wn);  

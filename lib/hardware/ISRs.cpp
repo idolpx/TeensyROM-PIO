@@ -21,8 +21,10 @@
 
 #include "ISRs.h"
 
-#include "main.h"
 #include "../../include/TeensyROM.h"
+
+#include "IOHandlers.h"
+#include "IOH_TeensyROM.h"
 
 FASTRUN void isrButton()
 {

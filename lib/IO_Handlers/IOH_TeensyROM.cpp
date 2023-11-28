@@ -50,7 +50,8 @@ void getNtpTime()
     byte packetBuffer[NTP_PACKET_SIZE]; // buffer to hold incoming and outgoing packets
 
     Serial.printf("Updating time from: %s\n", timeServer);
-   while (udp.parsePacket() > 0) ; // discard any previously received packets
+    while (udp.parsePacket() > 0)
+        ; // discard any previously received packets
 
     // send an NTP request to the time server at the given address
     // set all bytes in the buffer to 0
@@ -90,8 +91,10 @@ void getNtpTime()
             secsSince1900 /= 60; // to  minutes
             IO1[rRegLastMinBCD] = DecToBCD(secsSince1900 % 60);
             secsSince1900 = (secsSince1900 / 60 + (int8_t)IO1[rwRegTimezone]) % 24; // to hours, offset timezone
-         if (secsSince1900 >= 12) IO1[rRegLastHourBCD] = 0x80 | DecToBCD(secsSince1900-12); //change to 0 based 12 hour and add pm flag
-         else IO1[rRegLastHourBCD] =DecToBCD(secsSince1900); //default to AM (bit 7 == 0)
+            if (secsSince1900 >= 12)
+                IO1[rRegLastHourBCD] = 0x80 | DecToBCD(secsSince1900 - 12); // change to 0 based 12 hour and add pm flag
+            else
+                IO1[rRegLastHourBCD] = DecToBCD(secsSince1900); // default to AM (bit 7 == 0)
 
             Serial.printf("Time: %02x:%02x:%02x %sm\n", (IO1[rRegLastHourBCD] & 0x7f), IO1[rRegLastMinBCD], IO1[rRegLastSecBCD], (IO1[rRegLastHourBCD] & 0x80) ? "p" : "a");
             return;
@@ -115,16 +118,21 @@ void MakeBuildCPUInfoStr()
 void UpDirectory()
 {
     // non-root of Teensy, SD or USB drive only
-   if(PathIsRoot()) return;
+    if (PathIsRoot())
+        return;
 
-   if(IO1[rWRegCurrMenuWAIT] == rmtTeensy) MenuChange(); //back to root, only 1 dir level
+    if (IO1[rWRegCurrMenuWAIT] == rmtTeensy)
+        MenuChange(); // back to root, only 1 dir level
     else
     {
         char *LastSlash = strrchr(DriveDirPath, '/'); // find last slash
-      if (LastSlash == NULL) return;
+        if (LastSlash == NULL)
+            return;
         LastSlash[0] = 0; // terminate it there
-      if (IO1[rWRegCurrMenuWAIT] == rmtSD) LoadDirectory(&SD); 
-      else LoadDirectory(&firstPartition); 
+        if (IO1[rWRegCurrMenuWAIT] == rmtSD)
+            LoadDirectory(&SD);
+        else
+            LoadDirectory(&firstPartition);
         IO1[rwRegCursorItemOnPg] = 0;
         IO1[rwRegPageNumber] = 1;
     }
@@ -170,7 +178,6 @@ void (*StatusFunction[rsNumStatusTypes])() = // match RegStatusTypes order
         &LoadMainSIDforXfer,  // rsLoadSIDforXfer
 };
 
-
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 
 #define NUM_VOICES 3
@@ -183,17 +190,22 @@ struct stcVoiceInfo
 };
 
 stcVoiceInfo Voice[NUM_VOICES] =
-{  //voice table for poly synth
-   true, 0,
-   true, 0,
-   true, 0,
+    {
+        // voice table for poly synth
+        true,
+        0,
+        true,
+        0,
+        true,
+        0,
 };
 
 int FindVoiceUsingNote(int NoteNum)
 {
     for (int VoiceNum = 0; VoiceNum < NUM_VOICES; VoiceNum++)
     {
-    if(Voice[VoiceNum].NoteNumUsing == NoteNum && !Voice[VoiceNum].Available) return (VoiceNum);  
+        if (Voice[VoiceNum].NoteNumUsing == NoteNum && !Voice[VoiceNum].Available)
+            return (VoiceNum);
     }
     return (-1);
 }
@@ -202,7 +214,8 @@ int FindFreeVoice()
 {
     for (int VoiceNum = 0; VoiceNum < NUM_VOICES; VoiceNum++)
     {
-    if(Voice[VoiceNum].Available) return (VoiceNum);  
+        if (Voice[VoiceNum].Available)
+            return (VoiceNum);
     }
     return (-1);
 }
@@ -318,6 +331,7 @@ void M2SOnPitchChange(uint8_t channel, int pitch)
 
 //__________________________________________________________________________________
 
+#define usbDevMIDI usbMIDI
 
 void InitHndlr_TeensyROM()
 {
@@ -328,10 +342,10 @@ void InitHndlr_TeensyROM()
     usbHostMIDI.setHandleControlChange(M2SOnControlChange); // Bx
     usbHostMIDI.setHandlePitchChange(M2SOnPitchChange);     // Ex
 
-   usbDevMIDI.setHandleNoteOff       (M2SOnNoteOff);             // 8x
-   usbDevMIDI.setHandleNoteOn        (M2SOnNoteOn);              // 9x
-   usbDevMIDI.setHandleControlChange (M2SOnControlChange);       // Bx
-   usbDevMIDI.setHandlePitchChange   (M2SOnPitchChange);         // Ex
+    usbDevMIDI.setHandleNoteOff(M2SOnNoteOff);             // 8x
+    usbDevMIDI.setHandleNoteOn(M2SOnNoteOn);               // 9x
+    usbDevMIDI.setHandleControlChange(M2SOnControlChange); // Bx
+    usbDevMIDI.setHandlePitchChange(M2SOnPitchChange);     // Ex
 }
 
 void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
@@ -343,13 +357,15 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
         {
         case rRegItemTypePlusIOH:
             Data = MenuSource[SelItemFullIdx].ItemType;
-            if(IO1[rWRegCurrMenuWAIT] == rmtTeensy && MenuSource[SelItemFullIdx].IOHndlrAssoc != IOH_None) Data |= 0x80; //bit 7 indicates an assigned IOHandler
+            if (IO1[rWRegCurrMenuWAIT] == rmtTeensy && MenuSource[SelItemFullIdx].IOHndlrAssoc != IOH_None)
+                Data |= 0x80; // bit 7 indicates an assigned IOHandler
             DataPortWriteWaitLog(Data);
             break;
         case rRegStreamData:
             DataPortWriteWait(XferImage[StreamOffsetAddr]);
             // inc on read, check for end:
-            if (++StreamOffsetAddr >= XferSize) IO1[rRegStrAvailable]=0; //signal end of transfer
+            if (++StreamOffsetAddr >= XferSize)
+                IO1[rRegStrAvailable] = 0; // signal end of transfer
             break;
         case rwRegSerialString:
             Data = ptrSerialString[StringOffset++];
@@ -372,8 +388,8 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
         case wRegVid_TOD_Clks:
         case rwRegSIDSpeedHi:
         case rwRegSIDSpeedLo:
-         case wRegIRQ_ACK:
-         case rwRegIRQ_CMD:
+        case wRegIRQ_ACK:
+        case rwRegIRQ_CMD:
         case rwRegCursorItemOnPg:
             IO1[Address] = Data;
             break;
@@ -383,8 +399,10 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
             IO1[rRegNumItemsOnPage] = (NumItemsFull > Data * MaxItemsPerPage ? MaxItemsPerPage : NumItemsFull - (Data - 1) * MaxItemsPerPage);
             break;
         case rwRegNextIOHndlr:
-            if (Data & 0x80) Data = LastSelectableIOH; //wrap around to last item if negative
-            else if (Data > LastSelectableIOH) Data = 0; //wrap around to first item if above max
+            if (Data & 0x80)
+                Data = LastSelectableIOH; // wrap around to last item if negative
+            else if (Data > LastSelectableIOH)
+                Data = 0; // wrap around to first item if above max
             IO1[rwRegNextIOHndlr] = Data;
             eepAddrToWrite = eepAdNextIOHndlr;
             eepDataToWrite = Data;
@@ -438,7 +456,8 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
                     strcat(SerialStringBuf, DriveDirPath + Len - 36);
                     ptrSerialString = SerialStringBuf;
                 }
-                     else ptrSerialString = DriveDirPath;
+                else
+                    ptrSerialString = DriveDirPath;
             }
             break;
             }
@@ -486,13 +505,13 @@ void PollingHndlr_TeensyROM()
 {
     if (IO1[rwRegStatus] != rsReady)
     { // ISR requested work
-      if (IO1[rwRegStatus]<rsNumStatusTypes) StatusFunction[IO1[rwRegStatus]]();
-      else Serial.printf("?Stat: %02x\n", IO1[rwRegStatus]);
+        if (IO1[rwRegStatus] < rsNumStatusTypes)
+            StatusFunction[IO1[rwRegStatus]]();
+        else
+            Serial.printf("?Stat: %02x\n", IO1[rwRegStatus]);
         Serial.flush();
         IO1[rwRegStatus] = rsReady;
     }
     usbHostMIDI.read();
-   usbDevMIDI.read();
+    usbDevMIDI.read();
 }
-   
-

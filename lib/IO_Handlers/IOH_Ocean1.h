@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 void InitHndlr_Ocean1();
 void IO1Hndlr_Ocean1(uint8_t Address, bool R_Wn);

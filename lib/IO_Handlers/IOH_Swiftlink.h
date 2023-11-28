@@ -28,7 +28,7 @@
 
 #include "../../include/TeensyROM.h"
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 #include "Swift_RxQueue.h"
 #include "Swift_ATcommands.h"

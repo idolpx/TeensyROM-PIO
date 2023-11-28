@@ -26,7 +26,6 @@
 #include <FS.h>
 
 #include "../../include/TeensyROM.h"
-#include "IOHandlers.h"
 #include "Menu_Regs.h"
 
 #define Cart_Generic 0 // Supported
@@ -192,8 +191,6 @@ StructExt_ItemType_Assoc Ext_ItemType_Assoc[] =
 
 uint8_t NumCrtChips = 0;
 StructCrtChip CrtChips[MAX_CRT_CHIPS];
-
-uint16_t LOROM_Mask, HIROM_Mask;
 
 char DriveDirPath[MaxPathLength];
 

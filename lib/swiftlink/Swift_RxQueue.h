@@ -43,6 +43,7 @@ FLASHMEM void AddMACToRxQueueLN(uint8_t* mac);
 FLASHMEM void AddInvalidFormatToRxQueueLN();
 FLASHMEM void AddUpdatedToRxQueueLN();
 FLASHMEM void AddDHCPEnDisToRxQueueLN();
+bool inet_aton(const char* address, IPAddress& result);
 FLASHMEM void AddDHCPTimeoutToRxQueueLN();
 FLASHMEM void AddDHCPRespTOToRxQueueLN();
 FLASHMEM void StrToIPToEE(char* Arg, uint8_t EEPaddress);

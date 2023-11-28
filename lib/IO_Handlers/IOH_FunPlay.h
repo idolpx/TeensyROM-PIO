@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_struct.h"
+#include "IOH_defs.h"
 
 void IO1Hndlr_FunPlay(uint8_t Address, bool R_Wn);  
 

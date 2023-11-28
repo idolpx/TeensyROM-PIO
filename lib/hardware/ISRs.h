@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 
+volatile uint8_t BtnPressed = false;
+
 FASTRUN void isrButton();
 
 //Phi2 rising edge:

@@ -24,7 +24,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <SD.h>
-#include <NativeEthernet.h>
+#include <Dns.h>
+
 
 #include "IOHandlers.h"
 #include "IOH_Swiftlink.h"
