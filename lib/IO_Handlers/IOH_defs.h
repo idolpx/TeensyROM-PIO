@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <USBHost_t36.h>
 #include <MIDI.h>
-#include <MIDIUSB.h>
+//#include <MIDIUSB.h>
 
 #define IOHNameLength 20  //limited by display location on C64
 

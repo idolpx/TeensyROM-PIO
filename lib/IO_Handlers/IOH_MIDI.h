@@ -23,6 +23,8 @@
 #include "midiDevName.h"
 
 #include <Arduino.h>
+#include <MIDI.h>
+#include <MIDIUSB.h>
 
 #include "IOH_defs.h"
 #include "SerUSBIO.h"

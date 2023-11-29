@@ -22,8 +22,7 @@
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
-#include <MIDI.h>
-#include <MIDIUSB.h>
+#include "IOH_defs.h"
 
 // MIDI input handlers for HW Emulation _________________________________________________________________________
 // Only called if MIDIRxBytesToSend==0 (No data waiting)

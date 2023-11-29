@@ -20,7 +20,7 @@
 #ifndef TEENSYROM_H
 #define TEENSYROM_H
 
-char strVersionNumber[] = "v0.5.3+"; //*VERSION*
+char strVersionNumber[] = FIRMWARE_VERSION; //*VERSION*
 
 //Build options: enable debug messaging at your own risk, can cause emulation interference/fails
 //#define DbgMsgs_IO    //Serial out messages (Printf_dbg): Swift, MIDI (mostly out), CRT Chip info

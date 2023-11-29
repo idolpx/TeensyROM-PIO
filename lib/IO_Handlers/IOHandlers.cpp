@@ -17,13 +17,13 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Arduino.h>
-#include <MIDI.h>
-#include <MIDIUSB.h>
-
-#include "../../include/TeensyROM.h"
 #include "IOHandlers.h"
 
+#include <Arduino.h>
+
+#include "../../include/TeensyROM.h"
+
+#include "IOH_defs.h"
 
 void IOHandlerInitToNext()
 { //called after cart loaded, PRG x-fer finished, or exit to basic (rsIOHWinit)

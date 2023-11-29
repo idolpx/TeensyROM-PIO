@@ -19,9 +19,6 @@
 
 #include "IOH_Debug.h"
 
-#include <MIDI.h>
-#include <MIDIUSB.h>
-
 #include "../../include/TeensyROM.h"
 
 #include "IOH_defs.h"
@@ -186,6 +183,6 @@ void IO1Hndlr_Debug(uint8_t Address, bool R_Wn)
 void PollingHndlr_Debug()
 {
    usbHostMIDI.read();
-   usbMIDI.read();
+   usbDevMIDI.read();
 }
 
