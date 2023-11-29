@@ -30,10 +30,6 @@
 
 #include "IOH_defs.h"
 
-#include "Swift_RxQueue.h"
-#include "Swift_ATcommands.h"
-#include "Swift_Browser.h"
-
 extern EthernetClient client;
 
 void FreeSwiftlinkBuffs();
@@ -57,10 +53,7 @@ stcIOHandlers IOHndlr_SwiftLink =
 
 #define MaxTagSize          300
 #define TxMsgMaxSize        128
-#define BytesPerDot         (25*1024) //dot every 25k when downloading
-#define RxQueueNumBlocks    40 
-#define RxQueueBlockSize    (1024*8) // 40*8k=320k
-#define RxQueueSize         (RxQueueNumBlocks*RxQueueBlockSize) 
+
 #define C64CycBetweenRx     2300   //stops NMI from re-asserting too quickly. chars missed in large buffs when lower
 #define NMITimeoutnS        300    //if Rx data not read within this time, deassert NMI anyway
 #define Drive_USB           1
@@ -73,19 +66,6 @@ stcIOHandlers IOHndlr_SwiftLink =
 #define IORegSwiftCommand   0x02 // Swift Emulation Command Reg
 #define IORegSwiftControl   0x03 // Swift Emulation Control Reg
 
-// status reg flags
-#define SwiftStatusIRQ      0x80     // high if ACIA caused interrupt;
-#define SwiftStatusDSR      0x40     // reflects state of DSR line
-#define SwiftStatusDCD      0x20     // reflects state of DCD line
-#define SwiftStatusTxEmpty  0x10 // high if xmit-data register is empty
-#define SwiftStatusRxFull   0x08  // high if receive-data register full
-#define SwiftStatusErrOver  0x04 // high if overrun error
-#define SwiftStatusErrFram  0x02 // high if framing error
-#define SwiftStatusErrPar   0x01  // high if parity error
-
-// command reg flags
-#define SwiftCmndRxIRQEn    0x02 // low if Rx IRQ enabled
-#define SwiftCmndDefault    0xE0 // Default command reg state
 
 extern volatile uint32_t CycleCountdown;
 extern void EEPreadNBuf(uint16_t addr, uint8_t *buf, uint8_t len);
@@ -93,15 +73,12 @@ extern void EEPwriteNBuf(uint16_t addr, const uint8_t *buf, uint8_t len);
 extern void EEPwriteStr(uint16_t addr, const char *buf);
 extern void EEPreadStr(uint16_t addr, char *buf);
 
-uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
 char *TxMsg = NULL;                          // to hold messages (AT/browser commands) when off line
+bool ConnectedToHost, PagePaused, PrintingHyperlink;
 
-uint32_t RxQueueHead, RxQueueTail, TxMsgOffset;
-bool ConnectedToHost, BrowserMode, PagePaused, PrintingHyperlink;
-uint32_t PageCharsReceived;
 uint32_t NMIassertMicros;
 volatile uint8_t SwiftTxBuf, SwiftRxBuf;
-volatile uint8_t SwiftRegStatus, SwiftRegCommand, SwiftRegControl;
+
 uint8_t PlusCount;
 uint32_t LastTxMillis = millis();
 

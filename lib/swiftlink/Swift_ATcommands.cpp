@@ -26,6 +26,7 @@
 #include <EEPROM.h>
 #include <NativeEthernet.h>
 
+#include "IOH_Swiftlink.h"
 #include "Swift_Browser.h"
 #include "Swift_RxQueue.h"
 

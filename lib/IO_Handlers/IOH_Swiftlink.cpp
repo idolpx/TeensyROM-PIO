@@ -29,9 +29,11 @@
 
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
+#include "SerUSBIO.h"
 
+#include "Swift_ATcommands.h"
 #include "Swift_Browser.h"
-
+#include "Swift_RxQueue.h"
 
 void FreeSwiftlinkBuffs()
 {

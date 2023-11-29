@@ -25,7 +25,7 @@
 
 #include <Arduino.h>
 
-#include "IOH_Swiftlink.h"
+#include "../../include/TeensyROM.h"
 
 // PETSCII Colors/Special Symbols
 #define PETSCIIpurple      0x9c
@@ -80,6 +80,8 @@ void SendASCIIErrorStrImmediate(const char* CharsToSend);
 FLASHMEM void SendCommandSummaryImmediate(bool Paused);
 FLASHMEM void SendBrowserCommandsImmediate();
 
+bool BrowserMode;
+uint32_t PageCharsReceived;
 uint8_t HexCharToInt(uint8_t HexChar);
 bool CheckAndDecode(const char *ptrChars, uint8_t *ptrRetChar);
 void UnPausePage();

@@ -26,6 +26,30 @@
 #include <Arduino.h>
 #include <IPAddress.h>
 
+#define BytesPerDot         (25*1024) //dot every 25k when downloading
+#define RxQueueNumBlocks    40 
+#define RxQueueBlockSize    (1024*8) // 40*8k=320k
+#define RxQueueSize         (RxQueueNumBlocks*RxQueueBlockSize) 
+
+// status reg flags
+#define SwiftStatusIRQ      0x80     // high if ACIA caused interrupt;
+#define SwiftStatusDSR      0x40     // reflects state of DSR line
+#define SwiftStatusDCD      0x20     // reflects state of DCD line
+#define SwiftStatusTxEmpty  0x10 // high if xmit-data register is empty
+#define SwiftStatusRxFull   0x08  // high if receive-data register full
+#define SwiftStatusErrOver  0x04 // high if overrun error
+#define SwiftStatusErrFram  0x02 // high if framing error
+#define SwiftStatusErrPar   0x01  // high if parity error
+
+// command reg flags
+#define SwiftCmndRxIRQEn    0x02 // low if Rx IRQ enabled
+#define SwiftCmndDefault    0xE0 // Default command reg state
+
+uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
+uint32_t RxQueueHead, RxQueueTail, TxMsgOffset;
+
+volatile uint8_t SwiftRegStatus, SwiftRegCommand, SwiftRegControl;
+
 uint8_t PullFromRxQueue();
 bool ReadyToSendRx();
 bool CheckRxNMITimeout();

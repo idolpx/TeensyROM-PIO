@@ -32,6 +32,7 @@
 #include "../../include/TeensyROM.h"
 #include "ISRs.h"
 #include "IOHandlers.h"
+#include "eeprom.h"
 
 #include "Menu.h"
 #include "DriveDirLoad.h"
@@ -72,9 +73,7 @@ void setup()
    
    myusbHost.begin(); // Start USBHost_t36, HUB(s) and USB devices.
 
-   uint32_t MagNumRead;
-   EEPROM.get(eepAdMagicNum, MagNumRead);
-   if (MagNumRead != eepMagicNum) SetEEPDefaults();
+   EEPcheck();
 
    IO1 = (uint8_t*)calloc(IO1_Size, sizeof(uint8_t)); //allocate IO1 space and init to 0
    IO1[rwRegStatus]        = rsReady;
@@ -136,42 +135,3 @@ void loop()
    //handler specific polling items:
    if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL) IOHandler[CurrentIOHandler]->PollingHndlr();
 }
-
-
-void EEPwriteNBuf(uint16_t addr, const uint8_t* buf, uint8_t len)
-{
-   while (len--) EEPROM.write(addr+len, buf[len]);    
-}
-
-void EEPwriteStr(uint16_t addr, const char* buf)
-{
-   EEPwriteNBuf(addr, (uint8_t*)buf, strlen(buf)+1); //include terminator    
-}
-
-void EEPreadNBuf(uint16_t addr, uint8_t* buf, uint8_t len)
-{
-   while (len--) buf[len] = EEPROM.read(addr+len);   
-}
-
-void EEPreadStr(uint16_t addr, char* buf)
-{
-   uint16_t CharNum = 0;
-   
-   do
-   {
-      buf[CharNum] = EEPROM.read(addr+CharNum); 
-   } while (buf[CharNum++] !=0); //end on termination, but include it in buffer
-}
-
-void SetEEPDefaults()
-{
-   Serial.println("Setting EEPROM to defaults");
-   EEPROM.put(eepAdMagicNum, (uint32_t)eepMagicNum);
-   EEPROM.write(eepAdPwrUpDefaults, 0x90 | rpudMusicMask /* | rpudNetTimeMask */); //default med js speed, music on, eth time synch off
-   EEPROM.write(eepAdTimezone, -7); //default to pacific time
-   EEPROM.write(eepAdNextIOHndlr, IOH_None); //default to no Special HW
-   SetEthEEPDefaults();
-}
-
-
-
