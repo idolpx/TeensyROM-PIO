@@ -2,23 +2,8 @@
 #define IOH_STRUCT_H
 
 #include <Arduino.h>
-#include <USBHost_t36.h>
-#include <MIDI.h>
-//#include <MIDIUSB.h>
 
 #define IOHNameLength 20  //limited by display location on C64
-
-#define usbDevMIDI usbMIDI
-
-USBHost myusbHost;
-USBHub hub1(myusbHost);
-USBHub hub2(myusbHost);
-
-USBDrive myDrive(myusbHost);
-USBFilesystem firstPartition(myusbHost);
-
-MIDIDevice usbHostMIDI(myusbHost);
-
 
 struct stcIOHandlers
 {

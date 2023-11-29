@@ -27,6 +27,8 @@
 
 #include "../../include/TeensyROM.h"
 
+#include "eeprom_util.h"
+
 // PETSCII Colors/Special Symbols
 #define PETSCIIpurple      0x9c
 #define PETSCIIwhite       0x05
@@ -65,6 +67,7 @@ struct stcURLParse
    char path[MaxURLPathSize];
    char postpath[MaxURLPathSize];
 };
+
 
 char *PageLinkBuff[NumPageLinkBuffs];        // hold links from tags for user selection in browser
 stcURLParse *PrevURLQueue[NumPrevURLQueues]; // For browse previous

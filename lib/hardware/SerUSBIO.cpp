@@ -22,16 +22,18 @@
 #include <Arduino.h>
 #include <SD.h>
 
-//#include "main.h"
-#include "IOHandlers.h"
 #include "../../include/TeensyROM.h"
+
+#include "FileTransfer.h"
+#include "RemoteControl.h"
+#include "ISRs.h"
+#include "IOHandlers.h"
+
 #include "FlashTxx.h"
 #include "MainMenuItems.h"
+#include "eeprom_util.h"
 
-// synch with win app:
-#define SendFileToken 0x64AA
-#define AckToken 0x64CC
-#define FailToken 0x9B7F
+
 
 FLASHMEM void ServiceSerial()
 {

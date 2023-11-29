@@ -20,8 +20,6 @@
 #ifndef IOH_MIDI_H
 #define IOH_MIDI_H
 
-#include "midiDevName.h"
-
 #include <Arduino.h>
 #include <MIDI.h>
 #include <MIDIUSB.h>

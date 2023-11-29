@@ -1,6 +1,14 @@
 
-#define AckToken                0x64CC
-#define FailToken               0x9B7F
+#include "FileTransfer.h"
+
+#include <Arduino.h>
+#include <SD.h>
+
+#include "../../include/TeensyROM.h"
+
+#include "SerUSBIO.h"
+#include "IOH_defs.h"
+
 
 FLASHMEM bool GetPathParameter(char FileNamePath[]) 
 {

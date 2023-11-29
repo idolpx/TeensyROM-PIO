@@ -71,8 +71,9 @@ uint32_t* BigBuf = NULL;
 #define NTSCBusFreq         1022730
 #define PALBusFreq          985250
 #define IO1_Size            256
-                            
 
+#define Drive_USB           1
+#define Drive_SD            2
 
 volatile uint32_t StartCycCnt, LastCycCnt=0;
    

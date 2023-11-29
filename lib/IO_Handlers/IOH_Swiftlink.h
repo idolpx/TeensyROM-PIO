@@ -56,8 +56,7 @@ stcIOHandlers IOHndlr_SwiftLink =
 
 #define C64CycBetweenRx     2300   //stops NMI from re-asserting too quickly. chars missed in large buffs when lower
 #define NMITimeoutnS        300    //if Rx data not read within this time, deassert NMI anyway
-#define Drive_USB           1
-#define Drive_SD            2
+
 
 // 6551 ACIA interface emulation
 // register locations (IO1, DExx)
@@ -91,8 +90,5 @@ void ParseHTMLTag();
 void SetEthEEPDefaults();
 void SendBrowserCommandsImmediate();
 void UnPausePage();
-
-FLASHMEM bool EthernetInit();
-FLASHMEM void SetEthEEPDefaults();
 
 #endif // IOH_SWIFTLINK_H

@@ -197,7 +197,7 @@ uint8_t ASCIItoPETSCII[128]=
  /* 127 '' */   95, // delete            ->   left arrow
 };
 
-extern bool EthernetInit();
+
 extern void MenuChange();
 extern void HandleExecution();
 extern bool PathIsRoot();
@@ -233,33 +233,6 @@ void (*StatusFunction[rsNumStatusTypes])() = //match RegStatusTypes order
    &SearchForLetter,     // rsSearchForLetter
    &LoadMainSIDforXfer,  // rsLoadSIDforXfer
 };
-
-
-//MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
-
-#define NUM_VOICES 3
-const char NoteName[12][3] ={" a","a#"," b"," c","c#"," d","d#"," e"," f","f#"," g","g#"};
-
-struct stcVoiceInfo
-{
-  bool Available;
-  uint16_t  NoteNumUsing;
-};
-
-stcVoiceInfo Voice[NUM_VOICES]=
-{  //voice table for poly synth
-   true, 0,
-   true, 0,
-   true, 0,
-};
-
-int FindVoiceUsingNote(int NoteNum);
-int FindFreeVoice();
-
-void M2SOnNoteOn(uint8_t channel, uint8_t note, uint8_t velocity);
-void M2SOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity);
-void M2SOnControlChange(uint8_t channel, uint8_t control, uint8_t value);
-void M2SOnPitchChange(uint8_t channel, int pitch);
 
 
 #endif // IOH_TEENSYROM_H

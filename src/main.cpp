@@ -30,9 +30,11 @@
 #include <NativeEthernetUdp.h>
 
 #include "../../include/TeensyROM.h"
+
+#include "midi2sid.h"
 #include "ISRs.h"
 #include "IOHandlers.h"
-#include "eeprom.h"
+#include "eeprom_util.h"
 
 #include "Menu.h"
 #include "DriveDirLoad.h"
@@ -40,6 +42,8 @@
 #include "MainMenuItems.h"
 #include "RemoteControl.h"
 
+#include "Swift_Browser.h"
+#include "Swift_RxQueue.h"
 
 uint8_t RAM_Image[RAM_ImageSize]; //Main RAM1 file storage buffer
 volatile uint8_t EmulateVicCycles = false;
