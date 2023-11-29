@@ -22,6 +22,8 @@
 #ifndef MENU_REGS_H
 #define MENU_REGS_H
 
+#include <Arduino.h>
+
 #define MaxItemDispLength 35
 #define MaxItemsPerPage 19
 
@@ -56,10 +58,10 @@ enum IO1_Registers // offset from 0xDE00
     rwRegSIDSpeedHi = 26,      // SID Play Info: CIA interrupt timer speed Hi
     rwRegSIDSpeedLo = 27,      // SID Play Info: CIA interrupt timer speed Lo
     wRegVid_TOD_Clks = 28,     // C64/128 Video Standard and TOD clock frequencies
-   wRegIRQ_ACK         = 29 , // IRQ Ack from C64 app
-   rwRegIRQ_CMD        = 30 , // IRQ Command from TeensyROM
+    wRegIRQ_ACK = 29,          // IRQ Ack from C64 app
+    rwRegIRQ_CMD = 30,         // IRQ Command from TeensyROM
 
-   StartSIDRegs        = 31 , // start of SID Regs, matching SID Reg order ($D400)
+    StartSIDRegs = 31, // start of SID Regs, matching SID Reg order ($D400)
     rRegSIDFreqLo1 = StartSIDRegs + 0,
     rRegSIDFreqHi1 = StartSIDRegs + 1,
     rRegSIDDutyLo1 = StartSIDRegs + 2,
@@ -100,12 +102,12 @@ enum IO1_Registers // offset from 0xDE00
 
 };
 
-enum RegIRQCommands       //rwRegIRQ_CMD, echoed to wRegIRQ_ACK
+enum RegIRQCommands // rwRegIRQ_CMD, echoed to wRegIRQ_ACK
 {
-   ricmdNone           = 0, // no command, always 0 (init)
-   ricmdAck1           = 1, // Ack1 response from C64 IRQ routine
-   ricmdLaunch         = 2, // Launch app (set up before IRQ assert)
-   ricmdSIDPause       = 3, // SID pause/play
+    ricmdNone = 0,     // no command, always 0 (init)
+    ricmdAck1 = 1,     // Ack1 response from C64 IRQ routine
+    ricmdLaunch = 2,   // Launch app (set up before IRQ assert)
+    ricmdSIDPause = 3, // SID pause/play
 };
 
 enum RegSerialStringSelect // rwRegSerialString
@@ -185,11 +187,10 @@ enum regItemTypes // synch with TblItemType
 
 //   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  End C64 matching  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
 struct StructMenuItem
 {
     unsigned char ItemType; // 1  regItemTypes
-  uint8_t IOHndlrAssoc;         //1  enumIOHandlers (Teensy Mem Menu only)
+    uint8_t IOHndlrAssoc;   // 1  enumIOHandlers (Teensy Mem Menu only)
     char *Name;             // 4
     uint8_t *Code_Image;    // 1
     uint32_t Size;          // 4
@@ -216,7 +217,6 @@ enum enumIOHandlers // Synch order/qty with IOHandler[] (IOHandlers.h)
     IOH_EasyFlash,
     IOH_ZaxxonSuper,
 
-   
     IOH_Num_Handlers // always last
 };
 

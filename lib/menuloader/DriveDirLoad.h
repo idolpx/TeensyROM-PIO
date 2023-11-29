@@ -217,7 +217,7 @@ bool SetTypeFromCRT(StructMenuItem *MyMenuItem, uint8_t EXROM, uint8_t GAME);
 // Big endian byte to int conversions:
 uint32_t toU32(uint8_t *src);
 uint16_t toU16(uint8_t *src);
-uint8_t Assoc_Ext_ItemType(char *FileName, uint32_t Length);
+uint8_t Assoc_Ext_ItemType(char * FileName);
 bool AssocHWID_IOH(uint16_t HWType);
 void SendMsgOK();
 void SendMsgFailed();

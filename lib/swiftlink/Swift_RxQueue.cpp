@@ -25,6 +25,11 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "../../include/TeensyROM.h"
+
+#include "eeprom_util.h"
+#include "IOH_TeensyROM.h"
+#include "Swift_Browser.h"
 
 uint8_t PullFromRxQueue()
 {  //assumes queue data is available before calling

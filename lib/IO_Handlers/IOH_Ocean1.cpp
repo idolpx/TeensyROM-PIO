@@ -19,8 +19,8 @@
 
 #include "IOH_Ocean1.h"
 
-#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
+#include "IOH_TeensyROM.h"
 
 void InitHndlr_Ocean1()
 {

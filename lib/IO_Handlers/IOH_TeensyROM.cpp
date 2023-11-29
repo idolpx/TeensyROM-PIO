@@ -25,6 +25,7 @@
 #include <EEPROM.h>
 
 #include "ethernet_dev.h"
+#include "midi2sid.h"
 
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"

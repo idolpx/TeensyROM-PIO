@@ -5,7 +5,9 @@
 
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
-
+#include "IOHandlers.h"
+#include "IOH_TeensyROM.h"
+#include "IOH_Swiftlink.h"
 
 void SetUpMainMenuROM()
 {

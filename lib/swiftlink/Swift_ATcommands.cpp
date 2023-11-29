@@ -24,13 +24,14 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <NativeEthernet.h>
+
+#include "ethernet_dev.h"
 
 #include "IOH_Swiftlink.h"
 #include "Swift_Browser.h"
 #include "Swift_RxQueue.h"
 
-EthernetClient client;
+
 
 #define MaxATcmdLength   20
 

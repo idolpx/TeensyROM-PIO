@@ -55,6 +55,8 @@
 #define MaxURLHostSize      100
 #define MaxURLPathSize      300
 
+#define MaxTagSize          300
+#define TxMsgMaxSize        128
 #define NumPageLinkBuffs    99
 #define NumPrevURLQueues    8
 
@@ -68,7 +70,7 @@ struct stcURLParse
    char postpath[MaxURLPathSize];
 };
 
-
+char *TxMsg = NULL;                          // to hold messages (AT/browser commands) when off line
 char *PageLinkBuff[NumPageLinkBuffs];        // hold links from tags for user selection in browser
 stcURLParse *PrevURLQueue[NumPrevURLQueues]; // For browse previous
 char CurrPageTitle[eepBMTitleSize];          // keep current page title, could move to RAM2
@@ -83,7 +85,7 @@ void SendASCIIErrorStrImmediate(const char* CharsToSend);
 FLASHMEM void SendCommandSummaryImmediate(bool Paused);
 FLASHMEM void SendBrowserCommandsImmediate();
 
-bool BrowserMode;
+bool BrowserMode, PagePaused, PrintingHyperlink;
 uint32_t PageCharsReceived;
 uint8_t HexCharToInt(uint8_t HexChar);
 bool CheckAndDecode(const char *ptrChars, uint8_t *ptrRetChar);

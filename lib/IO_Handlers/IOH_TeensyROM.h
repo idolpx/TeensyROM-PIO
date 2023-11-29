@@ -48,6 +48,8 @@ stcIOHandlers IOHndlr_TeensyROM =
   NULL,                     //called at the end of EVERY c64 cycle
 };
 
+volatile uint8_t EmulateVicCycles;
+
 volatile uint8_t* IO1;  //io1 space/regs
 volatile uint16_t StreamOffsetAddr, StringOffset = 0;
 volatile char*    ptrSerialString; //pointer to selected serialstring
@@ -220,19 +222,5 @@ void MakeBuildCPUInfoStr();
 void UpDirectory();
 void SearchForLetter();
 void LoadMainSIDforXfer();
-
-void (*StatusFunction[rsNumStatusTypes])() = //match RegStatusTypes order
-{
-   &MenuChange,          // rsChangeMenu 
-   &HandleExecution,     // rsStartItem  
-   &getNtpTime,          // rsGetTime    
-   &IOHandlerInitToNext, // rsIOHWinit   
-   &WriteEEPROM,         // rsWriteEEPROM
-   &MakeBuildCPUInfoStr, // rsMakeBuildCPUInfoStr
-   &UpDirectory,         // rsUpDirectory
-   &SearchForLetter,     // rsSearchForLetter
-   &LoadMainSIDforXfer,  // rsLoadSIDforXfer
-};
-
 
 #endif // IOH_TEENSYROM_H

@@ -183,4 +183,6 @@ enum Phi2ISRStates
    P2I_TimingCheck,
 };
 
+volatile uint32_t CycleCountdown;
+
 #endif // TEENSYROM_H

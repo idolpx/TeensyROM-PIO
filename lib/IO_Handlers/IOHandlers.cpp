@@ -23,6 +23,7 @@
 
 #include "../../include/TeensyROM.h"
 
+#include "midi2sid.h"
 #include "IOH_defs.h"
 
 void IOHandlerInitToNext()

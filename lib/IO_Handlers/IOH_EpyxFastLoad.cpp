@@ -21,11 +21,11 @@
 
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
+#include "IOH_TeensyROM.h"
 
 #define EpyxMaxCycleCount  512 //Numer for C64 clock cycles to disable Epyx
 #define EpyxFastLoadCycleReset {SetExROMAssert;if(CycleCountdown<EpyxMaxCycleCount)CycleCountdown=EpyxMaxCycleCount;}  //don't interfere with long count set at init
 
-volatile uint32_t CycleCountdown=0;
 
 void InitHndlr_EpyxFastLoad()
 {

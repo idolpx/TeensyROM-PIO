@@ -28,8 +28,6 @@
 uint8_t *BankDecode[NumDecodeBanks][2];
 uint8_t EZFlashRAM[256];
 
-extern volatile uint8_t EmulateVicCycles;
-
 void InitHndlr_EasyFlash();  
 void IO1Hndlr_EasyFlash(uint8_t Address, bool R_Wn);  
 void IO2Hndlr_EasyFlash(uint8_t Address, bool R_Wn);  

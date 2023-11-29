@@ -46,7 +46,6 @@
 #include "Swift_RxQueue.h"
 
 uint8_t RAM_Image[RAM_ImageSize]; //Main RAM1 file storage buffer
-volatile uint8_t EmulateVicCycles = false;
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
 extern float tempmonGetTemp(void);

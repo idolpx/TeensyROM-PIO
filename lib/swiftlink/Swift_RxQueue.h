@@ -45,6 +45,11 @@
 #define SwiftCmndRxIRQEn    0x02 // low if Rx IRQ enabled
 #define SwiftCmndDefault    0xE0 // Default command reg state
 
+#define NMITimeoutnS        300    //if Rx data not read within this time, deassert NMI anyway
+
+uint32_t NMIassertMicros;
+volatile uint8_t SwiftTxBuf, SwiftRxBuf;
+
 uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
 uint32_t RxQueueHead, RxQueueTail, TxMsgOffset;
 

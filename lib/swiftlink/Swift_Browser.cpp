@@ -26,6 +26,9 @@
 #include <SD.h>
 #include <Dns.h>
 
+#include "ethernet_dev.h"
+#include "midi2sid.h"
+
 #include "IOH_TeensyROM.h"
 #include "Swift_RxQueue.h"
 

@@ -21,6 +21,7 @@
 
 #include "../../include/TeensyROM.h"
 
+#include "midi2sid.h"
 #include "IOH_defs.h"
 
 //MIDI input handlers for Debug _________________________________________________________________________

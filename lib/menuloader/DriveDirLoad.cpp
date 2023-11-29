@@ -23,10 +23,14 @@
 #include <SD.h>
 #include <EEPROM.h>
 
+#include "../../include/TeensyROM.h"
+
+#include "midi2sid.h"
+#include "eeprom_util.h"
 #include "Menu.h"
 #include "Menu_Regs.h"
 #include "MainMenuItems.h"
-#include "../../include/TeensyROM.h"
+
 #include "IOHandlers.h"
 #include "FlashUpdate.h"
 

@@ -6,6 +6,7 @@
 #include <NativeEthernetUdp.h>
 
 EthernetUDP udp;
+EthernetClient client;
 
 FLASHMEM bool EthernetInit();
 

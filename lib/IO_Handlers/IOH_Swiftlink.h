@@ -24,13 +24,11 @@
 #define IOH_SWIFTLINK_H
 
 #include <Arduino.h>
-#include <NativeEthernet.h>
 
 #include "../../include/TeensyROM.h"
 
 #include "IOH_defs.h"
 
-extern EthernetClient client;
 
 void FreeSwiftlinkBuffs();
 void IO1Hndlr_SwiftLink(uint8_t Address, bool R_Wn);
@@ -51,11 +49,10 @@ stcIOHandlers IOHndlr_SwiftLink =
 };
 
 
-#define MaxTagSize          300
-#define TxMsgMaxSize        128
+
 
 #define C64CycBetweenRx     2300   //stops NMI from re-asserting too quickly. chars missed in large buffs when lower
-#define NMITimeoutnS        300    //if Rx data not read within this time, deassert NMI anyway
+
 
 
 // 6551 ACIA interface emulation
@@ -66,17 +63,10 @@ stcIOHandlers IOHndlr_SwiftLink =
 #define IORegSwiftControl   0x03 // Swift Emulation Control Reg
 
 
-extern volatile uint32_t CycleCountdown;
-extern void EEPreadNBuf(uint16_t addr, uint8_t *buf, uint8_t len);
-extern void EEPwriteNBuf(uint16_t addr, const uint8_t *buf, uint8_t len);
-extern void EEPwriteStr(uint16_t addr, const char *buf);
-extern void EEPreadStr(uint16_t addr, char *buf);
 
-char *TxMsg = NULL;                          // to hold messages (AT/browser commands) when off line
-bool ConnectedToHost, PagePaused, PrintingHyperlink;
+bool ConnectedToHost;
 
-uint32_t NMIassertMicros;
-volatile uint8_t SwiftTxBuf, SwiftRxBuf;
+
 
 uint8_t PlusCount;
 uint32_t LastTxMillis = millis();

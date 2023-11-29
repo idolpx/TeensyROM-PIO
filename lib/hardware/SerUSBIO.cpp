@@ -33,36 +33,35 @@
 #include "MainMenuItems.h"
 #include "eeprom_util.h"
 
-
-
 FLASHMEM void ServiceSerial()
 {
     uint8_t inByte = Serial.read();
     switch (inByte)
     {
     case 0x64: //'d' command from app
-         if(!SerialAvailabeTimeout()) return;
+        if (!SerialAvailabeTimeout())
+            return;
         inByte = Serial.read(); // READ NEXT BYTE
-         //only commands available when busy:
-         if (inByte == 0xEE) //Reset C64
+        // only commands available when busy:
+        if (inByte == 0xEE) // Reset C64
         {
             Serial.println("Reset cmd received");
             BtnPressed = true;
             return;
         }
-         else if (inByte == 0x44) //Launch File
-         {
+        else if (inByte == 0x44) // Launch File
+        {
             LaunchFile();
             return;
-         }
-         
+        }
+
         if (CurrentIOHandler != IOH_TeensyROM)
         {
             SendU16(FailToken);
             Serial.print("Busy!\n");
             return;
         }
-         //TeensyROM IO Handler is active...
+        // TeensyROM IO Handler is active...
 
         switch (inByte)
         {
@@ -70,22 +69,24 @@ FLASHMEM void ServiceSerial()
             Serial.printf("TeensyROM %s ready!\n", strVersionNumber);
             break;
         case 0xAA: // file x-fer pc->TR
-            case 0xBB:  // v2 file x-fer pc->TR.  For use with v2 UI.
-               PostFileCommand();
+        case 0xBB: // v2 file x-fer pc->TR.  For use with v2 UI.
+            PostFileCommand();
             break;
-            case 0xDD:  // v2 directory listing from TR
-               GetDirectoryCommand();
-               break;
-            case 0x66: //Pause SID
-               if(RemotePauseSID()) SendU16(AckToken);
-               else SendU16(FailToken);
-               break;
-            case 0x67: //'dg'Test/debug
+        case 0xDD: // v2 directory listing from TR
+            GetDirectoryCommand();
+            break;
+        case 0x66: // Pause SID
+            if (RemotePauseSID())
+                SendU16(AckToken);
+            else
+                SendU16(FailToken);
+            break;
+        case 0x67: //'dg'Test/debug
             // for (int a=0; a<256; a++) Serial.printf("\n%3d, // %3d   '%c'", ToPETSCII(a), a, a);
             PrintDebugLog();
             break;
         default:
-               Serial.printf("Unk cmd: 0x64%02x\n", inByte); 
+            Serial.printf("Unk cmd: 0x64%02x\n", inByte);
             break;
         }
         break;
@@ -117,7 +118,8 @@ FLASHMEM void ServiceSerial()
         uint32_t TotalSize = 0;
         if (DriveDirMenu != NULL)
         {
-               for(uint16_t Num=0; Num < NumDrvDirMenuItems; Num++) TotalSize += strlen(DriveDirMenu[Num].Name)+1;
+            for (uint16_t Num = 0; Num < NumDrvDirMenuItems; Num++)
+                TotalSize += strlen(DriveDirMenu[Num].Name) + 1;
             Serial.printf("Filenames: %lu (%luk) @ $%08x\nDriveDirMenu: %lu (%luk) @ $%08x\n",
                           TotalSize, TotalSize / 1024, (uint32_t)DriveDirMenu[0].Name,
                           MaxMenuItems * sizeof(StructMenuItem), MaxMenuItems * sizeof(StructMenuItem) / 1024, (uint32_t)DriveDirMenu);
@@ -139,10 +141,12 @@ FLASHMEM void ServiceSerial()
                 TotalStructSize += TeensyROMMenu[ROMNum].Size;
                 for (uint8_t subROMNum = 0; subROMNum < TeensyROMMenu[ROMNum].Size / sizeof(StructMenuItem); subROMNum++)
                 {
-                     if(subTROMMenu[subROMNum].ItemType != rtDirectory) AddAndCheckSource(subTROMMenu[subROMNum], &TotalSize);
+                    if (subTROMMenu[subROMNum].ItemType != rtDirectory)
+                        AddAndCheckSource(subTROMMenu[subROMNum], &TotalSize);
                 }
             }
-               else AddAndCheckSource(TeensyROMMenu[ROMNum], &TotalSize);
+            else
+                AddAndCheckSource(TeensyROMMenu[ROMNum], &TotalSize);
         }
         Serial.printf("TeensyROMMenu/sub struct: %lu (%luk) @ $%08x\n",
                       TotalStructSize, TotalStructSize / 1024, (uint32_t)TeensyROMMenu);
@@ -156,10 +160,12 @@ FLASHMEM void ServiceSerial()
         while (1)
         {
             ptrChip[ChipNum] = (char *)malloc(8192);
-               if (ptrChip[ChipNum] == NULL) break;
+            if (ptrChip[ChipNum] == NULL)
+                break;
             ChipNum++;
         }
-            for(uint16_t Cnt=0; Cnt < ChipNum; Cnt++) free(ptrChip[Cnt]);
+        for (uint16_t Cnt = 0; Cnt < ChipNum; Cnt++)
+            free(ptrChip[Cnt]);
         Serial.printf("Created/freed %d  8k blocks (%dk total) in RAM2\n", ChipNum, ChipNum * 8);
     }
     break;
@@ -204,10 +210,10 @@ FLASHMEM void ServiceSerial()
             32, 32, 32, 32, 32, 18, 149, 191, 146, 32, 32, 151, 191, 32, 32, 32, 32, 18, 149, 188, 146, 32, 32, 18, 151, 190, 146, 32, 32, 32, 149, 190,
             18, 190, 151, 162, 162, 188, 146, 152, 188, 32, 32, 32, 18, 149, 191, 151, 32, 146, 191, 13, 13, 32, 32, 32, 195, 85, 82, 82, 69, 78, 84, 76,
             89, 32, 68, 79, 87, 78, 32, 70, 79, 82, 32, 77, 65, 73, 78, 84, 69, 78, 65, 78, 67, 69, 44, 13, 32, 32, 32, 32, 32, 32, 80, 76,
-            69,65,83,69,32,67,65,76,76,32,66,65,67,75,32,76,65,84,69,82,46,13,13,13,13,13,13
-            };
+            69, 65, 83, 69, 32, 67, 65, 76, 76, 32, 66, 65, 67, 75, 32, 76, 65, 84, 69, 82, 46, 13, 13, 13, 13, 13, 13};
 
-            for(uint16_t Cnt=0; Cnt<sizeof(inbuf); Cnt++) AddRawCharToRxQueue(inbuf[Cnt]);
+        for (uint16_t Cnt = 0; Cnt < sizeof(inbuf); Cnt++)
+            AddRawCharToRxQueue(inbuf[Cnt]);
     }
     break;
     case 'p':
@@ -232,17 +238,20 @@ FLASHMEM void ServiceSerial()
 
         Serial.printf("Swiftlink status:\n");
         Serial.printf("  client is");
-            if (!client.connected()) Serial.printf(stNot);
+        if (!client.connected())
+            Serial.printf(stNot);
         Serial.printf(" connected\n");
 
         Serial.printf("  Rx Queue Used: %d\n", RxQueueUsed);
 
         Serial.printf("  RxIRQ is");
-            if((SwiftRegCommand & SwiftCmndRxIRQEn) != 0) Serial.printf(stNot); 
+        if ((SwiftRegCommand & SwiftCmndRxIRQEn) != 0)
+            Serial.printf(stNot);
         Serial.printf(" enabled\n");
 
         Serial.printf("  RxIRQ is");
-            if((SwiftRegStatus & (SwiftStatusRxFull | SwiftStatusIRQ)) == 0) Serial.printf(stNot); 
+        if ((SwiftRegStatus & (SwiftStatusRxFull | SwiftStatusIRQ)) == 0)
+            Serial.printf(stNot);
         Serial.printf(" set\n");
     }
     break;
@@ -283,7 +292,6 @@ FLASHMEM void ServiceSerial()
         Serial.printf(" nS_VICStart(tv)  %03d\n", nS_VICStart);
         break;
 #endif
-   
     }
 }
 
@@ -346,7 +354,8 @@ FLASHMEM void PrintDebugLog()
 
     bool BufferFull = (BigBufCount == BigBufSize);
 
-   if  (BufferFull) BigBufCount--; //last element invalid
+    if (BufferFull)
+        BigBufCount--; // last element invalid
 
     for (uint16_t Cnt = 0; Cnt < BigBufCount; Cnt++)
     {
@@ -372,52 +381,59 @@ FLASHMEM void PrintDebugLog()
         {
             Serial.printf("%s 0xde%02x : ", (BigBuf[Cnt] & IOTLRead) ? "Read" : "\t\t\t\tWrite", BigBuf[Cnt] & 0xff);
 
-         if (BigBuf[Cnt] & IOTLDataValid) Serial.printf("%02x\n", (BigBuf[Cnt]>>8) & 0xff); //data is valid
-         else Serial.printf("n/a\n");
+            if (BigBuf[Cnt] & IOTLDataValid)
+                Serial.printf("%02x\n", (BigBuf[Cnt] >> 8) & 0xff); // data is valid
+            else
+                Serial.printf("n/a\n");
         }
     }
 
-   if (BigBufCount == 0) Serial.println("Buffer empty");
-   if (BufferFull) Serial.println("Buffer was full");
+    if (BigBufCount == 0)
+        Serial.println("Buffer empty");
+    if (BufferFull)
+        Serial.println("Buffer was full");
     Serial.println("Buffer Reset");
     BigBufCount = 0;
 }
 
+FLASHMEM bool ReceiveFileName(uint32_t *SD_nUSB, char *FileNamePath)
+{
+    if (!GetUInt(SD_nUSB, 1))
+        return false;
+
+    uint16_t CharNum = 0;
+    while (1)
+    {
+        if (!SerialAvailabeTimeout())
+            return false;
+        FileNamePath[CharNum] = Serial.read();
+        if (FileNamePath[CharNum] == 0)
+            return true;
+        if (++CharNum == MaxNamePathLength)
+        {
+            SendU16(FailToken);
+            Serial.print("Path too long!\n");
+            return false;
+        }
+    }
+}
+
 FLASHMEM void LaunchFile()
 {
-   //   App: LaunchFileToken 0x6444
+    //   App: LaunchFileToken 0x6444
     // Teensy: AckToken 0x64CC
-   //   App: Send SD_nUSB(1), DestPath/Name(up to MaxNamePathLength, null term)
+    //   App: Send SD_nUSB(1), DestPath/Name(up to MaxNamePathLength, null term)
     // Teensy: AckToken 0x64CC
 
-   //Launch file token has been received, only 2 byte responses until after final response
+    // Launch file token has been received, only 2 byte responses until after final response
     SendU16(AckToken);
 
     uint32_t SD_nUSB;
     char FileNamePath[MaxNamePathLength];
-   if (ReceiveFileName(&SD_nUSB, FileNamePath))
+    if (ReceiveFileName(&SD_nUSB, FileNamePath))
     {
-      RemoteLaunch(SD_nUSB !=0 , FileNamePath);
-      SendU16(AckToken);
-        }
-    }
-
-FLASHMEM bool ReceiveFileName(uint32_t *SD_nUSB, char *FileNamePath)
-    {
-   if (!GetUInt(SD_nUSB, 1)) return false;
-
-   uint16_t CharNum=0;
-   while (1) 
-    {
-      if(!SerialAvailabeTimeout()) return false;
-      FileNamePath[CharNum] = Serial.read();
-      if (FileNamePath[CharNum]==0) return true;
-      if (++CharNum == MaxNamePathLength)
-        {
-            SendU16(FailToken);
-         Serial.print("Path too long!\n");  
-         return false;
-        }
+        RemoteLaunch(SD_nUSB != 0, FileNamePath);
+        SendU16(AckToken);
     }
 }
 
@@ -426,7 +442,8 @@ FLASHMEM bool GetUInt(uint32_t *InVal, uint8_t NumBytes)
     *InVal = 0;
     for (int8_t ByteNum = NumBytes - 1; ByteNum >= 0; ByteNum--)
     {
-      if(!SerialAvailabeTimeout()) return false;
+        if (!SerialAvailabeTimeout())
+            return false;
         uint32_t ByteIn = Serial.read();
         *InVal += (ByteIn << (ByteNum * 8));
     }
@@ -443,8 +460,10 @@ FLASHMEM bool SerialAvailabeTimeout()
 {
     uint32_t StartTOMillis = millis();
 
-   while(!Serial.available() && (millis() - StartTOMillis) < SerialTimoutMillis); // timeout loop
-   if (Serial.available()) return(true);
+    while (!Serial.available() && (millis() - StartTOMillis) < SerialTimoutMillis)
+        ; // timeout loop
+    if (Serial.available())
+        return (true);
 
     SendU16(FailToken);
     Serial.print("Timeout!\n");
@@ -537,13 +556,14 @@ FLASHMEM void memInfo()
 #endif
 }
 
+FLASHMEM void getFreeITCM()
+{ // end of CODE ITCM, skip full 32 bits
 
-uint32_t *ptrFreeITCM;   // Set to Usable ITCM free RAM
-uint32_t sizeofFreeITCM; // sizeof free RAM in uint32_t units.
-uint32_t SizeLeft_etext;
-extern char _stext[], _etext[];
+    uint32_t *ptrFreeITCM;   // Set to Usable ITCM free RAM
+    uint32_t sizeofFreeITCM; // sizeof free RAM in uint32_t units.
+    uint32_t SizeLeft_etext;
+    extern char _stext[], _etext[];
 
-FLASHMEM void  getFreeITCM() { // end of CODE ITCM, skip full 32 bits
     Serial.println("\ngetFreeITCM:");
     SizeLeft_etext = (32 * 1024) - (((uint32_t)&_etext - (uint32_t)&_stext) % (32 * 1024));
     sizeofFreeITCM = SizeLeft_etext - 4;
@@ -552,10 +572,10 @@ FLASHMEM void  getFreeITCM() { // end of CODE ITCM, skip full 32 bits
     printf("Size of Free ITCM in Bytes = %u\n", sizeofFreeITCM * sizeof(ptrFreeITCM[0]));
     printf("Start of Free ITCM = %u [%X] \n", ptrFreeITCM, ptrFreeITCM);
     printf("End of Free ITCM = %u [%X] \n", ptrFreeITCM + sizeofFreeITCM, ptrFreeITCM + sizeofFreeITCM);
-  for ( uint32_t ii = 0; ii < sizeofFreeITCM; ii++) ptrFreeITCM[ii] = 1;
+    for (uint32_t ii = 0; ii < sizeofFreeITCM; ii++)
+        ptrFreeITCM[ii] = 1;
     uint32_t jj = 0;
-  for ( uint32_t ii = 0; ii < sizeofFreeITCM; ii++) jj += ptrFreeITCM[ii];
+    for (uint32_t ii = 0; ii < sizeofFreeITCM; ii++)
+        jj += ptrFreeITCM[ii];
     printf("ITCM DWORD cnt = %u [#bytes=%u] \n", jj, jj * 4);
 }
-
-

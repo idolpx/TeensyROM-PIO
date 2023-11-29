@@ -6,6 +6,7 @@
 
 #include "../../include/TeensyROM.h"
 
+#include "midi2sid.h"
 #include "SerUSBIO.h"
 #include "IOH_defs.h"
 

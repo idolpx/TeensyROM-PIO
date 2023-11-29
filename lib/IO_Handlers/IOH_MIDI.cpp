@@ -22,6 +22,7 @@
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
+#include "midi2sid.h"
 #include "IOH_defs.h"
 
 // MIDI input handlers for HW Emulation _________________________________________________________________________
