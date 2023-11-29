@@ -4,6 +4,6 @@
 
 #include <FS.h>
 
-void DoFlashUpdate(FS *sourceFS, const char *FilePathName);
+void DoFlashUpdate (FS *sourceFS, const char *FilePathName);
 
 #endif // FLASHUPDATE_H

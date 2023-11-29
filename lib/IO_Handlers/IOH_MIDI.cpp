@@ -39,11 +39,11 @@ void SetMidiIRQ()
     {
         MIDIRxBytesToSend = 0;
         if ((MIDIRxBuf[0] & 0xf0) != 0xf0)
-            Printf_dbg("IRQ off\n"); // don't print on real-time inputs (there are lots)
+            Printf_dbg ("IRQ off\n"); // don't print on real-time inputs (there are lots)
     }
 }
 
-void HWEOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
+void HWEOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity)
 {
     MIDIRxBuf[2] = 0x80 | channel; // 8x
     MIDIRxBuf[1] = note;
@@ -52,7 +52,7 @@ void HWEOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
     SetMidiIRQ();
 }
 
-void HWEOnNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
+void HWEOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity)
 {
     MIDIRxBuf[2] = 0x90 | channel; // 9x
     MIDIRxBuf[1] = note;
@@ -61,7 +61,7 @@ void HWEOnNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
     SetMidiIRQ();
 }
 
-void HWEOnAfterTouchPoly(uint8_t channel, uint8_t note, uint8_t velocity)
+void HWEOnAfterTouchPoly (uint8_t channel, uint8_t note, uint8_t velocity)
 {
     MIDIRxBuf[2] = 0xa0 | channel; // Ax
     MIDIRxBuf[1] = note;
@@ -70,7 +70,7 @@ void HWEOnAfterTouchPoly(uint8_t channel, uint8_t note, uint8_t velocity)
     SetMidiIRQ();
 }
 
-void HWEOnControlChange(uint8_t channel, uint8_t control, uint8_t value)
+void HWEOnControlChange (uint8_t channel, uint8_t control, uint8_t value)
 {
     // did this to accomodate relative mode, but turns out it's not so widely used...
     // if (value==64) return; //sends ref first, always 64 so just assume it
@@ -88,7 +88,7 @@ void HWEOnControlChange(uint8_t channel, uint8_t control, uint8_t value)
     SetMidiIRQ();
 }
 
-void HWEOnProgramChange(uint8_t channel, uint8_t program)
+void HWEOnProgramChange (uint8_t channel, uint8_t program)
 {
     MIDIRxBuf[1] = 0xc0 | channel; // Cx
     MIDIRxBuf[0] = program;
@@ -96,7 +96,7 @@ void HWEOnProgramChange(uint8_t channel, uint8_t program)
     SetMidiIRQ();
 }
 
-void HWEOnAfterTouch(uint8_t channel, uint8_t pressure)
+void HWEOnAfterTouch (uint8_t channel, uint8_t pressure)
 {
     MIDIRxBuf[1] = 0xd0 | channel; // Dx
     MIDIRxBuf[0] = pressure;
@@ -104,7 +104,7 @@ void HWEOnAfterTouch(uint8_t channel, uint8_t pressure)
     SetMidiIRQ();
 }
 
-void HWEOnPitchChange(uint8_t channel, int pitch)
+void HWEOnPitchChange (uint8_t channel, int pitch)
 {
     //-8192 to 8192, returns to 0 always
     pitch += 8192;
@@ -117,7 +117,7 @@ void HWEOnPitchChange(uint8_t channel, int pitch)
 }
 
 // F0 SysEx single call, message larger than buffer is truncated
-void HWEOnSystemExclusive(uint8_t *data, unsigned int size)
+void HWEOnSystemExclusive (uint8_t *data, unsigned int size)
 {
     // data already contains starting f0 and ending f7
     // just have to reverse the order to the RxBuf "stack"
@@ -126,13 +126,13 @@ void HWEOnSystemExclusive(uint8_t *data, unsigned int size)
     MIDIRxBytesToSend = size;
     SetMidiIRQ();
 
-#ifdef DbgMsgs_IO
+    #ifdef DbgMsgs_IO
     if (data[0] != 0xf0 || data[size - 1] != 0xf7)
-        Printf_dbg("Bad SysEx: %d %02x %02x\n", size, data[0], data[size - 1]);
-#endif
+        Printf_dbg ("Bad SysEx: %d %02x %02x\n", size, data[0], data[size - 1]);
+    #endif
 }
 
-void HWEOnTimeCodeQuarterFrame(uint8_t data)
+void HWEOnTimeCodeQuarterFrame (uint8_t data)
 {
     MIDIRxBuf[1] = 0xf1; // F1
     MIDIRxBuf[0] = data; // won't have bit 7 set
@@ -140,7 +140,7 @@ void HWEOnTimeCodeQuarterFrame(uint8_t data)
     SetMidiIRQ();
 }
 
-void HWEOnSongPosition(uint16_t beats)
+void HWEOnSongPosition (uint16_t beats)
 {
     MIDIRxBuf[2] = 0xf2;         // F2
     MIDIRxBuf[1] = beats & 0x7f; // not sure if this is correct format?
@@ -149,7 +149,7 @@ void HWEOnSongPosition(uint16_t beats)
     SetMidiIRQ();
 }
 
-void HWEOnSongSelect(uint8_t songnumber)
+void HWEOnSongSelect (uint8_t songnumber)
 {
     MIDIRxBuf[1] = 0xf3; // F3
     MIDIRxBuf[0] = songnumber;
@@ -165,7 +165,7 @@ void HWEOnTuneRequest()
 }
 
 // F8-FF (except FD)
-void HWEOnRealTimeSystem(uint8_t realtimebyte)
+void HWEOnRealTimeSystem (uint8_t realtimebyte)
 {
     MIDIRxBuf[0] = realtimebyte;
     MIDIRxBytesToSend = 1;
@@ -181,35 +181,35 @@ void MIDIinHndlrInit()
     // for (uint8_t ContNum=0; ContNum < NumMIDIControls;) MIDIControlVals[ContNum++]=63;
 
     // MIDI USB Host input handlers
-    usbHostMIDI.setHandleNoteOff(HWEOnNoteOff);                           // 8x
-    usbHostMIDI.setHandleNoteOn(HWEOnNoteOn);                             // 9x
-    usbHostMIDI.setHandleAfterTouchPoly(HWEOnAfterTouchPoly);             // Ax
-    usbHostMIDI.setHandleControlChange(HWEOnControlChange);               // Bx
-    usbHostMIDI.setHandleProgramChange(HWEOnProgramChange);               // Cx
-    usbHostMIDI.setHandleAfterTouch(HWEOnAfterTouch);                     // Dx
-    usbHostMIDI.setHandlePitchChange(HWEOnPitchChange);                   // Ex
-    usbHostMIDI.setHandleSystemExclusive(HWEOnSystemExclusive);           // F0
-    usbHostMIDI.setHandleTimeCodeQuarterFrame(HWEOnTimeCodeQuarterFrame); // F1
-    usbHostMIDI.setHandleSongPosition(HWEOnSongPosition);                 // F2
-    usbHostMIDI.setHandleSongSelect(HWEOnSongSelect);                     // F3
-    usbHostMIDI.setHandleTuneRequest(HWEOnTuneRequest);                   // F6
-    usbHostMIDI.setHandleRealTimeSystem(HWEOnRealTimeSystem);             // F8-FF (except FD)
+    usbHostMIDI.setHandleNoteOff (HWEOnNoteOff);                          // 8x
+    usbHostMIDI.setHandleNoteOn (HWEOnNoteOn);                            // 9x
+    usbHostMIDI.setHandleAfterTouchPoly (HWEOnAfterTouchPoly);            // Ax
+    usbHostMIDI.setHandleControlChange (HWEOnControlChange);              // Bx
+    usbHostMIDI.setHandleProgramChange (HWEOnProgramChange);              // Cx
+    usbHostMIDI.setHandleAfterTouch (HWEOnAfterTouch);                    // Dx
+    usbHostMIDI.setHandlePitchChange (HWEOnPitchChange);                  // Ex
+    usbHostMIDI.setHandleSystemExclusive (HWEOnSystemExclusive);          // F0
+    usbHostMIDI.setHandleTimeCodeQuarterFrame (HWEOnTimeCodeQuarterFrame); // F1
+    usbHostMIDI.setHandleSongPosition (HWEOnSongPosition);                // F2
+    usbHostMIDI.setHandleSongSelect (HWEOnSongSelect);                    // F3
+    usbHostMIDI.setHandleTuneRequest (HWEOnTuneRequest);                  // F6
+    usbHostMIDI.setHandleRealTimeSystem (HWEOnRealTimeSystem);            // F8-FF (except FD)
 
     // MIDI USB Device input handlers
-    usbDevMIDI.setHandleNoteOff(HWEOnNoteOff);                           // 8x
-    usbDevMIDI.setHandleNoteOn(HWEOnNoteOn);                             // 9x
-    usbDevMIDI.setHandleAfterTouchPoly(HWEOnAfterTouchPoly);             // Ax
-    usbDevMIDI.setHandleControlChange(HWEOnControlChange);               // Bx //was disabled as apps like cakewalk write controls to 0 on stop, mess up cynthcart settings
-    usbDevMIDI.setHandleProgramChange(HWEOnProgramChange);               // Cx //was disabled as apps like cakewalk write programs on start/stop, mess up Sta64 settings
-    usbDevMIDI.setHandleAfterTouch(HWEOnAfterTouch);                     // Dx
-    usbDevMIDI.setHandlePitchChange(HWEOnPitchChange);                   // Ex //was disabled as apps like cakewalk write pitch to 0 on stop and crash cynthcart
-    usbDevMIDI.setHandleSystemExclusive(HWEOnSystemExclusive);           // F0
-    usbDevMIDI.setHandleTimeCodeQuarterFrame(HWEOnTimeCodeQuarterFrame); // F1
-    usbDevMIDI.setHandleSongPosition(HWEOnSongPosition);                 // F2
-    usbDevMIDI.setHandleSongSelect(HWEOnSongSelect);                     // F3
-    usbDevMIDI.setHandleTuneRequest(HWEOnTuneRequest);                   // F6
-    usbDevMIDI.setHandleRealTimeSystem(HWEOnRealTimeSystem);             // F8-FF (except FD)
-                                                                         // not catching F0, F4, F5, F7 (end of SysEx), and FD
+    usbDevMIDI.setHandleNoteOff (HWEOnNoteOff);                          // 8x
+    usbDevMIDI.setHandleNoteOn (HWEOnNoteOn);                            // 9x
+    usbDevMIDI.setHandleAfterTouchPoly (HWEOnAfterTouchPoly);            // Ax
+    usbDevMIDI.setHandleControlChange (HWEOnControlChange);              // Bx //was disabled as apps like cakewalk write controls to 0 on stop, mess up cynthcart settings
+    usbDevMIDI.setHandleProgramChange (HWEOnProgramChange);              // Cx //was disabled as apps like cakewalk write programs on start/stop, mess up Sta64 settings
+    usbDevMIDI.setHandleAfterTouch (HWEOnAfterTouch);                    // Dx
+    usbDevMIDI.setHandlePitchChange (HWEOnPitchChange);                  // Ex //was disabled as apps like cakewalk write pitch to 0 on stop and crash cynthcart
+    usbDevMIDI.setHandleSystemExclusive (HWEOnSystemExclusive);          // F0
+    usbDevMIDI.setHandleTimeCodeQuarterFrame (HWEOnTimeCodeQuarterFrame); // F1
+    usbDevMIDI.setHandleSongPosition (HWEOnSongPosition);                // F2
+    usbDevMIDI.setHandleSongSelect (HWEOnSongSelect);                    // F3
+    usbDevMIDI.setHandleTuneRequest (HWEOnTuneRequest);                  // F6
+    usbDevMIDI.setHandleRealTimeSystem (HWEOnRealTimeSystem);            // F8-FF (except FD)
+    // not catching F0, F4, F5, F7 (end of SysEx), and FD
 }
 
 void InitHndlr_MIDI_Datel()
@@ -249,36 +249,37 @@ void InitHndlr_MIDI_NamesoftIRQ()
     MIDIinHndlrInit();
 }
 
-void IO1Hndlr_MIDI(uint8_t Address, bool R_Wn)
+void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn)
 {
     uint8_t Data;
     if (R_Wn) // IO1 Read  -------------------------------------------------
     {
         if (Address == rIORegAddrMIDIStatus)
         {
-            DataPortWriteWaitLog(rIORegMIDIStatus);
+            DataPortWriteWaitLog (rIORegMIDIStatus);
         }
-        else if (Address == rIORegAddrMIDIReceive) // MIDI-in from USB kbd (interrupt driven)
-        {
-            if (MIDIRxBytesToSend)
+        else
+            if (Address == rIORegAddrMIDIReceive) // MIDI-in from USB kbd (interrupt driven)
             {
-                DataPortWriteWaitLog(MIDIRxBuf[--MIDIRxBytesToSend]);
+                if (MIDIRxBytesToSend)
+                {
+                    DataPortWriteWaitLog (MIDIRxBuf[--MIDIRxBytesToSend]);
+                }
+                else
+                {
+                    DataPortWriteWaitLog (0);
+                    Printf_dbg ("unreq\n"); // unrequested read from Rx reg.
+                }
+                if (MIDIRxBytesToSend == 0) // if we're done/empty, remove the interrupt
+                {
+                    rIORegMIDIStatus &= ~ (MIDIStatusRxFull | MIDIStatusIRQReq);
+                    SetIRQDeassert;
+                }
             }
             else
             {
-                DataPortWriteWaitLog(0);
-                Printf_dbg("unreq\n"); // unrequested read from Rx reg.
+                DataPortWriteWaitLog (0); // read 0s from all other regs in IO1
             }
-            if (MIDIRxBytesToSend == 0) // if we're done/empty, remove the interrupt
-            {
-                rIORegMIDIStatus &= ~(MIDIStatusRxFull | MIDIStatusIRQReq);
-                SetIRQDeassert;
-            }
-        }
-        else
-        {
-            DataPortWriteWaitLog(0); // read 0s from all other regs in IO1
-        }
     }
     else // IO1 write    -------------------------------------------------
     {
@@ -297,66 +298,68 @@ void IO1Hndlr_MIDI(uint8_t Address, bool R_Wn)
             {
                 rIORegMIDIStatus |= MIDIStatusDCD;
                 MIDIRxBytesToSend = 0;
-                Printf_dbg("RIE:%02x\n", Data);
+                Printf_dbg ("RIE:%02x\n", Data);
             }
             if ((Data & 0x1C) == 0x14) // xxx101xx Word Select == 8 Bits + No Parity + 1 Stop Bit
             {
                 rIORegMIDIStatus |= MIDIStatusTxRdy;
             }
         }
-        else if (Address == wIORegAddrMIDITransmit) // Tx MIDI out to USB instrument
-        {
-            if (MIDITxBytesReceived < 3) // make sure there's not a full packet already in progress
+        else
+            if (Address == wIORegAddrMIDITransmit) // Tx MIDI out to USB instrument
             {
-                if ((Data & 0x80) == 0x80) // header byte, start new packet
+                if (MIDITxBytesReceived < 3) // make sure there's not a full packet already in progress
                 {
-                    if (MIDITxBytesReceived)
-                        Printf_dbg("drop %d\n", MIDITxBytesReceived); // had another in progress
-                    MIDITxBytesReceived = 0;
-                    switch (Data)
+                    if ((Data & 0x80) == 0x80) // header byte, start new packet
                     {
-                    case 0x00 ... 0xef:
-                    case 0xf1:
-                    case 0xf2:
-                    case 0xf3:
-                        // 2-3 byte messages
-                        MIDITxBuf[MIDITxBytesReceived++] = Data;
-                        break;
-                    case 0xf6:
-                    case 0xf8 ... 0xff:
-                        // 1 byte messages, send now
-                        MIDITxBuf[0] = Data;
-                        MIDITxBuf[1] = 0;
-                        MIDITxBuf[2] = 0;
-                        MIDITxBytesReceived = 3;
-                        break;
-                    default:
-                        Printf_dbg("igh: %02x\n", Data);
-                        break;
-                    }
-                }
-                else // adding data to existing
-                {
-                    if (MIDITxBytesReceived > 0) // make sure we accepted a valid header byte previously
-                    {
-                        MIDITxBuf[MIDITxBytesReceived++] = Data;
-                        if (MIDITxBytesReceived == 2 && ((MIDITxBuf[0] & 0xf0) == 0xc0 || (MIDITxBuf[0] & 0xf0) == 0xd0 || MIDITxBuf[0] == 0xf1 || MIDITxBuf[0] == 0xf3))
-                        { // single extra byte commands, send now
-                            MIDITxBuf[2] = 0;
-                            MIDITxBytesReceived = 3;
+                        if (MIDITxBytesReceived)
+                            Printf_dbg ("drop %d\n", MIDITxBytesReceived); // had another in progress
+                        MIDITxBytesReceived = 0;
+                        switch (Data)
+                        {
+                            case 0x00 ... 0xef:
+                            case 0xf1:
+                            case 0xf2:
+                            case 0xf3:
+                                // 2-3 byte messages
+                                MIDITxBuf[MIDITxBytesReceived++] = Data;
+                                break;
+                            case 0xf6:
+                            case 0xf8 ... 0xff:
+                                // 1 byte messages, send now
+                                MIDITxBuf[0] = Data;
+                                MIDITxBuf[1] = 0;
+                                MIDITxBuf[2] = 0;
+                                MIDITxBytesReceived = 3;
+                                break;
+                            default:
+                                Printf_dbg ("igh: %02x\n", Data);
+                                break;
                         }
                     }
-                    else
-                        Printf_dbg("igd: %02x\n", Data);
+                    else // adding data to existing
+                    {
+                        if (MIDITxBytesReceived > 0) // make sure we accepted a valid header byte previously
+                        {
+                            MIDITxBuf[MIDITxBytesReceived++] = Data;
+                            if (MIDITxBytesReceived == 2 && ((MIDITxBuf[0] & 0xf0) == 0xc0 || (MIDITxBuf[0] & 0xf0) == 0xd0 || MIDITxBuf[0] == 0xf1 || MIDITxBuf[0] == 0xf3))
+                            {
+                                // single extra byte commands, send now
+                                MIDITxBuf[2] = 0;
+                                MIDITxBytesReceived = 3;
+                            }
+                        }
+                        else
+                            Printf_dbg ("igd: %02x\n", Data);
+                    }
+                    rIORegMIDIStatus &= ~MIDIStatusIRQReq;
+                    if (MIDITxBytesReceived == 3)
+                        rIORegMIDIStatus &= ~MIDIStatusTxRdy; // not ready, waiting for USB transmit
                 }
-                rIORegMIDIStatus &= ~MIDIStatusIRQReq;
-                if (MIDITxBytesReceived == 3)
-                    rIORegMIDIStatus &= ~MIDIStatusTxRdy; // not ready, waiting for USB transmit
+                else
+                    Printf_dbg ("Miss!\n");
             }
-            else
-                Printf_dbg("Miss!\n");
-        }
-        TraceLogAddValidData(Data);
+        TraceLogAddValidData (Data);
     }
 }
 
@@ -372,11 +375,11 @@ void PollingHndlr_MIDI()
     if (MIDITxBytesReceived == 3) // Transmit MIDI-out data if buffer full/ready from C64
     {
         if (MIDITxBuf[0] < 0xf0)
-            usbHostMIDI.send(MIDITxBuf[0] & 0xf0, MIDITxBuf[1], MIDITxBuf[2], MIDITxBuf[0] & 0x0f);
+            usbHostMIDI.send (MIDITxBuf[0] & 0xf0, MIDITxBuf[1], MIDITxBuf[2], MIDITxBuf[0] & 0x0f);
         else
-            usbHostMIDI.send(MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2], 0);
+            usbHostMIDI.send (MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2], 0);
 
-        Printf_dbg("Mout: %02x %02x %02x\n", MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2]);
+        Printf_dbg ("Mout: %02x %02x %02x\n", MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2]);
         MIDITxBytesReceived = 0;
         rIORegMIDIStatus |= MIDIStatusTxRdy | MIDIStatusIRQReq;
     }

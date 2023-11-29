@@ -31,7 +31,7 @@
 
 
 void FreeSwiftlinkBuffs();
-void IO1Hndlr_SwiftLink(uint8_t Address, bool R_Wn);
+void IO1Hndlr_SwiftLink (uint8_t Address, bool R_Wn);
 void PollingHndlr_SwiftLink();
 void InitHndlr_SwiftLink();
 void CycleHndlr_SwiftLink();

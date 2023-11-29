@@ -133,36 +133,49 @@
 #define Cart_CPM -123
 #define Cart_DebugCart -124
 
-
 struct StructHWID_IOH_Assoc
 {
     uint16_t HWID;
     uint8_t IOH;
 };
 
-StructHWID_IOH_Assoc HWID_IOH_Assoc[]=
+StructHWID_IOH_Assoc HWID_IOH_Assoc[] =
 {
-           //HWID                  IOH
-   (uint16_t)Cart_MIDI_Datel,      IOH_MIDI_Datel,
-   (uint16_t)Cart_MIDI_Sequential, IOH_MIDI_Sequential,
-   (uint16_t)Cart_MIDI_Passport,   IOH_MIDI_Passport,
-   (uint16_t)Cart_MIDI_Namesoft,   IOH_MIDI_NamesoftIRQ,
-   (uint16_t)Cart_SwiftLink,       IOH_Swiftlink,
-   (uint16_t)Cart_EpyxFastload,    IOH_EpyxFastLoad,
-   (uint16_t)Cart_MagicDesk,       IOH_MagicDesk,
-   (uint16_t)Cart_Dinamic,         IOH_Dinamic,
-   (uint16_t)Cart_Oceantype1,      IOH_Ocean1,
-   (uint16_t)Cart_FunPlayPowerPlay,IOH_FunPlay,
-   (uint16_t)Cart_SuperGames      ,IOH_SuperGames,
-   (uint16_t)Cart_C64GameSystem3  ,IOH_C64GameSystem3,
-   (uint16_t)Cart_EasyFlash       ,IOH_EasyFlash,
-   (uint16_t)Cart_ZaxxonSuper     ,IOH_ZaxxonSuper,
-   
+    // HWID                  IOH
+    (uint16_t)Cart_MIDI_Datel,
+    IOH_MIDI_Datel,
+    (uint16_t)Cart_MIDI_Sequential,
+    IOH_MIDI_Sequential,
+    (uint16_t)Cart_MIDI_Passport,
+    IOH_MIDI_Passport,
+    (uint16_t)Cart_MIDI_Namesoft,
+    IOH_MIDI_NamesoftIRQ,
+    (uint16_t)Cart_SwiftLink,
+    IOH_Swiftlink,
+    (uint16_t)Cart_EpyxFastload,
+    IOH_EpyxFastLoad,
+    (uint16_t)Cart_MagicDesk,
+    IOH_MagicDesk,
+    (uint16_t)Cart_Dinamic,
+    IOH_Dinamic,
+    (uint16_t)Cart_Oceantype1,
+    IOH_Ocean1,
+    (uint16_t)Cart_FunPlayPowerPlay,
+    IOH_FunPlay,
+    (uint16_t)Cart_SuperGames,
+    IOH_SuperGames,
+    (uint16_t)Cart_C64GameSystem3,
+    IOH_C64GameSystem3,
+    (uint16_t)Cart_EasyFlash,
+    IOH_EasyFlash,
+    (uint16_t)Cart_ZaxxonSuper,
+    IOH_ZaxxonSuper,
+
 };
 
-#define CRT_MAIN_HDR_LEN  0x40
-#define CRT_CHIP_HDR_LEN  0x10
-#define MAX_CRT_CHIPS     128
+#define CRT_MAIN_HDR_LEN 0x40
+#define CRT_CHIP_HDR_LEN 0x10
+#define MAX_CRT_CHIPS 128
 
 struct StructCrtChip
 {
@@ -179,14 +192,14 @@ struct StructExt_ItemType_Assoc
 };
 
 StructExt_ItemType_Assoc Ext_ItemType_Assoc[] =
-    {
-        // Ext ,  ItemType
-        "prg", rtFilePrg,
-        "crt", rtFileCrt,
-        "hex", rtFileHex,
-        "p00", rtFileP00,
-        "sid", rtFileSID,
-        //"c64",  rtFilePrg,  //makefile output, not always prg...
+{
+    // Ext ,  ItemType
+    "prg", rtFilePrg,
+    "crt", rtFileCrt,
+    "hex", rtFileHex,
+    "p00", rtFileP00,
+    "sid", rtFileSID,
+    //"c64",  rtFilePrg,  //makefile output, not always prg...
 };
 
 uint8_t NumCrtChips = 0;
@@ -197,32 +210,32 @@ char DriveDirPath[MaxPathLength];
 void HandleExecution();
 void MenuChange();
 
-bool LoadFile(StructMenuItem *MyMenuItem, FS *sourceFS);
+bool LoadFile (StructMenuItem *MyMenuItem, FS *sourceFS);
 void InitDriveDirMenu();
-void SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename);
-void LoadDirectory(FS *sourceFS);
-void AddDirEntry(const char *EntryString);
+void SetDriveDirMenuNameType (uint16_t ItemNum, const char *filename);
+void LoadDirectory (FS *sourceFS);
+void AddDirEntry (const char *EntryString);
 
-void ParseP00File(StructMenuItem *MyMenuItem);
-bool ParseCRTHeader(StructMenuItem *MyMenuItem, uint8_t *EXROM, uint8_t *GAME);
-bool ParseChipHeader(uint8_t *ChipHeader);
+void ParseP00File (StructMenuItem *MyMenuItem);
+bool ParseCRTHeader (StructMenuItem *MyMenuItem, uint8_t *EXROM, uint8_t *GAME);
+bool ParseChipHeader (uint8_t *ChipHeader);
 
 void FreeDriveDirMenu();
 void FreeCrtChips();
 bool ParseSIDHeader();
 void RedirectEmptyDriveDirMenu();
 bool PathIsRoot();
-bool SetTypeFromCRT(StructMenuItem *MyMenuItem, uint8_t EXROM, uint8_t GAME);
+bool SetTypeFromCRT (StructMenuItem *MyMenuItem, uint8_t EXROM, uint8_t GAME);
 
 // Big endian byte to int conversions:
-uint32_t toU32(uint8_t *src);
-uint16_t toU16(uint8_t *src);
-uint8_t Assoc_Ext_ItemType(char * FileName);
-bool AssocHWID_IOH(uint16_t HWType);
+uint32_t toU32 (uint8_t *src);
+uint16_t toU16 (uint8_t *src);
+uint8_t Assoc_Ext_ItemType (char *FileName);
+bool AssocHWID_IOH (uint16_t HWType);
 void SendMsgOK();
 void SendMsgFailed();
-void SendMsgPrintfln(const char *Fmt, ...);
-void SendMsgPrintf(const char *Fmt, ...);
+void SendMsgPrintfln (const char *Fmt, ...);
+void SendMsgPrintf (const char *Fmt, ...);
 void SendMsgSerialStringBuf();
 
 #endif // DRIVEDIRLOAD_H

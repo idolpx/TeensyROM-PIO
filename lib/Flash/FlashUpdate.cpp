@@ -64,24 +64,24 @@ extern "C"
 #include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
 }
 
-void DoFlashUpdate(FS *sourceFS, const char *FilePathName)
+void DoFlashUpdate (FS *sourceFS, const char *FilePathName)
 {
     uint32_t buffer_addr, buffer_size;
 
     // Serial.printf( "target = %s (%dK flash in %dK sectors)\n", FLASH_ID, FLASH_SIZE/1024, FLASH_SECTOR_SIZE/1024);
 
     // create flash buffer to hold new firmware
-    SendMsgPrintfln("Create buffer ");
-    if (firmware_buffer_init(&buffer_addr, &buffer_size) != FLASH_BUFFER_TYPE)
+    SendMsgPrintfln ("Create buffer ");
+    if (firmware_buffer_init (&buffer_addr, &buffer_size) != FLASH_BUFFER_TYPE)
     {
         SendMsgFailed();
         return;
     }
     SendMsgOK();
 
-    SendMsgPrintfln("%s Buffer = %1luK of %1dK total\r\n(%08lX - %08lX)",
-                    IN_FLASH(buffer_addr) ? "Flash" : "RAM", buffer_size / 1024, FLASH_SIZE / 1024,
-                    buffer_addr, buffer_addr + buffer_size);
+    SendMsgPrintfln ("%s Buffer = %1luK of %1dK total\r\n(%08lX - %08lX)",
+                     IN_FLASH (buffer_addr) ? "Flash" : "RAM", buffer_size / 1024, FLASH_SIZE / 1024,
+                     buffer_addr, buffer_addr + buffer_size);
 
     // Already initialized to get to this point...
     // SendMsgPrintfln( "SD initialization " );
@@ -92,9 +92,9 @@ void DoFlashUpdate(FS *sourceFS, const char *FilePathName)
     // }
     // SendMsgOK();
 
-    SendMsgPrintfln("Open: %s%s ", sourceFS == &SD ? "SD" : "USB", FilePathName);
+    SendMsgPrintfln ("Open: %s%s ", sourceFS == &SD ? "SD" : "USB", FilePathName);
 
-    File hexFile = sourceFS->open(FilePathName, FILE_READ);
+    File hexFile = sourceFS->open (FilePathName, FILE_READ);
 
     if (!hexFile)
     {
@@ -104,12 +104,12 @@ void DoFlashUpdate(FS *sourceFS, const char *FilePathName)
     SendMsgOK();
 
     // read hex file, write new firmware to flash, clean up, reboot
-    update_firmware(&hexFile, &Serial, buffer_addr, buffer_size);
+    update_firmware (&hexFile, &Serial, buffer_addr, buffer_size);
 
     // return from update_firmware() means error or user abort, so clean up and
     // reboot to ensure that static vars get boot-up initialized before retry(? nah)
-    SendMsgPrintfln("Erasing Flash buffer ");
-    firmware_buffer_free(buffer_addr, buffer_size);
+    SendMsgPrintfln ("Erasing Flash buffer ");
+    firmware_buffer_free (buffer_addr, buffer_size);
     SendMsgOK();
 
     // SendMsgPrintfln( "Rebooting  Teensy");

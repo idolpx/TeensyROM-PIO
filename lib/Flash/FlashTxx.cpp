@@ -25,7 +25,7 @@ static int leave_interrupts_disabled = 0;
 //******************************************************************************
 // compute addr/size for firmware buffer and return NO/RAM/FLASH_BUFFER_TYPE
 //******************************************************************************
-int firmware_buffer_init(uint32_t *buffer_addr, uint32_t *buffer_size)
+int firmware_buffer_init (uint32_t *buffer_addr, uint32_t *buffer_size)
 {
     // #if defined(__MK66FX1M0__)     // for T3.6 only
     // LMEM_EnableCodeCache( false ); // disable LMEM code cache for flash operations
@@ -48,7 +48,7 @@ int firmware_buffer_init(uint32_t *buffer_addr, uint32_t *buffer_size)
     // 0x60000000 + 0x800000 - 0x40000 - 4 = 607BFFFC (607c0000-4)  increased to 0x40000 (256k)
     *buffer_addr = FLASH_BASE_ADDR + FLASH_SIZE - FLASH_RESERVE - 4;
 
-    while (*buffer_addr > 0 && *((uint32_t *)*buffer_addr) == 0xFFFFFFFF)
+    while (*buffer_addr > 0 && * ((uint32_t *)*buffer_addr) == 0xFFFFFFFF)
         *buffer_addr -= 4;
 
     *buffer_addr += 4; // first address above code
@@ -79,22 +79,22 @@ int firmware_buffer_init(uint32_t *buffer_addr, uint32_t *buffer_size)
 //******************************************************************************
 // compute addr/size for firmware buffer and return NO/RAM/FLASH_BUFFER_TYPE
 //******************************************************************************
-void firmware_buffer_free(uint32_t buffer_addr, uint32_t buffer_size)
+void firmware_buffer_free (uint32_t buffer_addr, uint32_t buffer_size)
 {
-    if (IN_FLASH(buffer_addr))
-        flash_erase_block(buffer_addr, buffer_size);
+    if (IN_FLASH (buffer_addr))
+        flash_erase_block (buffer_addr, buffer_size);
     else
-        free((void *)buffer_addr);
+        free ((void *)buffer_addr);
 }
 
 //******************************************************************************
 // search buffer for string FLASH_ID to verify code was built for correct TARGET
 //******************************************************************************
-int check_flash_id(uint32_t buffer, uint32_t size)
+int check_flash_id (uint32_t buffer, uint32_t size)
 {
-    for (uint32_t i = buffer; i < buffer + size - strlen(FLASH_ID); ++i)
+    for (uint32_t i = buffer; i < buffer + size - strlen (FLASH_ID); ++i)
     {
-        if (strncmp((char *)i, FLASH_ID, strlen(FLASH_ID)) == 0)
+        if (strncmp ((char *)i, FLASH_ID, strlen (FLASH_ID)) == 0)
             return 1;
     }
     return 0;
@@ -118,12 +118,12 @@ int check_flash_id(uint32_t buffer, uint32_t size)
 #define FTFL_READ_MARGIN_USER (0x01)
 #define FTFL_READ_MARGIN_FACTORY (0x02)
 
-RAMFUNC static void flash_exec(void)
+RAMFUNC static void flash_exec (void)
 {
     __disable_irq();              // disable interrupts
     kinetis_hsrun_disable();      // disable high-speed run
     FTFL_FSTAT = FTFL_FSTAT_CCIF; // execute!
-    while (!(FTFL_FSTAT & FTFL_FSTAT_CCIF))
+    while (! (FTFL_FSTAT & FTFL_FSTAT_CCIF))
     {
         ;
     }                               // wait for done
@@ -132,10 +132,10 @@ RAMFUNC static void flash_exec(void)
         __enable_irq();             //   re-enable interrupts
 }
 
-RAMFUNC static void flash_init_command(uint8_t command, uint32_t address)
+RAMFUNC static void flash_init_command (uint8_t command, uint32_t address)
 {
     // wait for ready, clear error flags, init command and address registers
-    while (!(FTFL_FSTAT & FTFL_FSTAT_CCIF))
+    while (! (FTFL_FSTAT & FTFL_FSTAT_CCIF))
     {
         ;
     }
@@ -149,22 +149,22 @@ RAMFUNC static void flash_init_command(uint8_t command, uint32_t address)
 #if (FLASH_WRITE_SIZE == 4) // TLC, T30, T31, T32
 
 //******************************************************************************
-// flash_word()		write 4-byte word to flash - must run from ram
+// flash_word()     write 4-byte word to flash - must run from ram
 //******************************************************************************
 // aFSEC = allow FSEC sector      (set aFSEC = true to write in FSEC sector)
 // oFSEC = overwrite FSEC value   (set BOTH  = true to write to FSEC address)
-RAMFUNC int flash_word(uint32_t address, uint32_t value, int aFSEC, int oFSEC)
+RAMFUNC int flash_word (uint32_t address, uint32_t value, int aFSEC, int oFSEC)
 {
-    FLASH_ALIGN(address, FLASH_WRITE_SIZE);
+    FLASH_ALIGN (address, FLASH_WRITE_SIZE);
 
-    if (address == (0x40C & ~(FLASH_SECTOR_SIZE - 1)))
+    if (address == (0x40C & ~ (FLASH_SECTOR_SIZE - 1)))
         if (aFSEC == 0)
             return 0;
     if (address == 0x40C)
         if (oFSEC == 0)
             return 0;
 
-    flash_init_command(FCMD_PROGRAM_LONG_WORD, address);
+    flash_init_command (FCMD_PROGRAM_LONG_WORD, address);
 
     FTFL_FCCOB4 = value >> 24;
     FTFL_FCCOB5 = value >> 16;
@@ -179,22 +179,22 @@ RAMFUNC int flash_word(uint32_t address, uint32_t value, int aFSEC, int oFSEC)
 #elif (FLASH_WRITE_SIZE == 8) // T35, T36
 
 //******************************************************************************
-// flash_phrase()	write 8-byte phrase to flash - must run from ram
+// flash_phrase()   write 8-byte phrase to flash - must run from ram
 //******************************************************************************
 // aFSEC = allow FSEC sector      (set aFSEC = true to write in FSEC sector)
 // oFSEC = overwrite FSEC value   (set BOTH  = true to write to FSEC address)
-RAMFUNC int flash_phrase(uint32_t address, uint64_t value, int aFSEC, int oFSEC)
+RAMFUNC int flash_phrase (uint32_t address, uint64_t value, int aFSEC, int oFSEC)
 {
-    FLASH_ALIGN(address, FLASH_WRITE_SIZE);
+    FLASH_ALIGN (address, FLASH_WRITE_SIZE);
 
-    if (address == (0x408 & ~(FLASH_SECTOR_SIZE - 1)))
+    if (address == (0x408 & ~ (FLASH_SECTOR_SIZE - 1)))
         if (aFSEC == 0)
             return 0;
     if (address == 0x408)
         if (oFSEC == 0)
             return 0;
 
-    flash_init_command(FCMD_PROGRAM_PHRASE, address);
+    flash_init_command (FCMD_PROGRAM_PHRASE, address);
 
     FTFL_FCCOB4 = value >> 24;
     FTFL_FCCOB5 = value >> 16;
@@ -214,18 +214,18 @@ RAMFUNC int flash_phrase(uint32_t address, uint64_t value, int aFSEC, int oFSEC)
 #endif // FLASH_WRITE_SIZE
 
 //******************************************************************************
-// flash_erase_sector()		erase sector at address - must run from RAM
+// flash_erase_sector()     erase sector at address - must run from RAM
 //******************************************************************************
 // aFSEC = allow FSEC sector      (set aFSEC = true to write in FSEC sector)
-RAMFUNC int flash_erase_sector(uint32_t address, int aFSEC)
+RAMFUNC int flash_erase_sector (uint32_t address, int aFSEC)
 {
-    FLASH_ALIGN(address, FLASH_SECTOR_SIZE);
+    FLASH_ALIGN (address, FLASH_SECTOR_SIZE);
 
-    if (address == (0x400 & ~(FLASH_SECTOR_SIZE - 1)))
+    if (address == (0x400 & ~ (FLASH_SECTOR_SIZE - 1)))
         if (aFSEC == 0)
             return 0;
 
-    flash_init_command(FCMD_ERASE_FLASH_SECTOR, address);
+    flash_init_command (FCMD_ERASE_FLASH_SECTOR, address);
 
     flash_exec();
 
@@ -233,13 +233,13 @@ RAMFUNC int flash_erase_sector(uint32_t address, int aFSEC)
 }
 
 //******************************************************************************
-// flash_sector_not_erased()	returns 0 if erased and !0 (error) if NOT erased
+// flash_sector_not_erased()    returns 0 if erased and !0 (error) if NOT erased
 //******************************************************************************
-RAMFUNC int flash_sector_not_erased(uint32_t address)
+RAMFUNC int flash_sector_not_erased (uint32_t address)
 {
     uint16_t num = (FLASH_SECTOR_SIZE / FLASH_WRITE_SIZE);
-    FLASH_ALIGN(address, FLASH_SECTOR_SIZE);
-    flash_init_command(FCMD_READ_1S_SECTION, address);
+    FLASH_ALIGN (address, FLASH_SECTOR_SIZE);
+    flash_init_command (FCMD_READ_1S_SECTION, address);
 
     FTFL_FCCOB4 = num >> 8;
     FTFL_FCCOB5 = num >> 0;
@@ -253,11 +253,11 @@ RAMFUNC int flash_sector_not_erased(uint32_t address)
 #elif defined(__IMXRT1062__) // T4.x
 
 //******************************************************************************
-// flash_sector_not_erased()	returns 0 if erased and !0 (error) if NOT erased
+// flash_sector_not_erased()    returns 0 if erased and !0 (error) if NOT erased
 //******************************************************************************
-RAMFUNC int flash_sector_not_erased(uint32_t address)
+RAMFUNC int flash_sector_not_erased (uint32_t address)
 {
-    uint32_t *sector = (uint32_t *)(address & ~(FLASH_SECTOR_SIZE - 1));
+    uint32_t *sector = (uint32_t *) (address & ~ (FLASH_SECTOR_SIZE - 1));
     for (int i = 0; i < FLASH_SECTOR_SIZE / 4; i++)
     {
         if (*sector++ != 0xFFFFFFFF)
@@ -272,7 +272,7 @@ RAMFUNC int flash_sector_not_erased(uint32_t address)
 // move from source to destination (flash), erasing destination sectors as we go
 // DANGER: this is critical and cannot be interrupted, else T3.x can be damaged
 //******************************************************************************
-RAMFUNC void flash_move(uint32_t dst, uint32_t src, uint32_t size)
+RAMFUNC void flash_move (uint32_t dst, uint32_t src, uint32_t size)
 {
     uint32_t offset = 0, error = 0, addr;
 
@@ -291,33 +291,33 @@ RAMFUNC void flash_move(uint32_t dst, uint32_t src, uint32_t size)
         // place where calls to KINETIS flash write functions have aFSEC = oFSEC = 1
         if ((addr & (FLASH_SECTOR_SIZE - 1)) == 0)
         {
-            if (flash_sector_not_erased(addr))
+            if (flash_sector_not_erased (addr))
             {
-#if defined(__IMXRT1062__)
-                eepromemu_flash_erase_sector((void *)addr);
-#elif (FLASH_WRITE_SIZE == 4)
-                error |= flash_erase_sector(addr, 1);
-                if (addr == (0x40C & ~(FLASH_SECTOR_SIZE - 1)))
-                    error |= flash_word(0x40C, 0xfffff9de, 1, 1);
-#elif (FLASH_WRITE_SIZE == 8)
-                error |= flash_erase_sector(addr, 1);
-                if (addr == (0x408 & ~(FLASH_SECTOR_SIZE - 1)))
-                    error |= flash_phrase(0x408, 0xfffff9deffffffff, 1, 1);
-#endif
+                #if defined(__IMXRT1062__)
+                eepromemu_flash_erase_sector ((void *)addr);
+                #elif (FLASH_WRITE_SIZE == 4)
+                error |= flash_erase_sector (addr, 1);
+                if (addr == (0x40C & ~ (FLASH_SECTOR_SIZE - 1)))
+                    error |= flash_word (0x40C, 0xfffff9de, 1, 1);
+                #elif (FLASH_WRITE_SIZE == 8)
+                error |= flash_erase_sector (addr, 1);
+                if (addr == (0x408 & ~ (FLASH_SECTOR_SIZE - 1)))
+                    error |= flash_phrase (0x408, 0xfffff9deffffffff, 1, 1);
+                #endif
             }
         }
 
 // for KINETIS, these writes may be to the sector containing FSEC, but the
 // FSEC location was written by the code above, so use aFSEC=1, oFSEC=0
-#if defined(__IMXRT1062__)
+        #if defined(__IMXRT1062__)
         // for T4.x, data address passed to flash_write() must be in RAM
-        uint32_t value = *(uint32_t *)(src + offset);
-        eepromemu_flash_write((void *)addr, &value, 4);
-#elif (FLASH_WRITE_SIZE == 4)
-        error |= flash_word(addr, *(uint32_t *)(src + offset), 1, 0);
-#elif (FLASH_WRITE_SIZE == 8)
-        error |= flash_phrase(addr, *(uint64_t *)(src + offset), 1, 0);
-#endif
+        uint32_t value = * (uint32_t *) (src + offset);
+        eepromemu_flash_write ((void *)addr, &value, 4);
+        #elif (FLASH_WRITE_SIZE == 4)
+        error |= flash_word (addr, * (uint32_t *) (src + offset), 1, 0);
+        #elif (FLASH_WRITE_SIZE == 8)
+        error |= flash_phrase (addr, * (uint64_t *) (src + offset), 1, 0);
+        #endif
 
         offset += FLASH_WRITE_SIZE;
     }
@@ -326,20 +326,20 @@ RAMFUNC void flash_move(uint32_t dst, uint32_t src, uint32_t size)
     // by erasing all sectors from top of new program to bottom of FLASH_RESERVE,
     // which leaves FLASH in same state as if code was loaded using TeensyDuino.
     // For KINETIS, this erase cannot include FSEC, so erase uses aFSEC=0.
-    if (IN_FLASH(src))
+    if (IN_FLASH (src))
     {
         while (offset < (FLASH_SIZE - FLASH_RESERVE) && error == 0)
         {
             addr = dst + offset;
             if ((addr & (FLASH_SECTOR_SIZE - 1)) == 0)
             {
-                if (flash_sector_not_erased(addr))
+                if (flash_sector_not_erased (addr))
                 {
-#if defined(__IMXRT1062__)
-                    eepromemu_flash_erase_sector((void *)addr);
-#else
-                    error |= flash_erase_sector(addr, 0);
-#endif
+                    #if defined(__IMXRT1062__)
+                    eepromemu_flash_erase_sector ((void *)addr);
+                    #else
+                    error |= flash_erase_sector (addr, 0);
+                    #endif
                 }
             }
             offset += FLASH_WRITE_SIZE;
@@ -356,9 +356,9 @@ RAMFUNC void flash_move(uint32_t dst, uint32_t src, uint32_t size)
 }
 
 //******************************************************************************
-// flash_erase_block()	erase sectors from (start) to (start + size)
+// flash_erase_block()  erase sectors from (start) to (start + size)
 //******************************************************************************
-int flash_erase_block(uint32_t start, uint32_t size)
+int flash_erase_block (uint32_t start, uint32_t size)
 {
     int error = 0;
     uint32_t address = start;
@@ -366,13 +366,13 @@ int flash_erase_block(uint32_t start, uint32_t size)
     {
         if ((address & (FLASH_SECTOR_SIZE - 1)) == 0)
         {
-            if (flash_sector_not_erased(address))
+            if (flash_sector_not_erased (address))
             {
-#if defined(__IMXRT1062__)
-                eepromemu_flash_erase_sector((void *)address);
-#elif defined(KINETISK) || defined(KINETISL)
-                error = flash_erase_sector(address, 0);
-#endif
+                #if defined(__IMXRT1062__)
+                eepromemu_flash_erase_sector ((void *)address);
+                #elif defined(KINETISK) || defined(KINETISL)
+                error = flash_erase_sector (address, 0);
+                #endif
             }
         }
         address += FLASH_SECTOR_SIZE;
@@ -383,14 +383,14 @@ int flash_erase_block(uint32_t start, uint32_t size)
 //******************************************************************************
 // take a 32-bit aligned array of 32-bit values and write it to erased flash
 //******************************************************************************
-int flash_write_block(uint32_t addr, char *data, uint32_t count)
+int flash_write_block (uint32_t addr, char *data, uint32_t count)
 {
 // static (aligned) variables to guarantee 32-bit or 64-bit-aligned writes
-#if (FLASH_WRITE_SIZE == 4)                          // #if 4-byte writes
-    static uint32_t buf __attribute__((aligned(4))); //   4-byte buffer
-#elif (FLASH_WRITE_SIZE == 8)                        // #elif 8-byte writes
-    static uint64_t buf __attribute__((aligned(8))); //   8-byte buffer
-#endif                                               //
+    #if (FLASH_WRITE_SIZE == 4)                          // #if 4-byte writes
+    static uint32_t buf __attribute__ ((aligned (4))); //   4-byte buffer
+    #elif (FLASH_WRITE_SIZE == 8)                        // #elif 8-byte writes
+    static uint64_t buf __attribute__ ((aligned (8))); //   8-byte buffer
+    #endif                                               //
     static uint32_t buf_count = 0;                   // bytes in buffer
     static uint32_t next_addr = 0;                   // expected address
 
@@ -398,34 +398,39 @@ int flash_write_block(uint32_t addr, char *data, uint32_t count)
     uint32_t data_i = 0; // index to data array
 
     if ((addr % 4) != 0 || (count % 4) != 0)
-    {             // if not 32-bit aligned
-        return 1; // "flash_block align error\n"		//   return error code 1
+    {
+        // if not 32-bit aligned
+        return 1; // "flash_block align error\n"        //   return error code 1
     }
 
     if (buf_count > 0 && addr != next_addr)
-    {             // if unexpected address
-        return 2; // "unexpected address\n"		//   return error code 2
+    {
+        // if unexpected address
+        return 2; // "unexpected address\n"     //   return error code 2
     }
     next_addr = addr + count; //   compute next address
     addr -= buf_count;        //   address of data[0]
 
     while (data_i < count)
-    {                                                 // while more data
+    {
+        // while more data
         ((char *)&buf)[buf_count++] = data[data_i++]; //   copy a byte to buf
         if (buf_count < FLASH_WRITE_SIZE)
-        {                                                     //   if buf not complete
+        {
+            //   if buf not complete
             continue;                                         //     continue while()
         }                                                     //
-#if defined(__IMXRT1062__)                                    //   #if T4.x 4-byte
-        eepromemu_flash_write((void *)addr, (void *)&buf, 4); //     flash_write()
-#elif (FLASH_WRITE_SIZE == 4)                                 //   #elif T3.x 4-byte
-        ret = flash_word(addr, buf, 0, 0); //     flash_word()
-#elif (FLASH_WRITE_SIZE == 8)                                 //   #elif T3.x 8-byte
-        ret = flash_phrase(addr, buf, 0, 0); //     flash_phrase()
-#endif
+        #if defined(__IMXRT1062__)                                    //   #if T4.x 4-byte
+        eepromemu_flash_write ((void *)addr, (void *)&buf, 4); //     flash_write()
+        #elif (FLASH_WRITE_SIZE == 4)                                 //   #elif T3.x 4-byte
+        ret = flash_word (addr, buf, 0, 0); //     flash_word()
+        #elif (FLASH_WRITE_SIZE == 8)                                 //   #elif T3.x 8-byte
+        ret = flash_phrase (addr, buf, 0, 0); //     flash_phrase()
+        #endif
         if (ret != 0)
-        {             //   if write error
-            return 3; // "flash write error %d\n"		//     error code
+        {
+            //   if write error
+            return 3; // "flash write error %d\n"       //     error code
         }
         buf_count = 0;            //   re-init buf count
         addr += FLASH_WRITE_SIZE; //   advance address
@@ -451,7 +456,7 @@ int flash_write_block(uint32_t addr, char *data, uint32_t count)
  * Copyright 2016-2017 NXP
  */
 
-void LMEM_EnableCodeCache(bool enable)
+void LMEM_EnableCodeCache (bool enable)
 {
     if (enable)
     {
@@ -471,7 +476,7 @@ void LMEM_EnableCodeCache(bool enable)
     }
 }
 
-void LMEM_CodeCacheInvalidateAll(void)
+void LMEM_CodeCacheInvalidateAll (void)
 {
     /* Enables the processor code bus to invalidate all lines in both ways.
     and Initiate the processor code bus code cache command. */
@@ -483,10 +488,10 @@ void LMEM_CodeCacheInvalidateAll(void)
     }
 
     /* As a precaution clear the bits to avoid inadvertently re-running this command. */
-    LMEM_PCCCR &= ~(LMEM_PCCCR_INVW0 | LMEM_PCCCR_INVW1);
+    LMEM_PCCCR &= ~ (LMEM_PCCCR_INVW0 | LMEM_PCCCR_INVW1);
 }
 
-void LMEM_CodeCachePushAll(void)
+void LMEM_CodeCachePushAll (void)
 {
     /* Enable the processor code bus to push all modified lines. */
     LMEM_PCCCR |= LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_PUSHW1 | LMEM_PCCCR_GO;
@@ -497,10 +502,10 @@ void LMEM_CodeCachePushAll(void)
     }
 
     /* As a precaution clear the bits to avoid inadvertently re-running this command. */
-    LMEM_PCCCR &= ~(LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_PUSHW1);
+    LMEM_PCCCR &= ~ (LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_PUSHW1);
 }
 
-void LMEM_CodeCacheClearAll(void)
+void LMEM_CodeCacheClearAll (void)
 {
     /* Push and invalidate all. */
     LMEM_PCCCR |= LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_INVW0 | LMEM_PCCCR_PUSHW1 | LMEM_PCCCR_INVW1 | LMEM_PCCCR_GO;
@@ -511,7 +516,7 @@ void LMEM_CodeCacheClearAll(void)
     }
 
     /* As a precaution clear the bits to avoid inadvertently re-running this command. */
-    LMEM_PCCCR &= ~(LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_INVW0 | LMEM_PCCCR_PUSHW1 | LMEM_PCCCR_INVW1);
+    LMEM_PCCCR &= ~ (LMEM_PCCCR_PUSHW0 | LMEM_PCCCR_INVW0 | LMEM_PCCCR_PUSHW1 | LMEM_PCCCR_INVW1);
 }
 
 #endif

@@ -25,7 +25,7 @@
 #include "IOH_defs.h"
 
 void InitHndlr_Ocean1();
-void IO1Hndlr_Ocean1(uint8_t Address, bool R_Wn);
+void IO1Hndlr_Ocean1 (uint8_t Address, bool R_Wn);
 
 stcIOHandlers IOHndlr_Ocean1 =
 {

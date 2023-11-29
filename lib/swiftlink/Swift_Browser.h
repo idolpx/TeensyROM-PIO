@@ -1,20 +1,20 @@
 // MIT License
-// 
+//
 // Copyright (c) 2023 Travis Smith
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-// and associated documentation files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, copy, modify, merge, publish, 
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all copies or 
+//
+// The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
@@ -64,10 +64,10 @@
 
 struct stcURLParse
 {
-   char host[MaxURLHostSize];
-   uint16_t port;
-   char path[MaxURLPathSize];
-   char postpath[MaxURLPathSize];
+    char host[MaxURLHostSize];
+    uint16_t port;
+    char path[MaxURLPathSize];
+    char postpath[MaxURLPathSize];
 };
 
 char *TxMsg = NULL;                          // to hold messages (AT/browser commands) when off line
@@ -78,31 +78,31 @@ char CurrPageTitle[eepBMTitleSize];          // keep current page title, could m
 uint8_t PrevURLQueueNum;   // current/latest in the link history queue
 uint8_t UsedPageLinkBuffs; // how many PageLinkBuff elements have been Used
 
-void SendPETSCIICharImmediate(uint8_t CharToSend);
-void SendASCIIStrImmediate(const char* CharsToSend);
-void SendASCIIErrorStrImmediate(const char* CharsToSend);
+void SendPETSCIICharImmediate (uint8_t CharToSend);
+void SendASCIIStrImmediate (const char *CharsToSend);
+void SendASCIIErrorStrImmediate (const char *CharsToSend);
 
-FLASHMEM void SendCommandSummaryImmediate(bool Paused);
+FLASHMEM void SendCommandSummaryImmediate (bool Paused);
 FLASHMEM void SendBrowserCommandsImmediate();
 
 bool BrowserMode, PagePaused, PrintingHyperlink;
 uint32_t PageCharsReceived;
-uint8_t HexCharToInt(uint8_t HexChar);
-bool CheckAndDecode(const char *ptrChars, uint8_t *ptrRetChar);
+uint8_t HexCharToInt (uint8_t HexChar);
+bool CheckAndDecode (const char *ptrChars, uint8_t *ptrRetChar);
 void UnPausePage();
 void ParseHTMLTag();
-void ParseURL(const char * URL, stcURLParse &URLParse);
-bool ReadClientLine(char* linebuf, uint16_t MaxLen);
+void ParseURL (const char *URL, stcURLParse &URLParse);
+bool ReadClientLine (char *linebuf, uint16_t MaxLen);
 void ClearClientStop();
-void AddToPrevURLQueue(const stcURLParse *URL);
-bool WebConnect(const stcURLParse *DestURL, bool AddToHist);
-void DoSearch(const char *Term);
+void AddToPrevURLQueue (const stcURLParse *URL);
+bool WebConnect (const stcURLParse *DestURL, bool AddToHist);
+void DoSearch (const char *Term);
 
-void DownloadFile(stcURLParse *DestURL);
-bool ValidModifier(const char cMod);
-bool isURLFiltered(const stcURLParse *URL);
-FLASHMEM bool DLExtension(const char * Extension);
-void ModWebConnect(stcURLParse *DestURL, char cMod, bool AddToHist);
+void DownloadFile (stcURLParse *DestURL);
+bool ValidModifier (const char cMod);
+bool isURLFiltered (const stcURLParse *URL);
+FLASHMEM bool DLExtension (const char *Extension);
+void ModWebConnect (stcURLParse *DestURL, char cMod, bool AddToHist);
 void ProcessBrowserCommand();
 
 #endif // SWIFTLINK_BROWSER_H

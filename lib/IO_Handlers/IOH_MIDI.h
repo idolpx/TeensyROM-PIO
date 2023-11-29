@@ -29,7 +29,7 @@
 
 // IO Handler for MIDI (6580 ACIA interface) Emulation
 
-void IO1Hndlr_MIDI(uint8_t Address, bool R_Wn);
+void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn);
 void PollingHndlr_MIDI();
 void InitHndlr_MIDI_Datel();
 void InitHndlr_MIDI_Sequential();
@@ -107,22 +107,22 @@ uint8_t wIORegAddrMIDIControl, rIORegAddrMIDIStatus, wIORegAddrMIDITransmit, rIO
 // Only called if MIDIRxBytesToSend==0 (No data waiting)
 
 void SetMidiIRQ();
-void HWEOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity);
-void HWEOnNoteOn(uint8_t channel, uint8_t note, uint8_t velocity);
-void HWEOnAfterTouchPoly(uint8_t channel, uint8_t note, uint8_t velocity);
-void HWEOnControlChange(uint8_t channel, uint8_t control, uint8_t value);
-void HWEOnProgramChange(uint8_t channel, uint8_t program);
-void HWEOnAfterTouch(uint8_t channel, uint8_t pressure);
-void HWEOnPitchChange(uint8_t channel, int pitch);
+void HWEOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity);
+void HWEOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity);
+void HWEOnAfterTouchPoly (uint8_t channel, uint8_t note, uint8_t velocity);
+void HWEOnControlChange (uint8_t channel, uint8_t control, uint8_t value);
+void HWEOnProgramChange (uint8_t channel, uint8_t program);
+void HWEOnAfterTouch (uint8_t channel, uint8_t pressure);
+void HWEOnPitchChange (uint8_t channel, int pitch);
 
 // F0 SysEx single call, message larger than buffer is truncated
-void HWEOnSystemExclusive(uint8_t *data, unsigned int size);
-void HWEOnTimeCodeQuarterFrame(uint8_t data);
-void HWEOnSongPosition(uint16_t beats);
-void HWEOnSongSelect(uint8_t songnumber);
+void HWEOnSystemExclusive (uint8_t *data, unsigned int size);
+void HWEOnTimeCodeQuarterFrame (uint8_t data);
+void HWEOnSongPosition (uint16_t beats);
+void HWEOnSongSelect (uint8_t songnumber);
 void HWEOnTuneRequest();
 
 // F8-FF (except FD)
-void HWEOnRealTimeSystem(uint8_t realtimebyte);
+void HWEOnRealTimeSystem (uint8_t realtimebyte);
 
 #endif // IOH_MIDI_H
