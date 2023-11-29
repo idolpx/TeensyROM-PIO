@@ -26,7 +26,7 @@
 #include "../../include/TeensyROM.h"
 
 #include "midi2sid.h"
-#include "eeprom_util.h"
+#include "eeprom_dev.h"
 #include "Menu.h"
 #include "Menu_Regs.h"
 #include "MainMenuItems.h"

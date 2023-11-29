@@ -27,7 +27,7 @@
 
 #include "../../include/TeensyROM.h"
 
-#include "eeprom_util.h"
+#include "eeprom_dev.h"
 #include "IOH_TeensyROM.h"
 #include "Swift_Browser.h"
 

@@ -31,7 +31,7 @@
 
 #include "FlashTxx.h"
 #include "MainMenuItems.h"
-#include "eeprom_util.h"
+#include "eeprom_dev.h"
 
 FLASHMEM void ServiceSerial()
 {

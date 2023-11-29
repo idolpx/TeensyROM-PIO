@@ -30,7 +30,7 @@
 #include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
-#include "eeprom_util.h"
+#include "eeprom_dev.h"
 
 void getNtpTime()
 {

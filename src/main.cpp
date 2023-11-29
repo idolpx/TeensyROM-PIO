@@ -34,7 +34,7 @@
 #include "midi2sid.h"
 #include "ISRs.h"
 #include "IOHandlers.h"
-#include "eeprom_util.h"
+#include "eeprom_dev.h"
 
 #include "Menu.h"
 #include "DriveDirLoad.h"
@@ -57,7 +57,9 @@ void setup()
     Serial.begin (115200);
     if (CrashReport) Serial.print (CrashReport);
 
-    for (uint8_t PinNum = 0; PinNum < sizeof (OutputPins); PinNum++) pinMode (OutputPins[PinNum], OUTPUT);
+    // Setup GPIO OUTPUT Pins
+    for (uint8_t PinNum = 0; PinNum < sizeof (OutputPins); PinNum++) 
+        pinMode (OutputPins[PinNum], OUTPUT);
     DataBufDisable; //buffer disabled
     SetDataPortDirOut; //default to output (for C64 Read)
     SetDMADeassert;
@@ -67,7 +69,9 @@ void setup()
     SetDebugDeassert;
     SetResetAssert; //assert reset until main loop()
 
-    for (uint8_t PinNum = 0; PinNum < sizeof (InputPins); PinNum++) pinMode (InputPins[PinNum], INPUT);
+    // Setup GPIO INPUT Pins
+    for (uint8_t PinNum = 0; PinNum < sizeof (InputPins); PinNum++) 
+        pinMode (InputPins[PinNum], INPUT);
     pinMode (Reset_Btn_In_PIN, INPUT_PULLUP); //also makes it Schmitt triggered (PAD_HYS)
     pinMode (PHI2_PIN, INPUT_PULLUP);  //also makes it Schmitt triggered (PAD_HYS)
     attachInterrupt ( digitalPinToInterrupt (Reset_Btn_In_PIN), isrButton, FALLING );
@@ -76,26 +80,33 @@ void setup()
 
     myusbHost.begin(); // Start USBHost_t36, HUB(s) and USB devices.
 
+    // Initialize EEPROM if needed
     EEPcheck();
 
     IO1 = (uint8_t *)calloc (IO1_Size, sizeof (uint8_t)); //allocate IO1 space and init to 0
     IO1[rwRegStatus]        = rsReady;
-    IO1[rWRegCurrMenuWAIT] = rmtTeensy;
-    IO1[rRegPresence1]     = 0x55;
-    IO1[rRegPresence2]     = 0xAA;
+    IO1[rWRegCurrMenuWAIT]  = rmtTeensy;
+    IO1[rRegPresence1]      = 0x55;
+    IO1[rRegPresence2]      = 0xAA;
     for (uint16_t reg = rRegSIDStrStart; reg < rRegSIDStringTerm; reg++) IO1[reg] = ' ';
-    IO1[rRegSIDStringTerm] = 0;
+    IO1[rRegSIDStringTerm]  = 0;
     IO1[rwRegPwrUpDefaults] = EEPROM.read (eepAdPwrUpDefaults);
-    IO1[rwRegTimezone]     = EEPROM.read (eepAdTimezone);
+    IO1[rwRegTimezone]      = EEPROM.read (eepAdTimezone);
     //IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr); //done each entry into menu
+
+
     SetUpMainMenuROM();
     MenuChange(); //set up drive path, menu source/size
 
-    for (uint8_t cnt = 0; cnt < IOH_Num_Handlers; cnt++) PadSpace (IOHandler[cnt]->Name, IOHNameLength - 1); //done so selection shown on c64 overwrites previous
+    for (uint8_t cnt = 0; cnt < IOH_Num_Handlers; cnt++) 
+        PadSpace (IOHandler[cnt]->Name, IOHNameLength - 1); //done so selection shown on c64 overwrites previous
 
-    for (uint8_t cnt = 0; cnt < NumPageLinkBuffs; cnt++) PageLinkBuff[cnt] = NULL; //initialize page link buffer for swiftlink browser mode
-    for (uint8_t cnt = 0; cnt < NumPrevURLQueues; cnt++) PrevURLQueue[cnt] = NULL; //initialize previous link buffer for swiftlink browser mode
-    for (uint8_t cnt = 0; cnt < RxQueueNumBlocks; cnt++) RxQueue[cnt] = NULL; //initialize RxQueue for swiftlink
+    for (uint8_t cnt = 0; cnt < NumPageLinkBuffs; cnt++) 
+        PageLinkBuff[cnt] = NULL; //initialize page link buffer for swiftlink browser mode
+    for (uint8_t cnt = 0; cnt < NumPrevURLQueues; cnt++) 
+        PrevURLQueue[cnt] = NULL; //initialize previous link buffer for swiftlink browser mode
+    for (uint8_t cnt = 0; cnt < RxQueueNumBlocks; cnt++) 
+        RxQueue[cnt] = NULL; //initialize RxQueue for swiftlink
 
     BigBuf = (uint32_t *)malloc (BigBufSize * sizeof (uint32_t));
     MakeBuildCPUInfoStr();
@@ -132,9 +143,11 @@ void loop()
         SetResetDeassert;
     }
 
-    if (Serial.available()) ServiceSerial();
+    if (Serial.available()) 
+        ServiceSerial();
     myusbHost.Task();
 
     //handler specific polling items:
-    if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL) IOHandler[CurrentIOHandler]->PollingHndlr();
+    if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL) 
+        IOHandler[CurrentIOHandler]->PollingHndlr();
 }
