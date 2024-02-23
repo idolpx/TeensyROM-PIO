@@ -32,7 +32,7 @@
 
 #include <SD.h>
 
-#include "../../include/TeensyROM.h"
+//#include "../../include/TeensyROM.h"
 
 #include "Menu.h"
 #include "DriveDirLoad.h"

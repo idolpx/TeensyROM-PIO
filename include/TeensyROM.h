@@ -62,34 +62,11 @@ uint32_t* BigBuf = NULL;
    __attribute__((always_inline)) inline void TraceLogAddValidData(...) {};
 #endif
 
-#define MaxItemNameLength   100
-#define MaxPathLength       300
-#define MaxNamePathLength   (MaxPathLength+MaxItemNameLength+2)
-#define MaxMenuItems        3000  //(Max Pages * MaxItemsPerPage) = 255 * 16 = 4080 max to keep page # 8-bit
-#define SerialTimoutMillis  500
-#define UpDirString         "/.. <Up Dir>"
-#define NTSCBusFreq         1022730
-#define PALBusFreq          985250
-#define IO1_Size            256
 
-#define Drive_USB           1
-#define Drive_SD            2
 
 volatile uint32_t StartCycCnt, LastCycCnt=0;
-   
-#define PHI2_PIN            1  
-#define Reset_Btn_In_PIN    31  
-const uint8_t InputPins[] = {
-   19,18,14,15,40,41,17,16,22,23,20,21,38,39,26,27,  //address bus
-   2, 3, 4, 5, PHI2_PIN, 0,   // IO1n, IO2n, ROML, ROMH, PHI2_PIN, R_Wn
-   28, 29, Reset_Btn_In_PIN,  // DOT clk, BA, Reset button
-   };
 
-const uint8_t OutputPins[] = {
-   35, 9, 32,   // DataCEn, ExROM, Game
-   30, 25, 24,  // DMA, NMI, IRQ
-   34,33, 6,    // LED, debug, Reset_Out_PIN,
-   };
+
 
 #define ReadGPIO6           (*(volatile uint32_t *)IMXRT_GPIO6_ADDRESS)
 #define GP6_R_Wn(r)         (r & CORE_PIN0_BITMASK)

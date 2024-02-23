@@ -19,7 +19,7 @@
 
 #include "IOH_Debug.h"
 
-#include "../../include/TeensyROM.h"
+//#include "../../include/TeensyROM.h"
 
 #include "midi2sid.h"
 #include "IOH_defs.h"

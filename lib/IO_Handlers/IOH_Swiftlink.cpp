@@ -26,7 +26,7 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
-#include "../../include/TeensyROM.h"
+//#include "../../include/TeensyROM.h"
 
 #include "ethernet_dev.h"
 

@@ -19,7 +19,6 @@
 
 #include "IOH_MIDI.h"
 
-#include "../../include/TeensyROM.h"
 #include "DriveDirLoad.h"
 
 #include "midi2sid.h"

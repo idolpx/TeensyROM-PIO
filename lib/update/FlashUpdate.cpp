@@ -56,12 +56,12 @@
 #include <Arduino.h>
 #include <SD.h>
 
-#include "DriveDirLoad.h"
+//#include "DriveDirLoad.h"
+#include "SendMsg.h"
 
 #include "FXUtil.h" // read_ascii_line(), hex file support
-extern "C"
-{
-#include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
+extern "C" {
+    #include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
 }
 
 void DoFlashUpdate (FS *sourceFS, const char *FilePathName)

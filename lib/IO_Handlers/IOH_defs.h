@@ -1,7 +1,9 @@
-#ifndef IOH_STRUCT_H
-#define IOH_STRUCT_H
+#ifndef IOH_DEFS_H
+#define IOH_DEFS_H
 
 #include <Arduino.h>
+
+#include "../../include/TeensyROM.h"
 
 #define IOHNameLength 20  //limited by display location on C64
 
@@ -17,4 +19,4 @@ struct stcIOHandlers
     void (*CycleHndlr)();                            //called at the end of EVERY c64 cycle
 };
 
-#endif // IOH_STRUCT_H
+#endif // IOH_DEFS_H

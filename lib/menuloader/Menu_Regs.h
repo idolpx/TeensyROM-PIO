@@ -27,6 +27,19 @@
 #define MaxItemDispLength 35
 #define MaxItemsPerPage 19
 
+#define MaxItemNameLength   100
+#define MaxPathLength       300
+#define MaxNamePathLength   (MaxPathLength+MaxItemNameLength+2)
+#define MaxMenuItems        3000  //(Max Pages * MaxItemsPerPage) = 255 * 16 = 4080 max to keep page # 8-bit
+#define SerialTimoutMillis  500
+#define UpDirString         "/.. <Up Dir>"
+#define NTSCBusFreq         1022730
+#define PALBusFreq          985250
+#define IO1_Size            256
+
+#define Drive_USB           1
+#define Drive_SD            2
+
 enum IO1_Registers // offset from 0xDE00
 {
     // skipping 0: Used by many others and accessed on reset

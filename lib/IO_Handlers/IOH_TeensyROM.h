@@ -27,7 +27,6 @@
 #include <FS.h>
 
 #include "IOH_defs.h"
-#include "../../include/TeensyROM.h"
 
 #include "Menu_Regs.h"
 #include "Menu.h"
@@ -52,8 +51,6 @@ volatile uint8_t EmulateVicCycles;
 
 volatile uint8_t *IO1;  //io1 space/regs
 volatile uint16_t StreamOffsetAddr, StringOffset = 0;
-volatile char    *ptrSerialString; //pointer to selected serialstring
-char SerialStringBuf[MaxPathLength] = "err"; // used for message passing to C64, up to full path length
 volatile uint8_t doReset = true;
 
 uint16_t LOROM_Mask, HIROM_Mask;

@@ -22,8 +22,6 @@
 #include <Arduino.h>
 #include <SD.h>
 
-#include "../../include/TeensyROM.h"
-
 #include "FileTransfer.h"
 #include "RemoteControl.h"
 #include "ISRs.h"

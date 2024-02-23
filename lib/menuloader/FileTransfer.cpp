@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <SD.h>
 
-#include "../../include/TeensyROM.h"
+//#include "../../include/TeensyROM.h"
 
 #include "midi2sid.h"
 #include "SerUSBIO.h"

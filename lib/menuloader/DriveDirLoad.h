@@ -25,7 +25,6 @@
 #include <Arduino.h>
 #include <FS.h>
 
-#include "../../include/TeensyROM.h"
 #include "Menu_Regs.h"
 
 #define Cart_Generic 0 // Supported
@@ -232,10 +231,5 @@ uint32_t toU32 (uint8_t *src);
 uint16_t toU16 (uint8_t *src);
 uint8_t Assoc_Ext_ItemType (char *FileName);
 bool AssocHWID_IOH (uint16_t HWType);
-void SendMsgOK();
-void SendMsgFailed();
-void SendMsgPrintfln (const char *Fmt, ...);
-void SendMsgPrintf (const char *Fmt, ...);
-void SendMsgSerialStringBuf();
 
 #endif // DRIVEDIRLOAD_H

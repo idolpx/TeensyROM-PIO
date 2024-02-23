@@ -31,6 +31,7 @@
 
 #include "IOH_TeensyROM.h"
 #include "Swift_RxQueue.h"
+#include "Menu_Regs.h"
 
 void SendPETSCIICharImmediate (uint8_t CharToSend)
 {

@@ -22,6 +22,8 @@
 #include "DriveDirLoad.h"
 #include "IOH_TeensyROM.h"
 
+#include "../../include/TeensyROM.h"
+
 void InitHndlr_EasyFlash()
 {
     //initialize bank decode pointers

@@ -6,8 +6,9 @@ extern "C" {
 #include "FlashTxx.h" // TLC/T3x/T4x/TMM flash primitives
 }
 
-#include "../../include/TeensyROM.h"
-#include "DriveDirLoad.h"
+#include "pinmap.h"
+
+#include "SendMsg.h"
 
 //******************************************************************************
 // hex_info_t   struct for hex record and hex file info

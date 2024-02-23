@@ -29,7 +29,7 @@
 #include <NativeEthernet.h>
 #include <NativeEthernetUdp.h>
 
-#include "../../include/TeensyROM.h"
+#include "pinmap.h"
 
 #include "midi2sid.h"
 #include "ISRs.h"
@@ -110,7 +110,7 @@ void setup()
 
     BigBuf = (uint32_t *)malloc (BigBufSize * sizeof (uint32_t));
     MakeBuildCPUInfoStr();
-    Serial.printf ("\n%sTeensyROM %s is on-line\n", SerialStringBuf, strVersionNumber);
+    //Serial.printf ("\n%sTeensyROM %s is on-line\n", SerialStringBuf, strVersionNumber);
 }
 
 void loop()
