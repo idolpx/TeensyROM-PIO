@@ -20,26 +20,21 @@
 #ifndef IOH_ZAXXONSUPER_H
 #define IOH_ZAXXONSUPER_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
-extern uint16_t LOROM_Mask;
-
-void InitHndlr_ZaxxonSuper();
-void ROMLHndlr_ZaxxonSuper (uint32_t Address);
+void InitHndlr_ZaxxonSuper();                           
+void ROMLHndlr_ZaxxonSuper(uint32_t Address);  
 
 stcIOHandlers IOHndlr_ZaxxonSuper =
 {
-    "Zaxxon_SuperZaxxon",  //Name of handler
-    &InitHndlr_ZaxxonSuper,//Called once at handler startup
-    NULL,                  //IO1 R/W handler
-    NULL,                  //IO2 R/W handler
-    &ROMLHndlr_ZaxxonSuper,//ROML Read handler, in addition to any ROM data sent
-    NULL,                  //ROMH Read handler, in addition to any ROM data sent
-    NULL,                  //Polled in main routine
-    NULL,                  //called at the end of EVERY c64 cycle
+  "Zaxxon_SuperZaxxon",  //Name of handler
+  &InitHndlr_ZaxxonSuper,//Called once at handler startup
+  NULL,                  //IO1 R/W handler
+  NULL,                  //IO2 R/W handler
+  &ROMLHndlr_ZaxxonSuper,//ROML Read handler, in addition to any ROM data sent
+  NULL,                  //ROMH Read handler, in addition to any ROM data sent
+  NULL,                  //Polled in main routine
+  NULL,                  //called at the end of EVERY c64 cycle
 };
-
 
 #endif // IOH_ZAXXONSUPER_H

@@ -20,8 +20,6 @@
 #ifndef IOH_OCEAN1_H
 #define IOH_OCEAN1_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
 void InitHndlr_Ocean1();

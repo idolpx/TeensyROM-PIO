@@ -20,8 +20,6 @@
 #ifndef IOH_NONE_H
 #define IOH_NONE_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
 stcIOHandlers IOHndlr_None =

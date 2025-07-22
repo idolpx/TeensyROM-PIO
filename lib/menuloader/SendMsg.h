@@ -3,6 +3,7 @@
 #define SENDMSG_H
 
 #include "Menu_Regs.h"
+#include "Common_Defs.h"
 
 volatile char    *ptrSerialString; //pointer to selected serialstring
 char SerialStringBuf[MaxPathLength] = "err"; // used for message passing to C64, up to full path length

@@ -20,23 +20,23 @@
 #ifndef IOH_SUPERGAMES_H
 #define IOH_SUPERGAMES_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
-void InitHndlr_SuperGames();
-void IO2Hndlr_SuperGames (uint8_t Address, bool R_Wn);
+void InitHndlr_SuperGames();                           
+void IO2Hndlr_SuperGames(uint8_t Address, bool R_Wn);  
 
 stcIOHandlers IOHndlr_SuperGames =
 {
-    "SuperGames",          //Name of handler
-    &InitHndlr_SuperGames, //Called once at handler startup
-    NULL,                  //IO1 R/W handler
-    &IO2Hndlr_SuperGames,  //IO2 R/W handler
-    NULL,                  //ROML Read handler, in addition to any ROM data sent
-    NULL,                  //ROMH Read handler, in addition to any ROM data sent
-    NULL,                  //Polled in main routine
-    NULL,                  //called at the end of EVERY c64 cycle
+  "SuperGames",          //Name of handler
+  &InitHndlr_SuperGames, //Called once at handler startup
+  NULL,                  //IO1 R/W handler
+  &IO2Hndlr_SuperGames,  //IO2 R/W handler
+  NULL,                  //ROML Read handler, in addition to any ROM data sent
+  NULL,                  //ROMH Read handler, in addition to any ROM data sent
+  NULL,                  //Polled in main routine
+  NULL,                  //called at the end of EVERY c64 cycle
 };
+
+bool WPLatched; 
 
 #endif // IOH_SUPERGAMES_H

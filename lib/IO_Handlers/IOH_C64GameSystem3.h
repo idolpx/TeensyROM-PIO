@@ -20,8 +20,6 @@
 #ifndef IOH_C64GAMESYSTEM3_H
 #define IOH_C64GAMESYSTEM3_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
 void IO1Hndlr_C64GameSystem3 (uint8_t Address, bool R_Wn);

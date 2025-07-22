@@ -6,7 +6,8 @@
 #include <USBHost_t36.h>
 #include <MIDI.h>
 
-#include "../../include/midiDevName.h"
+#include "IOHandlers.h"
+#include "midiDevName.h"
 
 #define usbDevMIDI usbMIDI
 

@@ -20,8 +20,6 @@
 #ifndef IOH_DEBUG_H
 #define IOH_DEBUG_H
 
-#include <Arduino.h>
-
 #include "IOH_defs.h"
 
 #define DEBUG_MEMLOC   FLASHMEM

@@ -20,88 +20,94 @@
 #ifndef IOH_MIDI_H
 #define IOH_MIDI_H
 
-#include <Arduino.h>
-#include <MIDI.h>
-#include <MIDIUSB.h>
+#include "DriveDirLoad.h"
 
+#include "midi2sid.h"
 #include "IOH_defs.h"
-#include "SerUSBIO.h"
 
-// IO Handler for MIDI (6580 ACIA interface) Emulation
 
-void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn);
-void PollingHndlr_MIDI();
-void InitHndlr_MIDI_Datel();
-void InitHndlr_MIDI_Sequential();
-void InitHndlr_MIDI_Passport();
-void InitHndlr_MIDI_NamesoftIRQ();
+//IO Handler for MIDI (6580 ACIA interface) Emulation
+
+void IO1Hndlr_MIDI(uint8_t Address, bool R_Wn);  
+void PollingHndlr_MIDI();                           
+void InitHndlr_MIDI_Datel();                           
+void InitHndlr_MIDI_Sequential();                           
+void InitHndlr_MIDI_Passport();                           
+void InitHndlr_MIDI_NamesoftIRQ();                           
 
 stcIOHandlers IOHndlr_MIDI_Datel =
 {
-    "MIDI:Datel/Siel",     // Name of handler
-    &InitHndlr_MIDI_Datel, // Called once at handler startup
-    &IO1Hndlr_MIDI,        // IO1 R/W handler
-    NULL,                  // IO2 R/W handler
-    NULL,                  // ROML Read handler, in addition to any ROM data sent
-    NULL,                  // ROMH Read handler, in addition to any ROM data sent
-    &PollingHndlr_MIDI,    // Polled in main routine
-    NULL,                  // called at the end of EVERY c64 cycle
+  "MIDI:Datel/Siel",           //Name of handler
+  &InitHndlr_MIDI_Datel,       //Called once at handler startup
+  &IO1Hndlr_MIDI,              //IO1 R/W handler
+  NULL,                        //IO2 R/W handler
+  NULL,                        //ROML Read handler, in addition to any ROM data sent
+  NULL,                        //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_MIDI,          //Polled in main routine
+  NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_Sequential =
 {
-    "MIDI:Sequential",          // Name of handler
-    &InitHndlr_MIDI_Sequential, // Called once at handler startup
-    &IO1Hndlr_MIDI,             // IO1 R/W handler
-    NULL,                       // IO2 R/W handler
-    NULL,                       // ROML Read handler, in addition to any ROM data sent
-    NULL,                       // ROMH Read handler, in addition to any ROM data sent
-    &PollingHndlr_MIDI,         // Polled in main routine
-    NULL,                       // called at the end of EVERY c64 cycle
+  "MIDI:Sequential",           //Name of handler
+  &InitHndlr_MIDI_Sequential,  //Called once at handler startup
+  &IO1Hndlr_MIDI,              //IO1 R/W handler
+  NULL,                        //IO2 R/W handler
+  NULL,                        //ROML Read handler, in addition to any ROM data sent
+  NULL,                        //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_MIDI,          //Polled in main routine
+  NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_Passport =
 {
-    "MIDI:Passport/Sent",     // Name of handler
-    &InitHndlr_MIDI_Passport, // Called once at handler startup
-    &IO1Hndlr_MIDI,           // IO1 R/W handler
-    NULL,                     // IO2 R/W handler
-    NULL,                     // ROML Read handler, in addition to any ROM data sent
-    NULL,                     // ROMH Read handler, in addition to any ROM data sent
-    &PollingHndlr_MIDI,       // Polled in main routine
-    NULL,                     // called at the end of EVERY c64 cycle
+  "MIDI:Passport/Sent",        //Name of handler
+  &InitHndlr_MIDI_Passport,    //Called once at handler startup
+  &IO1Hndlr_MIDI,              //IO1 R/W handler
+  NULL,                        //IO2 R/W handler
+  NULL,                        //ROML Read handler, in addition to any ROM data sent
+  NULL,                        //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_MIDI,          //Polled in main routine
+  NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_NamesoftIRQ =
 {
-    "MIDI:Namesoft IRQ",         // Name of handler
-    &InitHndlr_MIDI_NamesoftIRQ, // Called once at handler startup
-    &IO1Hndlr_MIDI,              // IO1 R/W handler
-    NULL,                        // IO2 R/W handler
-    NULL,                        // ROML Read handler, in addition to any ROM data sent
-    NULL,                        // ROMH Read handler, in addition to any ROM data sent
-    &PollingHndlr_MIDI,          // Polled in main routine
-    NULL,                        // called at the end of EVERY c64 cycle
+  "MIDI:Namesoft IRQ",         //Name of handler
+  &InitHndlr_MIDI_NamesoftIRQ, //Called once at handler startup
+  &IO1Hndlr_MIDI,              //IO1 R/W handler
+  NULL,                        //IO2 R/W handler
+  NULL,                        //ROML Read handler, in addition to any ROM data sent
+  NULL,                        //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_MIDI,          //Polled in main routine
+  NULL,                        //called at the end of EVERY c64 cycle
 };
 
-// see https://codebase64.org/doku.php?id=base:c64_midi_interfaces
-//  6580 ACIA interface emulation
-// rIORegMIDIStatus:
-#define MIDIStatusIRQReq 0x80 // Interrupt Request
-#define MIDIStatusDCD 0x04    // Data Carrier Detect (Ready to receive Tx data)
-#define MIDIStatusTxRdy 0x02  // Transmit Data Register Empty (Ready to receive Tx data)
-#define MIDIStatusRxFull 0x01 // Receive Data Register Full (Rx Data waiting to be read)
 
-// #define NumMIDIControls   16  //must be power of 2, may want to do this differently?
-// uint8_t MIDIControlVals[NumMIDIControls];
 
-volatile uint8_t rIORegMIDIStatus = 0;
-volatile uint8_t MIDIRxIRQEnabled = false;
+//see https://codebase64.org/doku.php?id=base:c64_midi_interfaces
+// 6580 ACIA interface emulation
+//rIORegMIDIStatus:
+#define MIDIStatusIRQReq  0x80   // Interrupt Request
+#define MIDIStatusDCD     0x04   // Data Carrier Detect (Ready to receive Tx data)
+#define MIDIStatusTxRdy   0x02   // Transmit Data Register Empty (Ready to receive Tx data)
+#define MIDIStatusRxFull  0x01   // Receive Data Register Full (Rx Data waiting to be read)
+
+//#define NumMIDIControls   16  //must be power of 2, may want to do this differently?
+//uint8_t MIDIControlVals[NumMIDIControls];
+
+#define MIDIRxBufSize    8192  // >= USB_MIDI_SYSEX_MAX (currently 290, defined in cores\teensy4\usb_midi.h)
+
+volatile uint8_t  rIORegMIDIStatus   = 0;
+volatile uint8_t  MIDIRxIRQEnabled = false;
 volatile uint16_t MIDIRxBytesToSend = 0;
-volatile uint8_t MIDIRxBuf[USB_MIDI_SYSEX_MAX]; // currently 290, defined in cores\teensy4\usb_midi.h
-volatile uint8_t MIDITxBytesReceived = 0;
-volatile uint8_t MIDITxBuf[3];
+volatile uint8_t  *MIDIRxBuf = NULL;
+volatile uint8_t  MIDITxBytesReceived = 0;
+volatile uint8_t  MIDITxBuf[3];
 uint8_t wIORegAddrMIDIControl, rIORegAddrMIDIStatus, wIORegAddrMIDITransmit, rIORegAddrMIDIReceive;
+
+extern uint8_t nfcState;
+
 
 // MIDI input handlers for HW Emulation _________________________________________________________________________
 // Only called if MIDIRxBytesToSend==0 (No data waiting)
@@ -124,5 +130,15 @@ void HWEOnTuneRequest();
 
 // F8-FF (except FD)
 void HWEOnRealTimeSystem (uint8_t realtimebyte);
+
+//____________________________________________________________________________________________________
+
+void MIDIinHndlrInit();
+void InitHndlr_MIDI_Datel();
+void InitHndlr_MIDI_Sequential();
+void InitHndlr_MIDI_Passport();
+void InitHndlr_MIDI_NamesoftIRQ();
+void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn);
+void PollingHndlr_MIDI();
 
 #endif // IOH_MIDI_H
