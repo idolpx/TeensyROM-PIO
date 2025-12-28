@@ -1,7 +1,7 @@
 #include "Common_Defs.h"
 
 // Global variable definitions
-char strVersionNumber[] = "v0.6.7+9.pio"; //*VERSION*
+char strVersionNumber[] = FIRMWARE_VERSION; //*VERSION*
 
 bool (*fBusSnoop)(uint16_t Address, bool R_Wn) = NULL;
 

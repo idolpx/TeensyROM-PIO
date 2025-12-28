@@ -1,0 +1,111 @@
+; PlatformIO Project Configuration File
+;
+;   Build options: build flags, source filter
+;   Upload options: custom upload port, speed and extra flags
+;   Library options: dependencies, extra library storages
+;   Advanced options: extra scripting
+;
+; Please visit documentation for the other options and examples
+; https://docs.platformio.org/page/projectconf.html
+
+
+[platformio]
+description = TeensyROM (ROM Emulator, Fast Loader, MIDI and Internet cartridge for Commodore64/128)
+firmware_version = "v0.6.7+9.x"
+default_envs = teensyrom-max
+
+
+[teensyrom]
+platform = teensy
+board = teensy41
+framework = arduino
+;extra_scripts = 
+;    pre:build_version.py
+;    post:build_firmwarezip.py
+
+
+[env]
+; Common settings for all enivornments
+lib_ldf_mode = deep+
+upload_speed = 115200 ;921600
+;upload_port = COM1 ; Windows
+;upload_port = /dev/ttyUSB0 ; Linux
+upload_port = /dev/cu.usbmodem148986801 ; Mac
+monitor_speed = 115200 ;921600
+;monitor_port = COM1 ; Windows
+;monitor_port = /dev/ttyUSB0 ; Linux
+monitor_port = /dev/cu.usbmodem148986801 ; Mac
+monitor_filters = color
+check_skip_packages = yes
+
+;lib_deps = 
+;    https://github.com/vjmuzik/FNET.git
+;    https://github.com/vjmuzik/NativeEthernet.git
+;    https://github.com/elechouse/PN532.git
+
+; https://forum.pjrc.com/index.php?threads/newbie-on-platformio-with-teensy.64225/#post-258173
+; Build-flag             Description (as in Arduino IDE)
+; ----------------------------------------------------
+; USB_SERIAL               Serial           
+; USB_DUAL_SERIAL          Dual Serial   
+; USB_TRIPLE_SERIAL        Triple Serial  
+; USB_KEYBOARDONLY         Keyboard
+; USB_TOUCHSCREEN          Keyboard + Touch Screen
+; USB_HID_TOUCHSCREEN      Keyboard + Mouse + Touch Screen
+; USB_HID                  Keyboard + Mouse + Joystick
+; USB_SERIAL_HID           Serial + Keyboard + Mouse + Joystick
+; USB_MIDI                 MIDI
+; USB_MIDI4                MIDIx4
+; USB_MIDI16               MIDIx16
+; USB_MIDI_SERIAL          Serial + MIDI
+; USB_MIDI4_SERIAL         Serial + MIDIx4
+; USB_MIDI16_SERIAL        Serial + MIDIx16
+; USB_AUDIO                Audio
+; USB_MIDI_AUDIO_SERIAL    Serial + MIDI + Audio
+; USB_MIDI16_AUDIO_SERIAL  Serial + MIDIx16 + Audio
+; USB_MTPDISK              MTP Disk (Experimental)
+; USB_RAWHID               Raw HID
+; USB_FLIGHTSIM            Flight Sim Controls
+; USB_FLIGHTSIM_JOYSTICK   Flight Sim Controls + Joystick
+; USB_EVERYTHING           All of the Above (only available @ teensy 3.1 3.5 3.6)
+; USB_DISABLED             No USB
+
+build_flags =
+    -D CMAKE_EXPORT_COMPILE_COMMANDS=ON
+    -D TEENSY_OPT_SMALLEST_CODE
+    -D USB_MIDI_SERIAL
+    -D FIRMWARE_VERSION=\"${platformio.firmware_version}\"
+    -I include
+
+    ; Debug Options
+    ; Enable debug messaging at your own risk, can cause emulation interference/fails
+    -D DEBUG_SPEED=${env.monitor_speed}
+    ; -D Dbg_SerASID        ; Debug messages for Serial ASID cartridge emulation
+    ; -D Dbg_SerLog         ; Allow commands over serial that display log and memory info
+    ; -D Dbg_SerLogMem      ; Allow commands over serial that display log and memory info
+    ; -D Dbg_SerMem         ; Allow commands over serial that display memory info
+    ; -D Dbg_SerSwift       ; Allow commands over serial that tweak SwiftLink parameters.
+    ; -D Dbg_SerTimChg      ; Allow commands over serial that tweak timing parameters.
+    ; -D DbgCycAdjLog       ; Logs ISR timing adjustments to BigBuf.
+    ; -D DbgFab0_3plus      ; Debug messages for the FAB0 3-plus cartridge emulation
+    ; -D DbgIOTraceLog      ; Logs Reads/Writes to/from IO1 to BigBuf. Like debug handler but can use for others
+    ; -D DbgMsgs_IO         ; Serial out messages (Printf_dbg): Swift, MIDI (mostly out), CRT Chip info
+    ; -D DbgMsgs_M2S        ; MIDI2SID MIDI handler messages
+    ; -D DbgMsgs_SW         ; SwiftLink related debug messages
+    ; -D DbgSignalASIDIRQ   ; Debug messages for ASID IRQ handling
+    ; -D DbgSignalIsrPHI20  ; Debug messages for PHI2 ISR timing
+    ; -D DbgSpecial         ; Special case logging to BigBuf
+
+    ; -D MinimumBuild     ; Exclude features to minimize code size
+
+
+[env:teensyrom-max]
+extends = teensyrom
+build_flags =
+    ${env.build_flags}
+
+[env:teensyrom-min]
+extends = teensyrom
+build_flags =
+    ${env.build_flags}
+    -D MinimumBuild
