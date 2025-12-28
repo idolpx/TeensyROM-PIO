@@ -164,26 +164,26 @@ const uint8_t OutputPins[] = {
 #define GP6_R_Wn(r)         (r & CORE_PIN0_BITMASK)
 #define GP6_Phi2(r)         (r & CORE_PIN1_BITMASK)
 #define GP6_Address(r)      ((r >> CORE_PIN19_BIT) & 0xFFFF)  // bits 16-31 contain address bus, in order 
-                            
+
 #define ReadGPIO7           (*(volatile uint32_t *)IMXRT_GPIO7_ADDRESS)
 #define GP7_DataMask        0xF000F   //CORE_PIN10,12,11,13,8,7,36,37_BITMASK
 #define SetDataPortDirOut   CORE_PIN10_DDRREG |= GP7_DataMask
 #define SetDataPortDirIn    CORE_PIN10_DDRREG &= ~GP7_DataMask
-                            
+
 #define ReadGPIO8           (*(volatile uint32_t *)IMXRT_GPIO8_ADDRESS)
 #define ReadButton          (ReadGPIO8 & CORE_PIN31_BITMASK)
 #define ReadDotClkDebug     (ReadGPIO8 & CORE_PIN28_BITMASK)
-                            
+
 #define ReadGPIO9           (*(volatile uint32_t *)IMXRT_GPIO9_ADDRESS)
 #define GP9_IO1n(r)         (r & CORE_PIN2_BITMASK)
 #define GP9_IO2n(r)         (r & CORE_PIN3_BITMASK)
 #define GP9_ROML(r)         (r & CORE_PIN4_BITMASK)
 #define GP9_ROMH(r)         (r & CORE_PIN5_BITMASK)
 #define GP9_BA(r)           (r & CORE_PIN29_BITMASK)
-                            
+
 #define DataBufDisable      CORE_PIN35_PORTSET = CORE_PIN35_BITMASK
 #define DataBufEnable       CORE_PIN35_PORTCLEAR = CORE_PIN35_BITMASK
-                            
+
 #define SetResetAssert      CORE_PIN6_PORTCLEAR = CORE_PIN6_BITMASK  //active low
 #define SetResetDeassert    CORE_PIN6_PORTSET = CORE_PIN6_BITMASK
 #define SetExROMAssert      CORE_PIN9_PORTCLEAR = CORE_PIN9_BITMASK  //active low
@@ -196,18 +196,18 @@ const uint8_t OutputPins[] = {
 #define SetNMIDeassert      CORE_PIN25_PORTSET = CORE_PIN25_BITMASK 
 #define SetIRQAssert        CORE_PIN24_PORTCLEAR = CORE_PIN24_BITMASK //active low
 #define SetIRQDeassert      CORE_PIN24_PORTSET = CORE_PIN24_BITMASK 
-                            
+
 #define SetLEDOn            CORE_PIN34_PORTSET = CORE_PIN34_BITMASK
 #define SetLEDOff           CORE_PIN34_PORTCLEAR = CORE_PIN34_BITMASK 
 #define SetDataBufOut       CORE_PIN33_PORTSET = CORE_PIN33_BITMASK
 #define SetDataBufIn        CORE_PIN33_PORTCLEAR = CORE_PIN33_BITMASK 
-                            
+
 #define CycTonS(N)          (N*(1000000000UL>>16)/(F_CPU_ACTUAL>>16))
 #define nSToCyc(N)          (N*(F_CPU_ACTUAL>>16)/(1000000000UL>>16))
 
 //#define RESET_CYCLECOUNT   { ARM_DEMCR |= ARM_DEMCR_TRCENA; ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA; ARM_DWT_CYCCNT = 0; }
 #define WaitUntil_nS(N)     while((ARM_DWT_CYCCNT-StartCycCnt) < nSToCyc(N))
-    
+
 #define Def_nS_MaxAdj      1030  //    above this nS since last int causes adjustment, formerly 993 for NTSC only
 
 // Times from Phi2 rising (interrupt start):

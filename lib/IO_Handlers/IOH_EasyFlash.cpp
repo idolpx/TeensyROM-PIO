@@ -22,6 +22,11 @@
 #include "Common_Defs.h"
 #include "FileParsers.h"
 
+#ifdef MinimumBuild
+   #include <SD.h>
+   File myFile;  // Global file handle for swap banks
+#endif
+
 // Global variable definitions
 stcIOHandlers IOHndlr_EasyFlash =
 {
@@ -46,12 +51,15 @@ uint8_t EZFlashRAM[256];
       uint8_t  Image[8192]; // 8k swap image
       uint32_t Offset; // chip swap file offsets to check for same & not reload
    };
- 
+
+   #define Num8kSwapBuffers 4
+   #define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
+
    stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
-    
+
    extern bool PathIsRoot();
    extern char DriveDirPath[];
-   extern StructMenuItem DriveDirMenu;
+   extern StructMenuItem *DriveDirMenu;
    extern File myFile;
 #endif
 
@@ -67,8 +75,8 @@ void LoadBank(uint32_t SeekTo, uint8_t* ptrImage)
 
       //uint32_t Startms = millis();
 
-      if (PathIsRoot()) sprintf(FullFilePath, "%s%s", DriveDirPath, DriveDirMenu.Name);  // at root
-      else sprintf(FullFilePath, "%s/%s", DriveDirPath, DriveDirMenu.Name);
+      if (PathIsRoot()) sprintf(FullFilePath, "%s%s", DriveDirPath, DriveDirMenu->Name);  // at root
+      else sprintf(FullFilePath, "%s/%s", DriveDirPath, DriveDirMenu->Name);
          
       //Printf_dbg("Loading:\r\n%s", FullFilePath);
 

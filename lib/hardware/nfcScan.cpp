@@ -220,7 +220,7 @@ bool nfcReadTagLaunch(uint8_t* uid, uint8_t uidLength)
          Printf_dbg("Couldn't read pg %d\n", PageNum);
          return false;
       }
-       
+
       if(PageNum == 4)
       { //extract start/length info when read (first pass through)
          if(TagData[0] == 0x03)
@@ -265,8 +265,8 @@ bool nfcReadTagLaunch(uint8_t* uid, uint8_t uidLength)
 
    Printf_dbg("\nRec %d pgs, %d msg len, %d chars read:\n%s\n", PageNum-4, messageLength, CharNum, TagData+DataStart);
    //for(uint16_t cnt=0; cnt<=CharNum; cnt++) Serial.printf("Chr %d: 0x%02x '%c'\n", cnt, TagData[cnt], TagData[cnt]);
- 
- 
+
+
    //*** Finished receiving data, now parse & check it ***
 
    // https://www.oreilly.com/library/view/beginning-nfc/9781449324094/ch04.html
@@ -309,8 +309,8 @@ bool nfcReadTagLaunch(uint8_t* uid, uint8_t uidLength)
       return false;      
    }
    pDataStart += 2 + (pDataStart[1] & 0x3f);
-  
-  
+
+
    Printf_dbg("Final Payload: %s\n\n", pDataStart);
    RegMenuTypes MenuSourceID = RegMenuTypeFromFileName((char**)&pDataStart);
 

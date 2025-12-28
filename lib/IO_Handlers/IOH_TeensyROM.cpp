@@ -228,9 +228,9 @@ FLASHMEM void getNtpTime()
 
    if (!EthernetInit()) 
    {
-      IO1[rRegLastSecBCD]  = 0;      
-      IO1[rRegLastMinBCD]  = 0;      
-      IO1[rRegLastHourBCD] = 0;      
+      IO1[rRegLastSecBCD]  = 0;
+      IO1[rRegLastMinBCD]  = 0;
+      IO1[rRegLastHourBCD] = 0;
       return;
    }
    
@@ -468,7 +468,7 @@ FLASHMEM void GetCurrentFilePathName(char* FilePathName)
    char Rand[] = "?";
    
    if (IO1[rwRegScratch]) LclFilename = Rand; //random dir
-  
+
    if (IO1[rWRegCurrMenuWAIT] == rmtTeensy) 
    {
       //figure out what menu dir we're in
