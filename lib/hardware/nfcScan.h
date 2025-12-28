@@ -25,26 +25,26 @@
 
 #include <USBHost_t36.h>
 #include "PN532.h"
-#include "PN532_HSU.h"
+#include "PN532_UHSU.h"
 
 #include "midi2sid.h"
 
-USBHIDParser hid1(myusbHost);
-USBHIDParser hid2(myusbHost);
-USBHIDParser hid3(myusbHost);  //need all 3?
+extern USBHIDParser hid1;
+extern USBHIDParser hid2;
+extern USBHIDParser hid3;  //need all 3?
 
-USBSerial userial(myusbHost);  // works only for those Serial devices who transfer <=64 bytes (like T3.x, FTDI...)
+extern USBSerial userial;  // works only for those Serial devices who transfer <=64 bytes (like T3.x, FTDI...)
 //USBSerial_BigBuffer userial(myusbHost, 1); // Handles anything up to 512 bytes
 //USBSerial_BigBuffer userial(myusbHost); // Handles up to 512 but by default only for those > 64 bytes
-PN532_UHSU pn532uhsu(userial);
-PN532 nfc(pn532uhsu);
+extern PN532_UHSU pn532uhsu;
+extern PN532 nfc;
 
 #define MaxNfcConfRetries    20
 #define NFCReReadTimeout   1000  // mS since of no scan to re-accept same tag
 
-uint8_t  Lastuid[7];  // Buffer to store the last UID read
-uint8_t  LastuidLength = 7;
-uint32_t LastTagMillis = 0; //stores last good tag time for Lastuid timeout/allow retag
+extern uint8_t  Lastuid[7];  // Buffer to store the last UID read
+extern uint8_t  LastuidLength;
+extern uint32_t LastTagMillis; //stores last good tag time for Lastuid timeout/allow retag
 
 FLASHMEM void nfcInit();
 FLASHMEM bool nfcConfigCheck();
@@ -53,5 +53,7 @@ RegMenuTypes RegMenuTypeFromFileName(char** ptrptrFileName);
 FS *FSfromSourceID(RegMenuTypes SourceID);
 bool nfcReadTagLaunch(uint8_t* uid, uint8_t uidLength);
 FLASHMEM void nfcWriteTag(const char* TxtMsg);
+
+extern uint8_t nfcState; // default disabled unless set in eeprom and passes init
 
 #endif // NFCSCAN_H

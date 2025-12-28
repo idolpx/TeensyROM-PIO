@@ -5,6 +5,9 @@
 
 #include "eeprom_dev.h"
 
+// Global variable definitions
+EthernetUDP udp;
+EthernetClient client;
 
 FLASHMEM bool EthernetInit()
 {

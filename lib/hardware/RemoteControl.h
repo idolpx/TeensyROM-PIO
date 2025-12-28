@@ -35,7 +35,7 @@
 #include "IOH_TeensyROM.h"
 #include "Menu_Regs.h"
 
-bool RemoteLaunched = false;            // last app was launched remotely
+extern bool RemoteLaunched;            // last app was launched remotely
 
 bool InterruptC64(RegIRQCommands IRQCommand);
 bool DoC64IRQ();

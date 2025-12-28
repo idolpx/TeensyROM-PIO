@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-volatile uint8_t BtnPressed = false;
+extern volatile uint8_t BtnPressed;
 
 FASTRUN void isrButton();
 

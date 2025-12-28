@@ -33,6 +33,14 @@
 
 #include "IOH_TeensyROM.h"
 
+// Global variable definitions
+uint8_t NumCrtChips = 0;
+StructCrtChip CrtChips[MAX_CRT_CHIPS];
+char* StrSIDInfo;
+char* LatestSIDLoaded;
+char StrMachineInfo[16];
+bool SendC64Msgs = true;
+
 void ParseP00File(StructMenuItem* MyMenuItem)   
 {  //update .ItemType(rtUnknown or rtFilePrg) & .Code_Image
    //Sources:

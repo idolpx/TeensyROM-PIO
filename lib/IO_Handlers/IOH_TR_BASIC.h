@@ -33,28 +33,18 @@ void IO1Hndlr_TR_BASIC(uint8_t Address, bool R_Wn);
 void PollingHndlr_TR_BASIC();
 void InitHndlr_TR_BASIC();
 
-stcIOHandlers IOHndlr_TR_BASIC =
-{
-  "TR_BASIC",              //Name of handler
-  &InitHndlr_TR_BASIC,     //Called once at handler startup
-  &IO1Hndlr_TR_BASIC,      //IO1 R/W handler
-  NULL,                     //IO2 R/W handler
-  NULL,                     //ROML Read handler, in addition to any ROM data sent
-  NULL,                     //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_TR_BASIC,  //Polled in main routine
-  NULL,                     //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_TR_BASIC;
 
 #define TgetQueueSize      4096
 #define TgetQueueUsed      ((RxQueueHead>=RxQueueTail)?(RxQueueHead-RxQueueTail):(RxQueueHead+TgetQueueSize-RxQueueTail))
 #define MainMemLoc         0xc000  //see MainMemLoc in assy code, start of BASIC extension code
 #define MainMemLocEnd      0xd000  //see MainMemLocEnd in compiled symbols ($caf5 as of 4/20/25, adding buffer)
 
-uint8_t* TgetQueue = NULL;  //to hold incoming messages
-uint8_t* LSFileName = NULL;
+extern uint8_t* TgetQueue;  //to hold incoming messages
+extern uint8_t* LSFileName;
 
-uint16_t FNCount;
-uint8_t  TR_BASContRegAction, TR_BASStatRegVal, TR_BASStrAvailableRegVal;
+extern uint16_t FNCount;
+extern uint8_t  TR_BASContRegAction, TR_BASStatRegVal, TR_BASStrAvailableRegVal;
 
 
 enum TR_BASregsMatching  //synch with TRCustomBasicCommands\source\main.asm

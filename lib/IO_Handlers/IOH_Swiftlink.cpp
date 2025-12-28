@@ -26,12 +26,43 @@
 #include <EEPROM.h>
 #include <Ethernet.h>
 
+#include "nfcScan.h"
 #include "IOHandlers.h"
 #include "SerUSBIO.h"
+#include "ethernet_dev.h"
 
 #include "Swift_ATcommands.h"
 #include "Swift_Browser.h"
 #include "Swift_RxQueue.h"
+
+// Global variable definitions
+stcIOHandlers IOHndlr_SwiftLink =
+{
+  "Swift-Turbo/Modem",      //Name of handler (IOHNameLength max)
+  &InitHndlr_SwiftLink,     //Called once at handler startup
+  &IO1Hndlr_SwiftLink,      //IO1 R/W handler
+  NULL,                     //IO2 R/W handler
+  NULL,                     //ROML Read handler, in addition to any ROM data sent
+  NULL,                     //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_SwiftLink,  //Polled in main routine
+  &CycleHndlr_SwiftLink,    //called at the end of EVERY c64 cycle
+};
+
+char* TxMsg = NULL;  //to hold messages (AT/browser commands) when off line
+char* PageLinkBuff[NumPageLinkBuffs] = {nullptr}; //hold links from tags for user selection in browser
+stcURLParse* PrevURLQueue[NumPrevURLQueues] = {nullptr}; //For browse previous
+char CurrPageTitle[eepBMTitleSize] = {0}; //keep current page title, could move to RAM2
+
+uint8_t  PrevURLQueueNum = 0;   //current/latest in the link history queue
+uint8_t  UsedPageLinkBuffs = 0;   //how many PageLinkBuff elements have been Used
+
+bool Verbose = false, EchoOn = false, ConnectedToHost = false, BrowserMode = false, PagePaused = false, PrintingHyperlink = false;
+uint32_t PageCharsReceived = 0;
+uint32_t NMIassertMicros = 0;
+volatile uint8_t SwiftTxBuf = 0, SwiftRxBuf = 0;
+volatile uint8_t SwiftRegStatus = 0, SwiftRegCommand = 0, SwiftRegControl = 0, TurboRegEnhancedSpeed = 0;
+uint8_t PlusCount = 0;
+uint32_t C64CycBetweenRx = 0, LastTxMillis = 0;
 
 // Browser mode: Buffer saved in ASCII from host, converted before sending out
 //               Uses Send...Immediate  commands for direct output
@@ -120,52 +151,7 @@ void FreeSwiftlinkBuffs()
    for(uint8_t cnt=0; cnt<NumPageLinkBuffs; cnt++) {free(PageLinkBuff[cnt]); PageLinkBuff[cnt]=NULL;}
    for(uint8_t cnt=0; cnt<NumPrevURLQueues; cnt++) {free(PrevURLQueue[cnt]); PrevURLQueue[cnt]=NULL;}
    for(uint8_t cnt=0; cnt<RxQueueNumBlocks; cnt++) {free(RxQueue[cnt]); RxQueue[cnt]=NULL;}
-   free(TxMsg); TxMsg = NULL;   
-}
-
-FLASHMEM bool EthernetInit()
-{
-   uint32_t beginWait = millis();
-   uint8_t  mac[6];
-   bool retval = true;
-   Serial.print("\nEthernet init ");
-   
-   EEPreadNBuf(eepAdMyMAC, mac, 6);
-
-   if (EEPROM.read(eepAdDHCPEnabled))
-   {
-      Serial.print("via DHCP... ");
-
-      uint16_t DHCPTimeout, DHCPRespTO;
-      EEPROM.get(eepAdDHCPTimeout, DHCPTimeout);
-      EEPROM.get(eepAdDHCPRespTO, DHCPRespTO);
-      if (Ethernet.begin(mac, DHCPTimeout, DHCPRespTO) == 0)
-      {
-         Serial.println("*Failed!*");
-         // Check for Ethernet hardware present
-         if (Ethernet.hardwareStatus() == EthernetNoHardware) Serial.println("Ethernet HW was not found.");
-         else if (Ethernet.linkStatus() == LinkOFF) Serial.println("Ethernet cable is not connected.");   
-         retval = false;
-      }
-      else
-      {
-         Serial.println("passed.");
-      }
-   }
-   else
-   {
-      Serial.println("using Static");
-      uint32_t ip, dns, gateway, subnetmask;
-      EEPROM.get(eepAdMyIP, ip);
-      EEPROM.get(eepAdDNSIP, dns);
-      EEPROM.get(eepAdGtwyIP, gateway);
-      EEPROM.get(eepAdMaskIP, subnetmask);
-      Ethernet.begin(mac, ip, dns, gateway, subnetmask);
-   }
-   
-   Serial.printf("Took %d mS\nIP: ", (millis() - beginWait));
-   Serial.println(Ethernet.localIP());
-   return retval;
+   free(TxMsg); TxMsg = NULL;
 }
    
 

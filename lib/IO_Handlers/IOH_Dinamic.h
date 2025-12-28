@@ -24,16 +24,6 @@
 
 void IO1Hndlr_Dinamic(uint8_t Address, bool R_Wn);  
 
-stcIOHandlers IOHndlr_Dinamic =
-{
-  "Dinamic",            //Name of handler
-  NULL,                 //Called once at handler startup
-  &IO1Hndlr_Dinamic,    //IO1 R/W handler
-  NULL,                 //IO2 R/W handler
-  NULL,                 //ROML Read handler, in addition to any ROM data sent
-  NULL,                 //ROMH Read handler, in addition to any ROM data sent
-  NULL,                 //Polled in main routine
-  NULL,                 //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_Dinamic;
 
 #endif // IOH_DINAMIC_H

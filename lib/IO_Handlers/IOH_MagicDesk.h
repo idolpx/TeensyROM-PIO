@@ -26,21 +26,11 @@
 void InitHndlr_MagicDesk();                           
 void IO1Hndlr_MagicDesk(uint8_t Address, bool R_Wn);  
 
-stcIOHandlers IOHndlr_MagicDesk =
-{
-  "Magic Desk",          //Name of handler
-  &InitHndlr_MagicDesk,   //Called once at handler startup
-  &IO1Hndlr_MagicDesk,    //IO1 R/W handler
-  NULL,                  //IO2 R/W handler
-  NULL,                   //ROML Read handler, in addition to any ROM data sent
-  NULL,                      //ROMH Read handler, in addition to any ROM data sent
-  NULL,                      //Polled in main routine
-  NULL,                  //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_MagicDesk;
 
 extern StructCrtChip CrtChips[];
 extern uint8_t NumCrtChips;
 
-uint8_t BankReg; 
+extern uint8_t BankReg; 
 
 #endif // IOH_MAGICDESK_H

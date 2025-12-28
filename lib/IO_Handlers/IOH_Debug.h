@@ -28,17 +28,7 @@ void IO1Hndlr_Debug (uint8_t Address, bool R_Wn);
 void PollingHndlr_Debug();
 void InitHndlr_Debug();
 
-stcIOHandlers IOHndlr_Debug =
-{
-    "Debug",             //Name of handler
-    &InitHndlr_Debug,    //Called once at handler startup
-    &IO1Hndlr_Debug,     //IO1 R/W handler
-    NULL,                //IO2 R/W handler
-    NULL,                //ROML Read handler, in addition to any ROM data sent
-    NULL,                //ROMH Read handler, in addition to any ROM data sent
-    &PollingHndlr_Debug, //Polled in main routine
-    NULL,                //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_Debug;
 
 
 //MIDI input handlers for Debug _________________________________________________________________________

@@ -19,6 +19,41 @@
 
 #include "IOHandlers.h"
 
+#include "midi2sid.h"
+
+// Global variable definitions
+const unsigned char *HIROM_Image = NULL;
+const unsigned char *LOROM_Image = NULL;
+uint16_t LOROM_Mask = 0, HIROM_Mask = 0;
+volatile uint8_t DMA_State = DMA_S_DisableReady;
+
+stcIOHandlers* IOHandler[] = {
+   &IOHndlr_None,               //IOH_None,
+   &IOHndlr_SwiftLink,          //IOH_Swiftlink,
+   &IOHndlr_MIDI_Datel,         //IOH_MIDI_Datel,
+   &IOHndlr_MIDI_Sequential,    //IOH_MIDI_Sequential,
+   &IOHndlr_MIDI_Passport,      //IOH_MIDI_Passport,
+   &IOHndlr_MIDI_NamesoftIRQ,   //IOH_MIDI_NamesoftIRQ,
+   &IOHndlr_Debug,              //IOH_Debug, //last manually selectable, see LastSelectableIOH
+
+   &IOHndlr_TeensyROM,          //IOH_TeensyROM,
+   &IOHndlr_EpyxFastLoad,       //IOH_EpyxFastLoad,
+   &IOHndlr_MagicDesk,          //IOH_MagicDesk,
+   &IOHndlr_Dinamic,            //IOH_Dinamic,
+   &IOHndlr_Ocean1,             //IOH_Ocean1,
+   &IOHndlr_FunPlay,            //IOH_FunPlay,
+   &IOHndlr_SuperGames,         //IOH_SuperGames,
+   &IOHndlr_C64GameSystem3,     //IOH_C64GameSystem3,
+   &IOHndlr_EasyFlash,          //IOH_EasyFlash,
+   &IOHndlr_ZaxxonSuper,        //IOH_ZaxxonSuper,
+   &IOHndlr_ASID,               //IOH_ASID,
+   &IOHndlr_TR_BASIC,           //IOH_TR_BASIC,
+   &IOHndlr_GMod2,              //IOH_GMod2,
+   &IOHndlr_MagicDesk2,         //IOH_MagicDesk2,
+};
+
+uint8_t CurrentIOHandler = IOH_None;
+
 void IOHandlerNextInit()
 {
    Printf_dbg("Default IO Handler\n");

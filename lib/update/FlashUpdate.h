@@ -54,64 +54,18 @@
 
 
 
+#ifndef FLASHUPDATE_H
+#define FLASHUPDATE_H
+
 #include <SD.h>
 #include "FXUtil.h"		// read_ascii_line(), hex file support
-#include "FXUtil.cpp"
 extern "C" {
   #include "FlashTxx.h"		// TLC/T3x/T4x/TMM flash primitives
-  #include "FlashTxx.c"
 }
 
 #include "FileParsers.h"
 
-void DoFlashUpdate(FS *sourceFS, const char *FilePathName)
-{
-   uint32_t buffer_addr, buffer_size;
+void DoFlashUpdate(FS *sourceFS, const char *FilePathName);
 
-   //Serial.printf( "target = %s (%dK flash in %dK sectors)\n", FLASH_ID, FLASH_SIZE/1024, FLASH_SECTOR_SIZE/1024);
-   
-   // create flash buffer to hold new firmware
-   SendMsgPrintfln("Create buffer ");
-   if (firmware_buffer_init( &buffer_addr, &buffer_size ) != FLASH_BUFFER_TYPE) 
-   {
-     SendMsgFailed();
-     return;
-   }
-   SendMsgOK();
-   
-   SendMsgPrintfln("%s Buffer = %1luK of %1dK total\r\n(%08lX - %08lX)", 
-      IN_FLASH(buffer_addr) ? "Flash" : "RAM", buffer_size/1024, FLASH_SIZE/1024, 
-      buffer_addr, buffer_addr + buffer_size);
-  
-   //Already initialized to get to this point...
-   //SendMsgPrintfln( "SD initialization " );
-   //if (!SD.begin( BUILTIN_SDCARD )) 
-   //{
-   //   SendMsgFailed();
-   //   return;
-   //}
-   //SendMsgOK();
-
-   SendMsgPrintfln("Open: %s%s ", sourceFS==&SD ? "SD" : "USB", FilePathName); 
-
-   File hexFile = sourceFS->open(FilePathName, FILE_READ );
-      
-   if (!hexFile) {
-      SendMsgFailed();
-      return;
-   }
-   SendMsgOK();
-   
-   // read hex file, write new firmware to flash, clean up, reboot
-   update_firmware( &hexFile, &Serial, buffer_addr, buffer_size );
-  
-   // return from update_firmware() means error or user abort, so clean up and
-   // reboot to ensure that static vars get boot-up initialized before retry(? nah)
-   SendMsgPrintfln( "Erasing Flash buffer ");  
-   firmware_buffer_free( buffer_addr, buffer_size );
-   SendMsgOK();
-   
-   //SendMsgPrintfln( "Rebooting  Teensy");  
-   //REBOOT;
-}
+#endif // FLASHUPDATE_H
 

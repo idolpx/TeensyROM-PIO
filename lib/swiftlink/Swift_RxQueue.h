@@ -27,11 +27,13 @@
 #include <stdint.h>
 #include <IPAddress.h>
 
-#include "Common_Defs.h"
+#define RxQueueNumBlocks    40 
+#define RxQueueBlockSize   (1024*8) // 40*8k=320k
+#define RxQueueSize        (RxQueueNumBlocks*RxQueueBlockSize) 
+#define NMITimeoutuS       300    //if Rx data not read within this time, deassert NMI anyway
 
-extern uint32_t RxQueueHead, RxQueueTail;
-uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
-uint32_t  RxQueueHead, RxQueueTail, TxMsgOffset;
+extern uint32_t RxQueueHead, RxQueueTail, TxMsgOffset;
+extern uint8_t* RxQueue[RxQueueNumBlocks];  //circular queue to pipe data to the c64, divided into blocks for better malloc
 
 #define RxQueueUsed ((RxQueueHead>=RxQueueTail)?(RxQueueHead-RxQueueTail):(RxQueueHead+RxQueueSize-RxQueueTail))
 

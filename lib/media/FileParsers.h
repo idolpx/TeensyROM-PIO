@@ -23,12 +23,12 @@
 #include <Arduino.h>
 #include "DriveDirLoad.h"
 
-uint8_t NumCrtChips = 0;
-StructCrtChip CrtChips[MAX_CRT_CHIPS];
-char* StrSIDInfo;  // allocated to RAM2 via StrSIDInfoSize
-char* LatestSIDLoaded; // allocated to RAM2 via MaxPathLength
-char StrMachineInfo[16]; //~5 extra
-bool SendC64Msgs = true;
+extern uint8_t NumCrtChips;
+extern StructCrtChip CrtChips[MAX_CRT_CHIPS];
+extern char* StrSIDInfo;  // allocated to RAM2 via StrSIDInfoSize
+extern char* LatestSIDLoaded; // allocated to RAM2 via MaxPathLength
+extern char StrMachineInfo[16]; //~5 extra
+extern bool SendC64Msgs;
 
 void ParseP00File(StructMenuItem* MyMenuItem);
 bool ParseCRTHeader(StructMenuItem* MyMenuItem, uint8_t *EXROM, uint8_t *GAME);

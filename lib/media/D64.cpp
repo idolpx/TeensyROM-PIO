@@ -23,6 +23,8 @@
 #include "SendMsg.h"
 #include "Common_Defs.h"
 
+#include "DriveDirLoad.h"
+
 FLASHMEM uint32_t D64Offset(uint8_t Track, uint8_t Sector)
 {
    if (Track<18) 

@@ -22,32 +22,14 @@
 
 #include <Arduino.h>
 
-#include <SD.h>
-#include <USBHost_t36.h>
-#include <SPI.h>
-
 #include <EEPROM.h>
-#include "TeensyROM.h"
+
 #include "Common_Defs.h"
-#include "Menu_Regs.h"
-#include "DriveDirLoad.h"
-#include "MainMenuItems.h"
-#include "IOHandlers.h"
 #include "nfcScan.h"
 #include "ISRs.h"
-#include "filesystem.h"
-#include "SerUSBIO.h"
 #include "SendMsg.h"
-#include "RemoteControl.h"
+#include "filesystem.h"
 
-#include "Common_Defs.h"
-
-
-
-
-char DriveDirPath[MaxPathLength];
-
-uint8_t nfcState = nfcStateBitDisabled; // default disabled unless set in eeprom and passes init
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
 extern float tempmonGetTemp(void);
@@ -110,12 +92,7 @@ void setup()
     for (uint8_t cnt = 0; cnt < IOH_Num_Handlers; cnt++)
         PadSpace(IOHandler[cnt]->Name, IOHNameLength - 1); // done so selection shown on c64 overwrites previous
 
-    for (uint8_t cnt = 0; cnt < NumPageLinkBuffs; cnt++)
-        PageLinkBuff[cnt] = NULL; // initialize page link buffer for swiftlink browser mode
-    for (uint8_t cnt = 0; cnt < NumPrevURLQueues; cnt++)
-        PrevURLQueue[cnt] = NULL; // initialize previous link buffer for swiftlink browser mode
-    for (uint8_t cnt = 0; cnt < RxQueueNumBlocks; cnt++)
-        RxQueue[cnt] = NULL; // initialize RxQueue for swiftlink
+    SwiftBrowserInit();
 
     StrSIDInfo = (char *)calloc(StrSIDInfoSize, sizeof(char)); // SID header info storage
     LatestSIDLoaded = (char *)malloc(MaxPathLength);           // Last loaded Source/SID path/filename

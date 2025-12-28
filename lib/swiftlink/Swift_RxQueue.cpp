@@ -27,6 +27,10 @@
 #include "IOH_Swiftlink.h"
 #include "IOH_TeensyROM.h"
 
+// Global variable definitions
+uint32_t RxQueueHead = 0, RxQueueTail = 0, TxMsgOffset = 0;
+uint8_t* RxQueue[RxQueueNumBlocks] = {nullptr};  //circular queue to pipe data to the c64, divided into blocks for better malloc
+
 uint8_t PullFromRxQueue()
 {  //assumes queue data is available before calling
    uint8_t c = RxQueue[RxQueueTail/RxQueueBlockSize][RxQueueTail%RxQueueBlockSize];

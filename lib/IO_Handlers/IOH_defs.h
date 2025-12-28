@@ -19,8 +19,18 @@ struct stcIOHandlers
   void (*CycleHndlr)();                            //called at the end of EVERY c64 cycle
 };
 
-const unsigned char *HIROM_Image = NULL;
-const unsigned char *LOROM_Image = NULL;
-uint16_t LOROM_Mask, HIROM_Mask;
+extern const unsigned char *HIROM_Image;
+extern const unsigned char *LOROM_Image;
+extern uint16_t LOROM_Mask, HIROM_Mask;
+
+enum DMA_States  //used with DMA_State
+{
+   DMA_S_StartDisable,
+   DMA_S_DisableReady,
+   DMA_S_StartActive, 
+   DMA_S_ActiveReady, 
+};
+
+extern volatile uint8_t DMA_State;
 
 #endif // IOH_DEFS_H

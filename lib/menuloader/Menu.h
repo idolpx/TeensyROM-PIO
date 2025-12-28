@@ -5,8 +5,8 @@
 
 #include "Menu_Regs.h"
 
-StructMenuItem *DriveDirMenu = NULL;
-uint16_t NumDrvDirMenuItems = 0;
+extern StructMenuItem *DriveDirMenu;
+extern uint16_t NumDrvDirMenuItems;
 
 void SetUpMainMenuROM();
 void SetNumItems (uint16_t NumItems);

@@ -23,6 +23,8 @@
 #ifndef MENU_REGS_H
 #define MENU_REGS_H
 
+#include <stdint.h>
+
 #define MaxItemDispLength  35
 #define MaxItemsPerPage    19
 

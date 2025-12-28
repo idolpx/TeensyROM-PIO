@@ -4,11 +4,17 @@
 #include <Arduino.h>
 
 //#include "../../include/TeensyROM.h"
+#include "nfcScan.h"
+
 #include "DriveDirLoad.h"
 #include "IOHandlers.h"
 #include "IOH_TeensyROM.h"
 #include "IOH_Swiftlink.h"
 #include "IOH_MIDI.h"
+
+// Global variable definitions
+StructMenuItem *DriveDirMenu = NULL;
+uint16_t NumDrvDirMenuItems = 0;
 
 void SetUpMainMenuROM()
 {

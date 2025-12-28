@@ -5,8 +5,8 @@
 #include <Arduino.h>
 #include <stdlib.h>
 
-uint32_t *BusBitCount;
-volatile uint32_t BusSampleCount;
+extern uint32_t *BusBitCount;
+extern volatile uint32_t BusSampleCount;
 
 #define BusSampleMaxSize   100000
 #define BusSampleTimeoutmS   2000

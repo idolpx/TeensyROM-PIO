@@ -40,16 +40,6 @@ void InitHndlr_MagicDesk2();
 void IO1Hndlr_MagicDesk2(uint8_t Address, bool R_Wn);  
 void PollingHndlr_MagicDesk2();                           
 
-stcIOHandlers IOHndlr_MagicDesk2 =
-{
-  "MagicDesk2",                //Name of handler
-  &InitHndlr_MagicDesk2,       //Called once at handler startup
-  &IO1Hndlr_MagicDesk2,        //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_MagicDesk2,    //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_MagicDesk2;
 
 #endif // IOH_MAGICDESK2_H

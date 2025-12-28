@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 
-char strVersionNumber[] = "v0.6.7+9"; //*VERSION*
+extern char strVersionNumber[]; //*VERSION*
 
 #define UpperAddr           0x040000  //address of upper (main) TR image, from FLASH_BASEADDRESS
 #define FLASH_BASEADDRESS 0x60000000
@@ -85,26 +85,18 @@ enum MinBootIndFlags
    MinBootInd_FromMin    = 2, // Min returning to main menu, skip of autolaunch (if enabled)
 };
 
-enum DMA_States  //used with DMA_State
-{
-   DMA_S_StartDisable,
-   DMA_S_DisableReady,
-   DMA_S_StartActive, 
-   DMA_S_ActiveReady, 
-};
 
-volatile uint8_t DMA_State = DMA_S_DisableReady;
 
-bool (*fBusSnoop)(uint16_t Address, bool R_Wn) = NULL;    //Bus snoop routine, return true to skip out of phi2 isr
+extern bool (*fBusSnoop)(uint16_t Address, bool R_Wn);    //Bus snoop routine, return true to skip out of phi2 isr
 
 #define BigBufSize          5
-uint16_t BigBufCount = 0;
-uint32_t* BigBuf = NULL;
+extern uint16_t BigBufCount;
+extern uint32_t* BigBuf;
 
 #ifdef DbgMsgs_SW  //Swiftlink debug msgs
    #define Printf_dbg_sw Serial.printf
 #else
-   __attribute__((always_inline)) inline void Printf_dbg_sw(...) {};
+   __attribute__((always_inline)) inline void Printf_dbg_sw(const char* format, ...) {};
 #endif
 
 #define MaxRAM_ImageSize  (144)  // RAM1 space (in kB) used for CRT & Transfer buffer
@@ -112,13 +104,13 @@ uint32_t* BigBuf = NULL;
    #define Printf_dbg Serial.printf
    #define RAM_ImageSize       ((MaxRAM_ImageSize-24)*1024)
 #else //Normal mode: maximize RAM_ImageSize
-   __attribute__((always_inline)) inline void Printf_dbg(...) {};
+   __attribute__((always_inline)) inline void Printf_dbg(const char* format, ...) {};
    #define RAM_ImageSize       (MaxRAM_ImageSize*1024)
 #endif
-uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
+extern uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
 
-uint8_t *XferImage = NULL; //pointer to image being transfered to C64 
-uint32_t XferSize = 0;  //size of image being transfered to C64
+extern uint8_t *XferImage; //pointer to image being transfered to C64
+extern uint32_t XferSize;  //size of image being transfered to C64
 
 #define IOTLRead            0x10000
 #define IOTLDataValid       0x20000
@@ -128,7 +120,7 @@ uint32_t XferSize = 0;  //size of image being transfered to C64
 #ifdef DbgIOTraceLog
    __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data) {BigBuf[BigBufCount] |= (data<<8) | IOTLDataValid;};
 #else
-   __attribute__((always_inline)) inline void TraceLogAddValidData(...) {};
+   __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data, ...) {};
 #endif
 
 #define MaxItemNameLength   100
@@ -141,7 +133,7 @@ uint32_t XferSize = 0;  //size of image being transfered to C64
 #define PALBusFreq          985250
 
 
-volatile uint32_t StartCycCnt, LastCycCnt=0;
+extern volatile uint32_t StartCycCnt, LastCycCnt;
    
 #define PHI2_PIN            1  
 #define Reset_Btn_In_PIN    31 
@@ -235,13 +227,13 @@ const uint8_t OutputPins[] = {
 #define Def_nS_VICStart     210  //    delay from Phi2 falling to look for ROMH.  Too long or short will manifest as general screen noise (missing data) on ROMH games such as JupiterLander and RadarRatRace
 #define Def_nS_VICDHold     365  //    On a C64 VIC cycle read, when to stop driving the data bus.  Higher breaks UltiMax carts on NTSC
 
-uint32_t nS_MaxAdj    = Def_nS_MaxAdj; 
-uint32_t nS_RWnReady  = Def_nS_RWnReady;  
-uint32_t nS_PLAprop   = Def_nS_PLAprop;  
-uint32_t nS_DataSetup = Def_nS_DataSetup;  
-uint32_t nS_DataHold  = Def_nS_DataHold;  
-uint32_t nS_VICStart  = Def_nS_VICStart;  
-uint32_t nS_VICDHold  = Def_nS_VICDHold;
+extern uint32_t nS_MaxAdj;
+extern uint32_t nS_RWnReady;
+extern uint32_t nS_PLAprop;
+extern uint32_t nS_DataSetup;
+extern uint32_t nS_DataHold;
+extern uint32_t nS_VICStart;
+extern uint32_t nS_VICDHold;
 
 __attribute__((always_inline)) inline void DataPortWriteWait(uint8_t Data)
 {  // for "normal" (non-VIC) C64 read cycles only
@@ -321,14 +313,11 @@ enum PokeColors
 #define eepBMURLSize       225    //Max Chars in bookmark URL path
 #define eepNumBookmarks      9    //Num Bookmarks saved
 #define BytesPerDot        (25*1024) //dot every 25k when downloading
-#define RxQueueNumBlocks    40 
-#define RxQueueBlockSize   (1024*8) // 40*8k=320k
-#define RxQueueSize        (RxQueueNumBlocks*RxQueueBlockSize) 
-#define NMITimeoutuS       300    //if Rx data not read within this time, deassert NMI anyway
+
 #define Drive_USB            1
 #define Drive_SD             2
 
-volatile uint8_t EmulateVicCycles = false; //set to true to emulate VIC cycles, false to use normal C64 timing
+extern volatile uint8_t EmulateVicCycles; //set to true to emulate VIC cycles, false to use normal C64 timing
 
 
 #endif // COMMON_DEFS_H

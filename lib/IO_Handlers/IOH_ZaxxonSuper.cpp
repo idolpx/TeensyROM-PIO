@@ -19,6 +19,21 @@
 
 #include "IOH_ZaxxonSuper.h"
 
+#include "FileParsers.h"
+
+// Global variable definitions
+stcIOHandlers IOHndlr_ZaxxonSuper =
+{
+  "Zaxxon_SuperZaxxon",  //Name of handler
+  &InitHndlr_ZaxxonSuper,//Called once at handler startup
+  NULL,                  //IO1 R/W handler
+  NULL,                  //IO2 R/W handler
+  &ROMLHndlr_ZaxxonSuper,//ROML Read handler, in addition to any ROM data sent
+  NULL,                  //ROMH Read handler, in addition to any ROM data sent
+  NULL,                  //Polled in main routine
+  NULL,                  //called at the end of EVERY c64 cycle
+};
+
 void InitHndlr_ZaxxonSuper()
 {
    LOROM_Mask = 0x0fff; //mirror 4k to both sides of 8klo

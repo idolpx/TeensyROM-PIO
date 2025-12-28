@@ -38,17 +38,7 @@ void PollingHndlr_SwiftLink();
 void InitHndlr_SwiftLink();
 void CycleHndlr_SwiftLink();
 
-stcIOHandlers IOHndlr_SwiftLink =
-{
-  "Swift-Turbo/Modem",      //Name of handler (IOHNameLength max)
-  &InitHndlr_SwiftLink,     //Called once at handler startup
-  &IO1Hndlr_SwiftLink,      //IO1 R/W handler
-  NULL,                     //IO2 R/W handler
-  NULL,                     //ROML Read handler, in addition to any ROM data sent
-  NULL,                     //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_SwiftLink,  //Polled in main routine
-  &CycleHndlr_SwiftLink,    //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_SwiftLink;
 
 
 // 6551 ACIA interface emulation
@@ -132,21 +122,21 @@ extern volatile uint8_t BtnPressed;
 extern void FreeDriveDirMenu();
 extern void SetRandomSeed();
 
-char* TxMsg = NULL;  //to hold messages (AT/browser commands) when off line
-char* PageLinkBuff[NumPageLinkBuffs]; //hold links from tags for user selection in browser
-stcURLParse* PrevURLQueue[NumPrevURLQueues]; //For browse previous
-char CurrPageTitle[eepBMTitleSize]; //keep current page title, could move to RAM2
+extern char* TxMsg;  //to hold messages (AT/browser commands) when off line
+extern char* PageLinkBuff[NumPageLinkBuffs]; //hold links from tags for user selection in browser
+extern stcURLParse* PrevURLQueue[NumPrevURLQueues]; //For browse previous
+extern char CurrPageTitle[eepBMTitleSize]; //keep current page title, could move to RAM2
 
-uint8_t  PrevURLQueueNum;   //current/latest in the link history queue
-uint8_t  UsedPageLinkBuffs;   //how many PageLinkBuff elements have been Used
+extern uint8_t  PrevURLQueueNum;   //current/latest in the link history queue
+extern uint8_t  UsedPageLinkBuffs;   //how many PageLinkBuff elements have been Used
 
-bool Verbose, EchoOn, ConnectedToHost, BrowserMode, PagePaused, PrintingHyperlink;
-uint32_t PageCharsReceived;
-uint32_t NMIassertMicros;
-volatile uint8_t SwiftTxBuf, SwiftRxBuf;
-volatile uint8_t SwiftRegStatus, SwiftRegCommand, SwiftRegControl, TurboRegEnhancedSpeed;
-uint8_t PlusCount;
-uint32_t C64CycBetweenRx, LastTxMillis = millis();
+extern bool Verbose, EchoOn, ConnectedToHost, BrowserMode, PagePaused, PrintingHyperlink;
+extern uint32_t PageCharsReceived;
+extern uint32_t NMIassertMicros;
+extern volatile uint8_t SwiftTxBuf, SwiftRxBuf;
+extern volatile uint8_t SwiftRegStatus, SwiftRegCommand, SwiftRegControl, TurboRegEnhancedSpeed;
+extern uint8_t PlusCount;
+extern uint32_t C64CycBetweenRx, LastTxMillis;
 
 
 // Browser mode: Buffer saved in ASCII from host, converted before sending out

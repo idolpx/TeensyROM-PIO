@@ -3,6 +3,10 @@
 
 #include "Common_Defs.h"
 
+// Global variable definitions
+uint32_t *BusBitCount;
+volatile uint32_t BusSampleCount;
+
 FLASHMEM void BusAnalysis()
 {
    Serial.printf("\nTaking max %d samples in %dmS\n", BusSampleMaxSize, BusSampleTimeoutmS);

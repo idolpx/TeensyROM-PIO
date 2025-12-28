@@ -19,6 +19,21 @@
 
 #include "IOH_MagicDesk.h"
 
+// Global variable definitions
+stcIOHandlers IOHndlr_MagicDesk =
+{
+  "Magic Desk",          //Name of handler
+  &InitHndlr_MagicDesk,   //Called once at handler startup
+  &IO1Hndlr_MagicDesk,    //IO1 R/W handler
+  NULL,                  //IO2 R/W handler
+  NULL,                   //ROML Read handler, in addition to any ROM data sent
+  NULL,                      //ROMH Read handler, in addition to any ROM data sent
+  NULL,                      //Polled in main routine
+  NULL,                  //called at the end of EVERY c64 cycle
+};
+
+uint8_t BankReg;
+
 void InitHndlr_MagicDesk()
 {
    BankReg = 0;

@@ -11,13 +11,13 @@
 
 #define usbDevMIDI usbMIDI
 
-USBHost myusbHost;
-//USBHub hub1(myusbHost);
-//USBHub hub2(myusbHost);
-//USBDrive myDrive(myusbHost);
-USBFilesystem firstPartition (myusbHost);
+extern USBHost myusbHost;
+//extern USBHub hub1;
+//extern USBHub hub2;
+//extern USBDrive myDrive;
+extern USBFilesystem firstPartition;
 
-MIDIDevice usbHostMIDI (myusbHost);
+extern MIDIDevice usbHostMIDI;
 
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 

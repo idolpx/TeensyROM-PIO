@@ -29,8 +29,24 @@
 //#include <PN532_UHSU.h> //Customized for USBSerial instead of HardwareSerial
 
 #include "MainMenuItems.h"
+#include "DriveDirLoad.h"
 #include "RemoteControl.h"
 #include "SendMsg.h"
+
+// Global variable definitions
+USBHIDParser hid1(myusbHost);
+USBHIDParser hid2(myusbHost);
+USBHIDParser hid3(myusbHost);  //need all 3?
+
+USBSerial userial(myusbHost);  // works only for those Serial devices who transfer <=64 bytes (like T3.x, FTDI...)
+PN532_UHSU pn532uhsu(userial);
+PN532 nfc(pn532uhsu);
+
+uint8_t  Lastuid[7] = {0};  // Buffer to store the last UID read
+uint8_t  LastuidLength = 7;
+uint32_t LastTagMillis = 0; //stores last good tag time for Lastuid timeout/allow retag
+
+uint8_t nfcState = nfcStateBitDisabled; // default disabled unless set in eeprom and passes init
 
 FLASHMEM void nfcInit()
 {  

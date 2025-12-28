@@ -22,6 +22,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Common_Defs.h"
+
 FLASHMEM void SendATresponse(ATRespCode ResponseCode)
 { 
    const char Verbose_RCs[NumATResponseCodes][15] = 

@@ -5,6 +5,10 @@
 
 #include "IOH_TeensyROM.h"
 
+// Global variable definitions
+volatile char    *ptrSerialString = NULL; //pointer to selected serialstring
+char SerialStringBuf[MaxPathLength] = "err"; // used for message passing to C64, up to full path length
+
 void SendMsgOK()
 {
     SendMsgPrintf ("OK");

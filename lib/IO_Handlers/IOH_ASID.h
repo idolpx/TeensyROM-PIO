@@ -24,23 +24,13 @@
 
 //IO Handler for MIDI ASID SysEx streams
 
-IntervalTimer ASIDPlaybackTimer;
+extern IntervalTimer ASIDPlaybackTimer;
 
 void IO1Hndlr_ASID(uint8_t Address, bool R_Wn);
 void PollingHndlr_ASID();
 void InitHndlr_ASID();
 
-stcIOHandlers IOHndlr_ASID =
-{
-  "ASID Player",           //Name of handler
-  &InitHndlr_ASID,       //Called once at handler startup
-  &IO1Hndlr_ASID,              //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_ASID,          //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_ASID;
 
 enum ASIDregsMatching  //synch with ASIDPlayer.asm
 {
@@ -122,50 +112,16 @@ uint32_t MaxT, MinT;
 uint32_t BufByteTarget;
 #endif
 
-bool QueueInitialized, FrameTimerMode;
-int32_t DeltaFrames;
-uint32_t ASIDQueueSize, NumPackets, TotalInituS, ForceIntervalUs, TimerIntervalUs;
-uint8_t MutedVoiceFlags;
+extern bool QueueInitialized, FrameTimerMode;
+extern int32_t DeltaFrames;
+extern uint32_t ASIDQueueSize, NumPackets, TotalInituS, ForceIntervalUs, TimerIntervalUs;
+extern uint8_t MutedVoiceFlags;
 
 #define MaxNumRegisters   28 //Max registers in an ASID Sysex Packet
-int8_t RegisterOrder[MaxNumRegisters];  //index is reg order, value is sysex reg #
-bool ForcedRegOrder = false;
+extern int8_t RegisterOrder[MaxNumRegisters];  //index is reg order, value is sysex reg #
+extern bool ForcedRegOrder;
 
-uint8_t ASIDidToReg[] = 
-{
- //reg#,// bit/id
-    0,  // 00
-    1,  // 01
-    2,  // 02
-    3,  // 03
-    5,  // 04
-    6,  // 05
-    7,  // 06
-           
-    8,  // 07
-    9,  // 08
-   10,  // 09
-   12,  // 10
-   13,  // 11
-   14,  // 12
-   15,  // 13
-
-   16,  // 14
-   17,  // 15
-   19,  // 16
-   20,  // 17
-   21,  // 18
-   22,  // 19
-   23,  // 20
-
-   24,  // 21
-    4,  // 22
-   11,  // 23
-   18,  // 24
-    4,  // 25 <= secondary for reg 04
-   11,  // 26 <= secondary for reg 11
-   18,  // 27 <= secondary for reg 18
-};
+extern uint8_t ASIDidToReg[];
 
 void InitTimedASIDQueue();
 void AddToASIDRxQueue(uint8_t Addr, uint8_t Data);

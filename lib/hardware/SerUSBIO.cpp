@@ -26,6 +26,9 @@
 #include "FlashUpdate.h"
 #include "BusSnoop.h"
 #include "RemoteControl.h"
+#include "SendMsg.h"
+
+#include "Common_Defs.h"
 
 FLASHMEM void ServiceSerial()
 {  //Serial.available() confirmed before calling

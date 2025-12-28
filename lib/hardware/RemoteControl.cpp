@@ -47,6 +47,9 @@
 #include "filesystem.h"
 #include "SendMsg.h"
 
+// Global variable definitions
+bool RemoteLaunched = false;
+
 bool InterruptC64(RegIRQCommands IRQCommand)
 {
    IO1[rwRegIRQ_CMD] = IRQCommand;

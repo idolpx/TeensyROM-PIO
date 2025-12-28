@@ -22,10 +22,23 @@
 #include "Common_Defs.h"
 #include "FileParsers.h"
 
-#define Printf_Swaps     Printf_dbg   //Serial.printf  //
-#define NumDecodeBanks   64
+// Global variable definitions
+stcIOHandlers IOHndlr_EasyFlash =
+{
+    "EasyFlash",          //Name of handler
+    &InitHndlr_EasyFlash, //Called once at handler startup
+    &IO1Hndlr_EasyFlash,  //IO1 R/W handler
+    &IO2Hndlr_EasyFlash,  //IO2 R/W handler
+    NULL,                 //ROML Read handler, in addition to any ROM data sent
+    NULL,                 //ROMH Read handler, in addition to any ROM data sent
+    NULL,                 //Polled in main routine
+    NULL,                 //called at the end of EVERY c64 cycle
+};
+
 uint8_t *BankDecode[NumDecodeBanks][2];
 uint8_t EZFlashRAM[256];
+
+#define Printf_Swaps     Printf_dbg   //Serial.printf  //
 
 #ifdef MinimumBuild
    struct stcSwapBuffers
@@ -43,22 +56,7 @@ uint8_t EZFlashRAM[256];
 #endif
 
 
-void InitHndlr_EasyFlash();  
-void IO1Hndlr_EasyFlash(uint8_t Address, bool R_Wn);  
-void IO2Hndlr_EasyFlash(uint8_t Address, bool R_Wn);  
-void PollingHndlr_EasyFlash();                           
 
-stcIOHandlers IOHndlr_EasyFlash =
-{
-  "EasyFlash",                //Name of handler
-  &InitHndlr_EasyFlash,       //Called once at handler startup
-  &IO1Hndlr_EasyFlash,        //IO1 R/W handler
-  &IO2Hndlr_EasyFlash,        //IO2 R/W handler
-  NULL,                       //ROML Read handler, in addition to any ROM data sent
-  NULL,                       //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_EasyFlash,    //Polled in main routine
-  NULL,                       //called at the end of EVERY c64 cycle
-};
 
 #ifdef MinimumBuild
 void LoadBank(uint32_t SeekTo, uint8_t* ptrImage)

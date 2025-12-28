@@ -26,16 +26,6 @@
 
 void IO1Hndlr_FunPlay (uint8_t Address, bool R_Wn);
 
-stcIOHandlers IOHndlr_FunPlay =
-{
-    "FunPlay",          //Name of handler
-    NULL,                //Called once at handler startup
-    &IO1Hndlr_FunPlay,    //IO1 R/W handler
-    NULL,                  //IO2 R/W handler
-    NULL,                   //ROML Read handler, in addition to any ROM data sent
-    NULL,                      //ROMH Read handler, in addition to any ROM data sent
-    NULL,                      //Polled in main routine
-    NULL,                  //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_FunPlay;
 
 #endif // IOH_FUNPLAY_H

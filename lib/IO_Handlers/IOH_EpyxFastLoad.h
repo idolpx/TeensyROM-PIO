@@ -23,6 +23,7 @@
 #include <Arduino.h>
 
 #include "IOH_defs.h"
+#include "Common_Defs.h"
 
 void InitHndlr_EpyxFastLoad();
 void IO1Hndlr_EpyxFastLoad (uint8_t Address, bool R_Wn);
@@ -30,16 +31,11 @@ void IO2Hndlr_EpyxFastLoad (uint8_t Address, bool R_Wn);
 void ROMLHndlr_EpyxFastLoad (uint32_t Address);
 void CycleHndlr_EpyxFastLoad();
 
-stcIOHandlers IOHndlr_EpyxFastLoad =
-{
-    "Epyx Fast Load",          //Name of handler
-    &InitHndlr_EpyxFastLoad,   //Called once at handler startup
-    &IO1Hndlr_EpyxFastLoad,    //IO1 R/W handler
-    &IO2Hndlr_EpyxFastLoad,    //IO2 R/W handler
-    &ROMLHndlr_EpyxFastLoad,   //ROML Read handler, in addition to any ROM data sent
-    NULL,                      //ROMH Read handler, in addition to any ROM data sent
-    NULL,                      //Polled in main routine
-    &CycleHndlr_EpyxFastLoad,  //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_EpyxFastLoad;
+
+#define EpyxMaxCycleCount  512 //Numer for C64 clock cycles to disable Epyx
+#define EpyxFastLoadCycleReset {SetExROMAssert;if(CycleCountdown<EpyxMaxCycleCount)CycleCountdown=EpyxMaxCycleCount;}  //don't interfere with long count set at init
+
+extern volatile uint32_t CycleCountdown;
 
 #endif // IOH_EPYXFLASHLOAD_H

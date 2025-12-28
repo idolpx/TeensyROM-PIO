@@ -20,8 +20,8 @@
 #include "IOH_EpyxFastLoad.h"
 
 #include "Common_Defs.h"
-#include "IOH_defs.h"
 
+// Global variable definitions
 stcIOHandlers IOHndlr_EpyxFastLoad =
 {
   "Epyx Fast Load",          //Name of handler
@@ -34,11 +34,7 @@ stcIOHandlers IOHndlr_EpyxFastLoad =
   &CycleHndlr_EpyxFastLoad,  //called at the end of EVERY c64 cycle
 };
 
-
-#define EpyxMaxCycleCount  512 //Numer for C64 clock cycles to disable Epyx
-#define EpyxFastLoadCycleReset {SetExROMAssert;if(CycleCountdown<EpyxMaxCycleCount)CycleCountdown=EpyxMaxCycleCount;}  //don't interfere with long count set at init
-
-volatile uint32_t CycleCountdown=0;
+volatile uint32_t CycleCountdown = 0;
 
 void InitHndlr_EpyxFastLoad()
 {

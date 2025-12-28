@@ -4,6 +4,9 @@
 #include <Arduino.h>
 #include <FS.h>
 #include <SD.h>
+#include <SerUSBIO.cpp>
+
+#include "midi2sid.h"
 
 FLASHMEM bool GetPathParameter(char FileNamePath[])
 {

@@ -22,16 +22,6 @@
 
 #include "IOH_defs.h"
 
-stcIOHandlers IOHndlr_None =
-{
-    "None",  //Name of handler
-    NULL,    //Called once at handler startup
-    NULL,    //IO1 R/W handler
-    NULL,    //IO2 R/W handler
-    NULL,    //ROML Read handler, in addition to any ROM data sent
-    NULL,    //ROMH Read handler, in addition to any ROM data sent
-    NULL,    //Polled in main routine
-    NULL,    //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_None;
 
 #endif // IOH_NONE_H

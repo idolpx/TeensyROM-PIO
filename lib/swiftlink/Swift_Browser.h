@@ -40,6 +40,7 @@ struct stcURLParse
    char postpath[MaxURLPathSize];
 };
 
+void SwiftBrowserInit();
 void SwiftTxBufToLcaseASSCII();
 void SendPETSCIICharImmediate(uint8_t CharToSend);
 void SendASCIIStrImmediate(const char* CharsToSend);

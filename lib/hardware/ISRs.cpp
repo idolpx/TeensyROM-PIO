@@ -26,6 +26,9 @@
 #include "IOHandlers.h"
 #include "IOH_TeensyROM.h"
 
+// Global variable definition
+volatile uint8_t BtnPressed = false;
+
 FASTRUN void isrButton()
 {
     BtnPressed = true;

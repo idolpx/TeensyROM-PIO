@@ -17,27 +17,24 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define DEBUG_MEMLOC   FLASHMEM
+#include "IOH_Debug.h"
 
-void IO1Hndlr_Debug(uint8_t Address, bool R_Wn);  
-void PollingHndlr_Debug();                           
-void InitHndlr_Debug();                           
+#include "midi2sid.h"
 
+#include "IOH_defs.h"
+
+// Global variable definitions
 stcIOHandlers IOHndlr_Debug =
 {
-  "Debug",             //Name of handler
-  &InitHndlr_Debug,    //Called once at handler startup
-  &IO1Hndlr_Debug,     //IO1 R/W handler
-  NULL,                //IO2 R/W handler
-  NULL,                //ROML Read handler, in addition to any ROM data sent
-  NULL,                //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_Debug, //Polled in main routine
-  NULL,                //called at the end of EVERY c64 cycle
+    "Debug",             //Name of handler
+    &InitHndlr_Debug,    //Called once at handler startup
+    &IO1Hndlr_Debug,     //IO1 R/W handler
+    NULL,                //IO2 R/W handler
+    NULL,                //ROML Read handler, in addition to any ROM data sent
+    NULL,                //ROMH Read handler, in addition to any ROM data sent
+    &PollingHndlr_Debug, //Polled in main routine
+    NULL,                //called at the end of EVERY c64 cycle
 };
-
-extern uint8_t ASIDidToReg[];
-
-//MIDI input handlers for Debug _________________________________________________________________________
 
 DEBUG_MEMLOC void DbgOnNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
 {

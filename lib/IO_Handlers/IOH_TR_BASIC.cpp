@@ -20,6 +20,30 @@
 
 #include "IOH_TR_BASIC.h"
 
+#include <SD.h>
+
+#include "IOH_TeensyROM.h"
+#include "Common_Defs.h"
+#include "Swift_RxQueue.h"
+#include "midi2sid.h"
+
+// Global variable definitions
+stcIOHandlers IOHndlr_TR_BASIC =
+{
+  "TR_BASIC",              //Name of handler
+  &InitHndlr_TR_BASIC,     //Called once at handler startup
+  &IO1Hndlr_TR_BASIC,      //IO1 R/W handler
+  NULL,                     //IO2 R/W handler
+  NULL,                     //ROML Read handler, in addition to any ROM data sent
+  NULL,                     //ROMH Read handler, in addition to any ROM data sent
+  &PollingHndlr_TR_BASIC,  //Polled in main routine
+  NULL,                     //called at the end of EVERY c64 cycle
+};
+
+uint8_t* TgetQueue = NULL;
+uint8_t* LSFileName = NULL;
+uint16_t FNCount;
+uint8_t  TR_BASContRegAction, TR_BASStatRegVal, TR_BASStrAvailableRegVal;
 
 
 void InitHndlr_TR_BASIC()

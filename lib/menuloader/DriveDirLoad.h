@@ -136,32 +136,13 @@
 
 
 struct StructHWID_IOH_Assoc
-{ 
+{
    uint16_t HWID;
    uint8_t  IOH;
 };
 
-StructHWID_IOH_Assoc HWID_IOH_Assoc[]=
-{
-           //HWID                  IOH
-   (uint16_t)Cart_MIDI_Datel,      IOH_MIDI_Datel,
-   (uint16_t)Cart_MIDI_Sequential, IOH_MIDI_Sequential,
-   (uint16_t)Cart_MIDI_Passport,   IOH_MIDI_Passport,
-   (uint16_t)Cart_MIDI_Namesoft,   IOH_MIDI_NamesoftIRQ,
-   (uint16_t)Cart_SwiftLink,       IOH_Swiftlink,
-   (uint16_t)Cart_Turbo232,        IOH_Swiftlink,
-   (uint16_t)Cart_EpyxFastload,    IOH_EpyxFastLoad,
-   (uint16_t)Cart_MagicDesk,       IOH_MagicDesk,
-   (uint16_t)Cart_Dinamic,         IOH_Dinamic,
-   (uint16_t)Cart_Oceantype1,      IOH_Ocean1,
-   (uint16_t)Cart_FunPlayPowerPlay,IOH_FunPlay,
-   (uint16_t)Cart_SuperGames      ,IOH_SuperGames,
-   (uint16_t)Cart_C64GameSystem3  ,IOH_C64GameSystem3,
-   (uint16_t)Cart_EasyFlash       ,IOH_EasyFlash,
-   (uint16_t)Cart_ZaxxonSuper     ,IOH_ZaxxonSuper,
-   (uint16_t)Cart_GMod2           ,IOH_GMod2,
-   (uint16_t)Cart_MagicDesk2      ,IOH_MagicDesk2,
-};
+#define HWID_IOH_Assoc_Count 17
+extern StructHWID_IOH_Assoc HWID_IOH_Assoc[HWID_IOH_Assoc_Count];
 
 #define StrSIDInfoSize    (5*40+5) // max 5 *full* lines + 1 blank line
 
@@ -178,35 +159,13 @@ struct StructCrtChip
 };
 
 struct StructExt_ItemType_Assoc
-{ 
+{
    char    Extension[4];
    uint8_t ItemType;
 };
 
-StructExt_ItemType_Assoc Ext_ItemType_Assoc[]=
-{ //Update Win UI if this changes
-  //Ext ,  ItemType
-   "prg",  rtFilePrg,
-   "crt",  rtFileCrt,
-   "hex",  rtFileHex,
-   "p00",  rtFileP00,
-   "sid",  rtFileSID,
-   "kla",  rtFileKla,
-   "koa",  rtFileKla,
-   "ocp",  rtFileArt,
-   "pic",  rtFileArt,
-   "art",  rtFileArt,
-   "aas",  rtFileArt,
-   "hpi",  rtFileArt,
-   "txt",  rtFileTxt,
-   "nfo",  rtFileTxt,
-   "md",   rtFileTxt,
-   "seq",  rtFilePETSCII,
-   "d64",  rtD64,
-   "d71",  rtD71,
-   "d81",  rtD81,
-   //"c64",  rtFilePrg,  //makefile output, not always prg...
-};
+#define Ext_ItemType_Assoc_Count 19
+extern StructExt_ItemType_Assoc Ext_ItemType_Assoc[Ext_ItemType_Assoc_Count];
 
 void HandleExecution();
 void MenuChange();

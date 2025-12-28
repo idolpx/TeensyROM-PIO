@@ -6,6 +6,11 @@
 #include "Menu_Regs.h"
 #include "IOH_TeensyROM.h"
 
+// Global variable definitions
+USBHost myusbHost;
+USBFilesystem firstPartition(myusbHost);
+MIDIDevice usbHostMIDI(myusbHost);
+
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 
 #define NUM_VOICES 3

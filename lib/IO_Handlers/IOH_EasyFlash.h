@@ -25,23 +25,13 @@
 #include "IOH_defs.h"
 
 #define NumDecodeBanks   64
-uint8_t *BankDecode[NumDecodeBanks][2];
-uint8_t EZFlashRAM[256];
+extern uint8_t *BankDecode[NumDecodeBanks][2];
+extern uint8_t EZFlashRAM[256];
 
 void InitHndlr_EasyFlash();
 void IO1Hndlr_EasyFlash (uint8_t Address, bool R_Wn);
 void IO2Hndlr_EasyFlash (uint8_t Address, bool R_Wn);
 
-stcIOHandlers IOHndlr_EasyFlash =
-{
-    "EasyFlash",          //Name of handler
-    &InitHndlr_EasyFlash, //Called once at handler startup
-    &IO1Hndlr_EasyFlash,  //IO1 R/W handler
-    &IO2Hndlr_EasyFlash,  //IO2 R/W handler
-    NULL,                 //ROML Read handler, in addition to any ROM data sent
-    NULL,                 //ROMH Read handler, in addition to any ROM data sent
-    NULL,                 //Polled in main routine
-    NULL,                 //called at the end of EVERY c64 cycle
-};
+extern stcIOHandlers IOHndlr_EasyFlash;
 
 #endif // IOH_EASYFLASH_H

@@ -25,12 +25,37 @@
 #include <SD.h>
 #include <EEPROM.h>
 
+#include "Swift_RxQueue.h"
 #include "IOH_Swiftlink.h"
 #include "eeprom_dev.h"
 #include "IOH_TeensyROM.h"
 #include "midi2sid.h"
 #include "RemoteControl.h"
 
+void SwiftBrowserInit()
+{
+    Serial.printf("Swiftlink Browser Init\n");
+    SetLEDOff; // turn off LED to indicate init in progress
+
+    if (BrowserMode)
+    {
+        Printf_dbg_sw("Swiftlink Browser Mode Enabled\n");
+        SendPETSCIICharImmediate(PETSCIIclearScreen);
+        SendPETSCIICharImmediate(PETSCIIpurple);
+        SendASCIIStrImmediate("Swiftlink Browser Mode\r");
+        SendPETSCIICharImmediate(PETSCIIwhite);
+    }
+
+    for (uint8_t PinNum = 0; PinNum < sizeof(OutputPins); PinNum++)
+        pinMode(OutputPins[PinNum], OUTPUT);
+
+    for (uint8_t cnt = 0; cnt < NumPageLinkBuffs; cnt++)
+        PageLinkBuff[cnt] = NULL; // initialize page link buffer for swiftlink browser mode
+    for (uint8_t cnt = 0; cnt < NumPrevURLQueues; cnt++)
+        PrevURLQueue[cnt] = NULL; // initialize previous link buffer for swiftlink browser mode
+    for (uint8_t cnt = 0; cnt < RxQueueNumBlocks; cnt++)
+        RxQueue[cnt] = NULL; // initialize RxQueue for swiftlink
+}
 
 void SwiftTxBufToLcaseASSCII()
 {

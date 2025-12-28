@@ -23,6 +23,19 @@
 #include "IOH_defs.h"
 #include "FileParsers.h"
 
+// Global variable definitions
+stcIOHandlers IOHndlr_Ocean1 =
+{
+    "Ocean Type 1",    // Name of handler
+    &InitHndlr_Ocean1, // Called once at handler startup
+    &IO1Hndlr_Ocean1,  // IO1 R/W handler
+    NULL,              // IO2 R/W handler
+    NULL,              // ROML Read handler, in addition to any ROM data sent
+    NULL,              // ROMH Read handler, in addition to any ROM data sent
+    NULL,              // Polled in main routine
+    NULL,              // called at the end of EVERY c64 cycle
+};
+
 void InitHndlr_Ocean1()
 {
    if (NumCrtChips == 64) // Type B, 512k
