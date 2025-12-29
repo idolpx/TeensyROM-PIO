@@ -30,22 +30,25 @@
 
 #include "Common_Defs.h"
 
-FLASHMEM void ServiceSerial()
-{  //Serial.available() confirmed before calling
+Stream *CmdChannel = &Serial;
+
+FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
+{  //ThisCmdChannel->available() confirmed before calling
+   CmdChannel = ThisCmdChannel;
 
    if (CurrentIOHandler == IOH_TR_BASIC) return; //special case, handler will take care of serial input
-   
-   uint16_t inVal = Serial.read();
+
+   uint16_t inVal = CmdChannel->read();
    switch (inVal)
    {
       case 0x64: //'d' command from app
          if(!SerialAvailabeTimeout()) return;
-         inVal = (inVal<<8) | Serial.read(); //READ NEXT BYTE
-         
+         inVal = (inVal<<8) | CmdChannel->read(); //READ NEXT BYTE
+
          //only commands available when busy:
          if (inVal == ResetC64Token) //Reset C64
          {
-            Serial.println("Reset cmd received");  //UI looks for this string, do not change.
+            CmdChannel->println("Reset cmd received");  //UI looks for this string, do not change.
             BtnPressed = true;
             return;
          }
@@ -54,9 +57,10 @@ FLASHMEM void ServiceSerial()
             LaunchFile();
             return;
          }
-         else if (inVal == C64PauseOnToken) //pause C64 via DMA 
+         else if (inVal == C64PauseOnToken) //pause C64 via DMA, during next bad line
          {
-            DMA_State = DMA_S_StartActive;
+            //DMA_State = DMA_S_StartActive;
+            DMA_State = DMA_S_Start_BA_Active; //Apply DMA When BA is low (bad line).  Doesn't work?
             SendU16(AckToken);
             return;
          }
@@ -66,11 +70,19 @@ FLASHMEM void ServiceSerial()
             SendU16(AckToken);
             return;
          }
-            
+         else if (inVal == VersionInfoToken) //Version Info
+         {
+            MakeBuildInfo();
+            SendU16(AckToken);
+            CmdChannel->printf("\nTeensyROM %s\n%s\n", strVersionNumber, SerialStringBuf);
+            return;
+         }
+
+
          if (CurrentIOHandler != IOH_TeensyROM)
          {
             SendU16(FailToken);
-            Serial.print("Busy!\n");
+            CmdChannel->print("Busy!\n");
             return;
          }
          //TeensyROM IO Handler is active...
@@ -78,7 +90,7 @@ FLASHMEM void ServiceSerial()
          switch (inVal)
          {
             case PingToken:  //ping
-               Serial.printf("TeensyROM %s ready!\n", strVersionNumber);
+               CmdChannel->printf("TeensyROM %s ready!\n", strVersionNumber);
                break;
             case SendFileToken: //file x-fer pc->TR
             case PostFileToken:  // v2 file x-fer pc->TR.  For use with v2 UI.
@@ -93,8 +105,9 @@ FLASHMEM void ServiceSerial()
             case GetFileToken:
                GetFileCommand();
                break;
-            case GetDirectoryToken:  // v2 directory listing from TR
-               GetDirectoryCommand();
+            case GetDirectoryToken:  // JSON directory listing (to be deprecated)
+            case GetDirNDJSONToken:  // NDJSON directory listing from TR
+               GetDirectoryCommand(inVal==GetDirNDJSONToken);
                break;
             case PauseSIDToken: //Pause SID
                if(RemotePauseSID()) SendU16(AckToken);
@@ -118,23 +131,24 @@ FLASHMEM void ServiceSerial()
                else SendU16(FailToken);
                break;
             case DebugToken: //'dg'Test/debug
-               //for (int a=0; a<256; a++) Serial.printf("\n%3d, // %3d   '%c'", ToPETSCII(a), a, a);
+               //for (int a=0; a<256; a++) CmdChannel->printf("\n%3d, // %3d   '%c'", ToPETSCII(a), a, a);
                //PrintDebugLog();
                //nfcInit();
-               Printf_dbg("isFab2x: %d\n", isFab2x()); 
+               //Printf_dbg("isFab2x: %d\n", isFab2x());
+               //USBHostSerial.print("USB Host Serial\n");
+               //Serial.print("Sent:USB Host Serial\n");
+               //EEPROM.write(eepAdDHCPEnabled, 0); //DHCP disabled
+               //EEPROM.put(eepAdMyIP, (uint32_t)IPAddress(192,168,1,222));
+               //CmdChannel->printf("Static IP updated\n");
                break;
             default:
-               Serial.printf("Unk cmd: 0x%04x\n", inVal); 
+               CmdChannel->printf("Unk cmd: 0x%04x\n", inVal);
                break;
          }
          break;
       case 'e': //Reset EEPROM to defaults
          SetEEPDefaults();
-         Serial.println("Applied upon reboot");
-         break;
-      case 'v': //version info
-         MakeBuildInfo();
-         Serial.printf("\nTeensyROM %s\n%s\n", strVersionNumber, SerialStringBuf);
+         CmdChannel->println("Applied upon reboot");
          break;
       case 'b': //bus analysis
          BusAnalysis();
@@ -513,39 +527,47 @@ FLASHMEM void PrintDebugLog()
 }
 
 FLASHMEM void LaunchFile()
-{            
+{
    //   App: LaunchFileToken 0x6444
    //Teensy: AckToken 0x64CC or RetryToken/abort from minimal
-   //   App: Send SD_nUSB(1), DestPath/Name(up to MaxNamePathLength, null term)
+   //   App: Send DriveType(1), DestPath/Name(up to MaxNamePathLength, null term)
+   //        DriveTypes: (RegMenuTypes)
+   //           USBDrive  = 0
+   //           SD        = 1
+   //           Teensy    = 2
    //Teensy: AckToken 0x64CC
    //   C64: file Launches
 
    //Launch file token has been received
    SendU16(AckToken);
-
-   uint32_t SD_nUSB;
+   RegMenuTypes DriveType;
    char FileNamePath[MaxNamePathLength];
-   if (ReceiveFileName(&SD_nUSB, FileNamePath))
+
+   if (ReceiveFileName(&DriveType, FileNamePath))
    {
       SendU16(AckToken);
-      RemoteLaunch(SD_nUSB == 0 ? rmtUSBDrive : rmtSD, FileNamePath, false); //only SD and USB supported by UI
+      RemoteLaunch(DriveType, FileNamePath, false);
    }
 }
 
-FLASHMEM bool ReceiveFileName(uint32_t *SD_nUSB, char *FileNamePath)
+FLASHMEM bool ReceiveFileName(RegMenuTypes* DriveType, char *FileNamePath)
 {
-   if (!GetUInt(SD_nUSB, 1)) return false;
- 
+   uint32_t RecDrive;
+   if (!GetUInt(&RecDrive, 1)) return false;
+
+   if (RecDrive >= rmtNumTypes) return false;
+   *DriveType = (RegMenuTypes)RecDrive;
+
    uint16_t CharNum=0;
-   while (1) 
+   while (1)
    {
       if(!SerialAvailabeTimeout()) return false;
-      FileNamePath[CharNum] = Serial.read();
+      FileNamePath[CharNum] = CmdChannel->read();
       if (FileNamePath[CharNum]==0) return true;
       if (++CharNum == MaxNamePathLength)
       {
          SendU16(FailToken);
-         Serial.print("Path too long!\n");  
+         CmdChannel->print("Path too long!\n");
          return false;
       }
    }
@@ -557,7 +579,7 @@ FLASHMEM bool GetUInt(uint32_t *InVal, uint8_t NumBytes)
    for(int8_t ByteNum=NumBytes-1; ByteNum>=0; ByteNum--)
    {
       if(!SerialAvailabeTimeout()) return false;
-      uint32_t ByteIn = Serial.read();
+      uint32_t ByteIn = CmdChannel->read();
       *InVal += (ByteIn << (ByteNum*8));
    }
    return true;
@@ -565,27 +587,27 @@ FLASHMEM bool GetUInt(uint32_t *InVal, uint8_t NumBytes)
 
 FLASHMEM void SendU16(uint16_t SendVal)
 {
-   Serial.write((uint8_t)(SendVal & 0xff));
-   Serial.write((uint8_t)((SendVal >> 8) & 0xff));
+   CmdChannel->write((uint8_t)(SendVal & 0xff));
+   CmdChannel->write((uint8_t)((SendVal >> 8) & 0xff));
 }
 
 FLASHMEM void SendU32(uint32_t SendVal)
 {
-    Serial.write((uint8_t)(SendVal & 0xff));
-    Serial.write((uint8_t)((SendVal >> 8) & 0xff));
-    Serial.write((uint8_t)((SendVal >> 16) & 0xff));
-    Serial.write((uint8_t)((SendVal >> 24) & 0xff));
+    CmdChannel->write((uint8_t)(SendVal & 0xff));
+    CmdChannel->write((uint8_t)((SendVal >> 8) & 0xff));
+    CmdChannel->write((uint8_t)((SendVal >> 16) & 0xff));
+    CmdChannel->write((uint8_t)((SendVal >> 24) & 0xff));
 }
-   
+
 FLASHMEM bool SerialAvailabeTimeout()
 {
    uint32_t StartTOMillis = millis();
-   
-   while(!Serial.available() && (millis() - StartTOMillis) < SerialTimoutMillis); // timeout loop
-   if (Serial.available()) return(true);
-   
+
+   while(!CmdChannel->available() && (millis() - StartTOMillis) < SerialTimoutMillis); // timeout loop
+   if (CmdChannel->available()) return(true);
+
    SendU16(FailToken);
-   Serial.print("Timeout!\n");  
+   CmdChannel->print("Timeout!\n");
    return(false);
 }
 

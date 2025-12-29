@@ -49,8 +49,8 @@ void EEPreadStr(uint16_t addr, char* buf)
 void SetEEPDefaults()
 {
    Serial.println("--> Setting EEPROM to defaults");
-   EEPROM.write(eepAdPwrUpDefaults, 0x90 | rpudRWReadyDly); //default med js speed, music on, eth time synch off, NFC off, RW delay on
-   EEPROM.write(eepAdPwrUpDefaults2, 0x00); //default 12 hour clock mode
+   EEPROM.write(eepAdPwrUpDefaults, 0x90); //default: music on, eth time synch off, hide extensions, 12 hour clock, med js speed (9/15), see RegPowerUpDefaultMasks
+   EEPROM.write(eepAdPwrUpDefaults2, 0x00); //default: NFC & Serial TRCont off, see see bit mask defs RegPowerUpDefaultMasks2
    EEPROM.write(eepAdTimezone, -14); //default to pacific time
    EEPROM.write(eepAdNextIOHndlr, IOH_None); //default to no Special HW
    SetEthEEPDefaults();
@@ -65,9 +65,15 @@ void SetEEPDefaults()
    EEPROM.write(eepAdColorRefStart+EscTRBannerColor, PokePurple ); 
    EEPROM.write(eepAdColorRefStart+EscTimeColor    , PokeOrange ); 
    EEPROM.write(eepAdColorRefStart+EscOptionColor  , PokeYellow ); 
-   EEPROM.write(eepAdColorRefStart+EscSourcesColor , PokeLtBlue ); 
-   EEPROM.write(eepAdColorRefStart+EscNameColor    , PokeLtGreen); 
-   
+   EEPROM.write(eepAdColorRefStart+EscSourcesColor , PokeLtBlue );
+   EEPROM.write(eepAdColorRefStart+EscNameColor    , PokeLtGreen);
+   //hot key defaults:
+   EEPwriteStr(eepAdHotKeyPaths+0*MaxPathLength, "TR:/MIDI + ASID/Cynthcart 2.0.1       +Datel MIDI");
+   EEPwriteStr(eepAdHotKeyPaths+1*MaxPathLength, "TR:/MIDI + ASID/Station64 2.6      +Passport MIDI");
+   EEPwriteStr(eepAdHotKeyPaths+2*MaxPathLength, "TR:/Utilities/CCGMS 2021 Term       +SwiftLink ");
+   EEPwriteStr(eepAdHotKeyPaths+3*MaxPathLength, "TR:/MIDI + ASID/TeensyROM ASID Player    +TR ASID");
+   EEPwriteStr(eepAdHotKeyPaths+4*MaxPathLength, "TR:/Games/Jupiter Lander");
+
    EEPROM.put(eepAdMagicNum, (uint32_t)eepMagicNum); //set this last in case of power down, etc.
 }
 
@@ -92,10 +98,6 @@ FLASHMEM void SetEthEEPDefaults()
       "68k.news Headlines from the Future", "http://68k.news/",
       "CNN Lite (filtered)",                "http://www.frogfind.com/read.php?a=http://lite.cnn.com/",
       "CBC Lite News (filtered)",           "http://www.frogfind.com/read.php?a=http://www.cbc.ca/lite/news",
-      "textfiles.com",                      "http://textfiles.com/directory.html",
-      "Hyperlinked Text (filtered)",        "http://www.frogfind.com/read.php?a=http://sjmulder.nl/en/textonly.html",
-      "legiblenews.com (filtered)",         "http://www.frogfind.com/read.php?a=http://legiblenews.com/",
-      "text-only news sites (filtered)",    "http://www.frogfind.com/read.php?a=http://greycoder.com/a-list-of-text-only-new-sites",
    };
    
    for (uint8_t BMNum=0; BMNum<eepNumBookmarks; BMNum++)

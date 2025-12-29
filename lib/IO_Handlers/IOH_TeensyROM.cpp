@@ -49,6 +49,7 @@ stcIOHandlers IOHndlr_TeensyROM =
 
 int16_t SidSpeedAdjust = 0;
 bool    SidLogConv = false; //true=Log, false=linear
+bool    NetListenEnable = false;
 volatile uint8_t* IO1 = NULL;  //io1 space/regs
 volatile uint16_t StreamOffsetAddr = 0, StringOffset = 0;
 
@@ -215,15 +216,28 @@ void (*StatusFunction[rsNumStatusTypes])() = //match RegStatusTypes order
    &ClearAutoLaunch,     // rsClearAutoLaunch
    &NextTextFile,        // rsNextTextFile
    &LastTextFile,        // rsLastTextFile
-   &IOHandlerNextInit    // rsIOHWNextInit
+   &IOHandlerNextInit,   // rsIOHWNextInit
+   &IOHandlerNextInit,   // rsIOHWReInit
+   &HotKeySetLaunch,     // rsHotKeySetLaunch
+   &NetListenInit,       // rsNetListenInit
 };
 
-FLASHMEM void getNtpTime() 
+FLASHMEM void SendStrPrintfln(const char* Msg)
+{
+   SendMsgPrintfln(Msg); //printf style, throws warning if used as callback in EthernetInit
+}
+
+FLASHMEM void NetListenInit()
+{  //called on main menu start when rpud2TRTCPListen
+   NetListenEnable = EthernetInit();
+}
+
+FLASHMEM void getNtpTime()
 {
    //IO1[rRegLastHourBCD] = 0x0; //91;   // 11pm
-   //IO1[rRegLastMinBCD]  = 0x59;      
-   //IO1[rRegLastSecBCD]  = 0x53;      
-   //Serial.printf("Time: %02x:%02x:%02x %sm\n", (IO1[rRegLastHourBCD] & 0x7f) , IO1[rRegLastMinBCD], IO1[rRegLastSecBCD], (IO1[rRegLastHourBCD] & 0x80) ? "p" : "a");        
+   //IO1[rRegLastMinBCD]  = 0x59;
+   //IO1[rRegLastSecBCD]  = 0x53;
+   //Serial.printf("Time: %02x:%02x:%02x %sm\n", (IO1[rRegLastHourBCD] & 0x7f) , IO1[rRegLastMinBCD], IO1[rRegLastSecBCD], (IO1[rRegLastHourBCD] & 0x80) ? "p" : "a");
    //return;
 
    if (!EthernetInit()) 
@@ -577,6 +591,38 @@ FLASHMEM void ClearAutoLaunch()
    EEPROM.write(eepAdAutolaunchName, 0); //disable auto Launch
 }
 
+FLASHMEM void HotKeySetLaunch()
+{
+   uint8_t HotKeyNumSL = IO1[rwRegScratch];  //zero based HK num + bit 7 high = set HK, low = launch
+
+   if (HotKeyNumSL & 0x80)
+   {
+      //set
+      char PathFilename[MaxPathLength];
+
+      HotKeyNumSL &= 0x7f;  // strip SL bit
+      //get/print path+filename
+      SelItemFullIdx = IO1[rwRegCursorItemOnPg]+(IO1[rwRegPageNumber]-1)*MaxItemsPerPage;
+      IO1[rwRegScratch] = 0; //needed for GetCurrentFilePathName, also indicates success of this function
+      GetCurrentFilePathName(PathFilename);
+      SendMsgPrintfln("\rSet Hot Key #%d to this file:\r%s\r", HotKeyNumSL+1, PathFilename);
+
+      if(MenuSource[SelItemFullIdx].ItemType < rtFilePrg)
+      {
+         SendMsgPrintfln("Invalid File Type (%d)\r\rHot Key *not* updated\r", MenuSource[SelItemFullIdx].ItemType);
+         return;
+      }
+
+      EEPwriteStr(eepAdHotKeyPaths+HotKeyNumSL*MaxPathLength, PathFilename);  //set autolaunch in EEPROM:
+      SendMsgPrintfln("Hot Key updated\r");
+   }
+   else
+   {
+      //launch, no messaging/not waiting...
+      EEPRemoteLaunch(eepAdHotKeyPaths+HotKeyNumSL*MaxPathLength);
+   }
+}
+
 FLASHMEM void SetBackgroundSID()
 {
    EEPwriteNBuf(eepAdDefaultSID, (uint8_t*)LatestSIDLoaded, MaxPathLength); //write the source/path/name to EEPROM   
@@ -923,6 +969,15 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
                   break;
                case rCtlLastTextFile:
                   IO1[rwRegStatus] = rsLastTextFile; //work this in the main code
+                  break;
+               case rCtlIOHWReInitWAIT:
+                  IO1[rwRegStatus] = rsIOHWReInit; //work this in the main code
+                  break;
+               case rCtlHotKeySetLaunch:
+                  IO1[rwRegStatus] = rsHotKeySetLaunch; //work this in the main code
+                  break;
+               case rCtlNetListenInitWAIT:
+                  IO1[rwRegStatus] = rsNetListenInit; //work this in the main code
                   break;
                
             }

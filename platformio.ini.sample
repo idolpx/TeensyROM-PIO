@@ -11,14 +11,15 @@
 
 [platformio]
 description = TeensyROM (ROM Emulator, Fast Loader, MIDI and Internet cartridge for Commodore64/128)
-firmware_version = "v0.6.7+9.x"
+firmware_version = "v0.7-ipx"
 default_envs = teensyrom-max
 
 
 [teensyrom]
 platform = teensy
-board = teensy41
 framework = arduino
+board = teensy41
+;upload_protocol = teensy-cli
 ;extra_scripts = 
 ;    pre:build_version.py
 ;    post:build_firmwarezip.py
@@ -27,22 +28,18 @@ framework = arduino
 [env]
 ; Common settings for all enivornments
 lib_ldf_mode = deep+
-upload_speed = 115200 ;921600
-;upload_port = COM1 ; Windows
-;upload_port = /dev/ttyUSB0 ; Linux
-upload_port = /dev/cu.usbmodem148986801 ; Mac
-monitor_speed = 115200 ;921600
+monitor_speed = 2000000
 ;monitor_port = COM1 ; Windows
 ;monitor_port = /dev/ttyUSB0 ; Linux
 monitor_port = /dev/cu.usbmodem148986801 ; Mac
-monitor_filters = color
-check_skip_packages = yes
 
 ;lib_deps = 
 ;    https://github.com/vjmuzik/FNET.git
 ;    https://github.com/vjmuzik/NativeEthernet.git
 ;    https://github.com/elechouse/PN532.git
 
+; Teensy USB Type Build Flags
+; https://docs.platformio.org/en/latest/platforms/teensy.html
 ; https://forum.pjrc.com/index.php?threads/newbie-on-platformio-with-teensy.64225/#post-258173
 ; Build-flag             Description (as in Arduino IDE)
 ; ----------------------------------------------------
@@ -73,7 +70,6 @@ check_skip_packages = yes
 build_flags =
     -D CMAKE_EXPORT_COMPILE_COMMANDS=ON
     -D TEENSY_OPT_SMALLEST_CODE
-    -D USB_MIDI_SERIAL
     -D FIRMWARE_VERSION=\"${platformio.firmware_version}\"
     -I include
 
@@ -99,13 +95,15 @@ build_flags =
     ; -D MinimumBuild     ; Exclude features to minimize code size
 
 
-[env:teensyrom-max]
-extends = teensyrom
-build_flags =
-    ${env.build_flags}
-
 [env:teensyrom-min]
 extends = teensyrom
 build_flags =
     ${env.build_flags}
+    -D USB_SERIAL
     -D MinimumBuild
+
+[env:teensyrom-max]
+extends = teensyrom
+build_flags =
+    ${env.build_flags}
+    -D USB_MIDI_SERIAL

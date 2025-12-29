@@ -41,9 +41,9 @@ FLASHMEM bool SendPagedDirectoryContents(FS& fileStream, const char* directoryPa
 // Receive <-- SD_nUSB(1), Destination Path(MaxNameLength, null terminator), sake(1), skip(1)
 // Send --> AckToken 0x64CC on successful check of directory existence, 0x9b7f on Fail
 // Send --> StartDirectoryListToken 0x5A5A or FailToken 0x9b7f
-// Send --> Write content as json
+// Send --> Write content as json or ndjson (if SetNDJSONformat=true)
 // Send --> EndDirectoryListToken 0xA5A5,  0x9b7f on Fail
-FLASHMEM void GetDirectoryCommand();
+FLASHMEM void GetDirectoryCommand(bool SetNDJSONformat = false);
 FLASHMEM bool CopyFile(const char* sourcePath, const char* destinationPath, FS& fs);
 
 // Command: 

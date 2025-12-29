@@ -103,36 +103,41 @@ void setup()
     Printf_dbg("Debug messages enabled!\n");
     Printf_dbg_sw("Swiftlink debug messages enabled!\n");
 
-    if (IO1[rwRegPwrUpDefaults] & rpudNFCEnabled)
+    if (IO1[rwRegPwrUpDefaults2] & rpud2NFCEnabled)
         nfcInit(); // connect to nfc scanner
 
-    if (IO1[rwRegPwrUpDefaults] & rpudRWReadyDly)
-        nS_RWnReady = Def_nS_RWnReady_dly; // delay RW read timing
-
-    if (EEPROM.read(eepAdMinBootInd) == MinBootInd_SkipMin) // normal first power up
-    {
-        if (ReadButton != 0) // skip autolaunch checks if button pressed
-        {
-            uint32_t AutoStartmS = millis();
-            if (!CheckLaunchSDAuto()) // if nothing autolaunched from SD autolaunch file
-            {
-                if (EEPROM.read(eepAdAutolaunchName) && (ReadButton != 0)) // If name is non zero length & button not pressed
-                {
-                    char AutoFileName[MaxPathLength];
-                    EEPreadStr(eepAdAutolaunchName, AutoFileName);
-                    char *ptrAutoFileName = AutoFileName; // pointer to move past SD/USB/TR:
-                    RegMenuTypes MenuSourceID = RegMenuTypeFromFileName(&ptrAutoFileName);
-
-                    Printf_dbg("EEP Autolaunch %d \"%s\"\n", MenuSourceID, ptrAutoFileName);
-                    RemoteLaunch(MenuSourceID, ptrAutoFileName, true); // do CRT directly
-                }
-            }
-            Printf_dbg("Autolaunch checks: %lumS\n", millis() - AutoStartmS);
-        }
+    if (IO1[rwRegPwrUpDefaults2] & rpud2TRContEnabled) // connect to TR Control device
+    {   // takes 200mS typical, 5 seconds if usb serial device not present!
+        USBHostSerial.begin(115200, USBHOST_SERIAL_8N1); // 115200 460800 2000000
+        Serial.println("USB Host Control Enabled");
+        // USBHostSerial.printf("USB Host Serial Control Ready\n");
     }
-    else
-    { // if it's not skip min (most likely MinBootInd_FromMin), set back to default for next time
-        EEPROM.write(eepAdMinBootInd, MinBootInd_SkipMin);
+
+    switch (EEPROM.read(eepAdMinBootInd))
+    {
+        case MinBootInd_SkipMin: // normal first power up
+            if (ReadButton != 0) // skip autolaunch checks if button pressed
+            {
+                uint32_t AutoStartmS = millis();
+                if (!CheckLaunchSDAuto()) // if nothing autolaunched from SD autolaunch file
+                {
+                    if (EEPROM.read(eepAdAutolaunchName) && (ReadButton != 0)) // If name is non zero length & button not pressed
+                    {
+                        EEPRemoteLaunch(eepAdAutolaunchName);
+                    }
+                }
+                Printf_dbg("Autolaunch checks: %lumS\n", millis() - AutoStartmS);
+            }
+            break;
+
+        case MinBootInd_LaunchFull: // Launch command received in minimal, launch it from full
+            EEPROM.write(eepAdMinBootInd, MinBootInd_SkipMin);
+            EEPRemoteLaunch(eepAdCrtBootName);
+            break;
+
+        default: // ignore anything else (most likely MinBootInd_FromMin), set back to default for next time
+            EEPROM.write(eepAdMinBootInd, MinBootInd_SkipMin);
+            break;
     }
 
     SetLEDOn; // done last as indicator of init completion
@@ -153,7 +158,7 @@ void loop()
             RemoteLaunched = false;
             Printf_dbg("Remote recovery\n");
         }
-        if (IO1[rwRegPwrUpDefaults] & rpudNFCEnabled)
+        if (IO1[rwRegPwrUpDefaults2] & rpud2NFCEnabled)
             nfcInit();      // connect to nfc scanner
         SetUpMainMenuROM(); // back to main menu, also sets doReset
     }
@@ -193,8 +198,22 @@ void loop()
         ServiceSerial();
 
     myusbHost.Task();
+
     if (nfcState == nfcStateEnabled)
         nfcCheck();
+
+    if (IO1[rwRegPwrUpDefaults2] & rpud2TRContEnabled)
+        if (USBHostSerial.available())
+            ServiceSerial(&USBHostSerial);
+
+#ifdef FeatTCPListen
+    if (NetListenEnable)
+    {   // Listen for TCP packets
+        EthernetClient tcpclient = tcpServer.available();
+        if (tcpclient)
+            ServiceTCP(tcpclient);
+    }
+#endif
 
     // handler specific polling items:
     if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL)

@@ -18,6 +18,7 @@ extern USBHost myusbHost;
 extern USBFilesystem firstPartition;
 
 extern MIDIDevice usbHostMIDI;
+extern USBSerial USBHostSerial;
 
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 

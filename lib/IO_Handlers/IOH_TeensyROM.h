@@ -75,7 +75,10 @@ extern void nfcInit();
 //#define ToPETSCII(x) (x==95 ? 32 : x>64 ? x^32 : x)
 #define ToPETSCII(x) ASCIItoPETSCII[(x) & 0x7f]
 
+FLASHMEM void SendStrPrintfln(const char* Msg);
+FLASHMEM void NetListenInit();
 FLASHMEM void getNtpTime();
+FLASHMEM void HotKeySetLaunch();
 void WriteEEPROM();
 FLASHMEM uint8_t RAM2blocks();
 FLASHMEM void MakeBuildInfo();

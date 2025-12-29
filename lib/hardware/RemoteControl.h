@@ -87,6 +87,7 @@ FLASHMEM bool RemoteSetSIDSpeed(bool LogConv);
 //             bits 7:3= Zero
 // Send --> AckToken 0x64CC or FailToken 0x9B7F
 FLASHMEM bool RemoteSetSIDVoiceMute();
+void EEPRemoteLaunch(uint16_t eepAdNameToLaunch);
 void RemoteLaunch(RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoCartDirect);
 
 #endif // REMOTECONTROL_H

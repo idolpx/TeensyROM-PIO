@@ -8,7 +8,7 @@
 
 extern char strVersionNumber[]; //*VERSION*
 
-#define UpperAddr           0x040000  //address of upper (main) TR image, from FLASH_BASEADDRESS
+#define UpperAddr           0x060000  //address of upper (main) TR image, from FLASH_BASEADDRESS
 #define FLASH_BASEADDRESS 0x60000000
 
 //synch with win app:
@@ -21,16 +21,18 @@ extern char strVersionNumber[]; //*VERSION*
 #define SIDSpeedLinToken  0x6499
 #define SIDSpeedLogToken  0x649A
 #define SIDVoiceMuteToken 0x6433
-#define C64PauseOnToken   0x6431  //d1
-#define C64PauseOffToken  0x6430  //d0
+#define C64PauseOnToken   0x6431  // C64 Paused
+#define C64PauseOffToken  0x6430  // C64 Unpaused
 #define DebugToken        0x6467  //dg
+#define VersionInfoToken  0x6476  //dv
 #define SendFileToken     0x64AA
 #define PostFileToken     0x64BB
 #define CopyFileToken     0x64FF
 #define GetFileToken      0x64B0
 #define DeleteFileToken   0x64CF
 #define AckToken          0x64CC
-#define GetDirectoryToken 0x64DD
+#define GetDirectoryToken 0x64DD  // regular JSON format, to be deprecated
+#define GetDirNDJSONToken 0x64DE  // NDJSON format
 #define ResetC64Token     0x64EE
 #define RetryToken        0x9B7E
 #define FailToken         0x9B7F
@@ -38,7 +40,7 @@ extern char strVersionNumber[]; //*VERSION*
 #define GoodSIDToken      0x9B81
 
 
-#define eepMagicNum         0xfeed640c // 01: 6/22/23  net settings added 
+#define eepMagicNum         0xfeed640f // 01: 6/22/23  net settings added
                                        // 02: 9/07/23  Joy2 speed added
                                        // 03: 11/3/23  Browser Bookmarks added
                                        // 04: 11/4/23  Browser DL drive/path added
@@ -50,6 +52,9 @@ extern char strVersionNumber[]; //*VERSION*
                                        // 0a: 12/29/24 RW Delay default to on
                                        // 0b: 2/13/25  12 hour clock mode by default
                                        // 0c: 6/5/25   added eepAdColorRefStart
+                                       // 0d: 7/5/25   reduced bookmarks to 5
+                                       // 0e: 7/10/25  hot key support (5)
+                                       // 0f: 7/15/25  Updated EEPROM magic for v0.7
 enum InternalEEPROMmap
 {
    eepAdMagicNum      =    0, // (4:uint32_t)   Mismatch indicates internal EEPROM needs initialization
@@ -66,15 +71,16 @@ enum InternalEEPROMmap
    eepAdDHCPRespTO    =   32, // (2:uint16_t)   DNS Response Timeout
    eepAdDLPathSD_USB  =   34, // (1:uint8_t)    Download path is on SD or USB per Drive_SD/USB
    eepAdDLPath        =   35, // (TxMsgMaxSize=128)  HTTP Download path
-   eepAdBookmarks     =  163, // (75+225)*9     Bookmark Titles and Full Paths
-   eepAdDefaultSID    = 2863, // (MaxPathLength=300) Path/filename of Default SID to play in background
-   eepAdCrtBootName   = 3163, // (MaxPathLength=300) Boot to minimal .crt path to launch
-   eepAdMinBootInd    = 3463, // (1:uint8_t)    Indicates that Minimal boot should execute eepAdCrtBootName (!=0) or passthrough (=0)
-   eepAdAutolaunchName= 3464, // (MaxPathLength=300) Autolaunch path to launch or zero length for off
-   eepAdPwrUpDefaults2= 3764, // (1:uint8_t)    power up default reg, see bit mask defs rpudSIDPauseMask, rpudNetTimeMask
-   eepAdColorRefStart = 3765, // (NumColorRefs=7)  UI color references, see ColorRefOffsets
+   eepAdBookmarks     =  163, // (MaxPathLength=300)*eepNumBookmarks (5)
+   eepAdDefaultSID    = 1663, // (MaxPathLength=300) Path/filename of Default SID to play in background
+   eepAdCrtBootName   = 1963, // (MaxPathLength=300) Boot to minimal .crt path to launch
+   eepAdMinBootInd    = 2263, // (1:uint8_t)    Indicates that Minimal boot should execute eepAdCrtBootName (!=0) or passthrough (=0)
+   eepAdAutolaunchName= 2264, // (MaxPathLength=300) Autolaunch path to launch or zero length for off
+   eepAdHotKeyPaths   = 2564, // (MaxPathLength=300)*NumHotKeys (5)  Default Hot Key settings
+   eepAdPwrUpDefaults2= 4064, // (1:uint8_t)    power up default reg, see bit mask defs rpudSIDPauseMask, rpudNetTimeMask
+   eepAdColorRefStart = 4065, // (NumColorRefs=7)  UI color references, see ColorRefOffsets
 
-   //eepAdNext        = 3765+NumColorRefs, // Next address to be used
+   //eepAdNext        = 4065+NumColorRefs, // Next address to be used
    //Max size = 4284 (4k, emulated in flash)
 };
 
@@ -83,8 +89,8 @@ enum MinBootIndFlags
    MinBootInd_SkipMin    = 0, // skip minimal and go to main as normal first power up (and autolaunch, if enabled)
    MinBootInd_ExecuteMin = 1, // minimal boot called from main, launch CRT in minimal
    MinBootInd_FromMin    = 2, // Min returning to main menu, skip of autolaunch (if enabled)
+   MinBootInd_LaunchFull = 3, // Launch command received in minimal, launch it from full
 };
-
 
 
 extern bool (*fBusSnoop)(uint16_t Address, bool R_Wn);    //Bus snoop routine, return true to skip out of phi2 isr
@@ -126,7 +132,7 @@ extern uint32_t XferSize;  //size of image being transfered to C64
 #define MaxItemNameLength   100
 #define MaxPathLength       300
 #define MaxNamePathLength   (MaxPathLength+MaxItemNameLength+2)
-#define MaxMenuItems        3000  //(Max Pages * MaxItemsPerPage) = 255 * 16 = 4080 max to keep page # 8-bit
+#define MaxMenuItems        4000  //(Max Pages * MaxItemsPerPage) = 255 * 19 = 4845 max
 #define SerialTimoutMillis  500
 #define UpDirString         "/.. <Up Dir>"
 #define NTSCBusFreq         1022730
@@ -311,7 +317,7 @@ enum PokeColors
 #define TxMsgMaxSize       128    //DL path saved in EEPROM is tied to this
 #define eepBMTitleSize      75    //max chars in bookmark title
 #define eepBMURLSize       225    //Max Chars in bookmark URL path
-#define eepNumBookmarks      9    //Num Bookmarks saved
+#define eepNumBookmarks      5    //Num Bookmarks saved
 #define BytesPerDot        (25*1024) //dot every 25k when downloading
 
 #define Drive_USB            1

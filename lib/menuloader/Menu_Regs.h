@@ -25,6 +25,8 @@
 
 #include <stdint.h>
 
+#define NumHotKeys          5
+
 #define MaxItemDispLength  35
 #define MaxItemsPerPage    19
 
@@ -167,17 +169,20 @@ enum RegSerialStringSelect // rwRegSerialString
 
 enum RegPowerUpDefaultMasks
 {  //eepAdPwrUpDefaults, rwRegPwrUpDefaults
-   rpudSIDPauseMask    = 0x01, // rwRegPwrUpDefaults bit 0, 1=SID music paused
-   rpudNetTimeMask     = 0x02, // rwRegPwrUpDefaults bit 1, 1=synch net time
-   rpudNFCEnabled      = 0x04, // rwRegPwrUpDefaults bit 2, 1=NFC Enabled
-   rpudRWReadyDly      = 0x08, // rwRegPwrUpDefaults bit 3, 1=RW Ready Detection delayed
-   rpudJoySpeedMask    = 0xf0, // rwRegPwrUpDefaults bits 4-7=Joystick2 speed setting
+   rpudSIDPauseMask    = 0b00000001, // rwRegPwrUpDefaults bit 0, 1=SID music paused
+   rpudNetTimeMask     = 0b00000010, // rwRegPwrUpDefaults bit 1, 1=synch net time
+   rpudShowExtension   = 0b00000100, // rwRegPwrUpDefaults bit 2, 1=show file extension
+   rpudClock12_24hr    = 0b00001000, // rwRegPwrUpDefaults bit 3, 1=24 hour clock displayed
+   rpudJoySpeedMask    = 0b11110000, // rwRegPwrUpDefaults bits 4-7=Joystick2 speed setting
 };
 
 enum RegPowerUpDefaultMasks2
 {  //eepAdPwrUpDefaults2, rwRegPwrUpDefaults2
-   rpud2Clock12_24hr   = 0x01, // rwRegPwrUpDefaults2 bit 0, 1=24 hour clock displayed
-   //bits 7:1 currently unused
+   rpud2HostSerCtlMask    = 0b00000110,
+   rpud2HostSerCtlMaskInv = 0b11111001,
+   rpud2NFCEnabled        = 0b00000010, // rwRegPwrUpDefaults2 bit 1, 1=NFC Enabled
+   rpud2TRContEnabled     = 0b00000100, // rwRegPwrUpDefaults2 bit 2, 1=TeensyROM Control Enabled
+   rpud2TRTCPListen       = 0b10000000, // rwRegPwrUpDefaults2 bit 7, 1=TCP Listen Enabled
 };
 
 enum RegStatusTypes  //rwRegStatus, match StatusFunction order
@@ -202,8 +207,11 @@ enum RegStatusTypes  //rwRegStatus, match StatusFunction order
    rsNextTextFile       = 0x11,
    rsLastTextFile       = 0x12,
    rsIOHWNextInit       = 0x13,
-   
-   rsNumStatusTypes     = 0x14,
+   rsIOHWReInit         = 0x14,
+   rsHotKeySetLaunch    = 0x15,
+   rsNetListenInit      = 0x16,
+
+   rsNumStatusTypes     = 0x17,
 
    rsReady              = 0x5a, //FW->64 (Rd) update finished (done, abort, or otherwise)
    rsC64Message         = 0xa5, //FW->64 (Rd) message for the C64, set to continue when finished
@@ -216,6 +224,7 @@ enum RegMenuTypes //must match TblMsgMenuName order/qty
    rmtSD        = 0,
    rmtTeensy    = 1,
    rmtUSBDrive  = 2,
+   rmtNumTypes  = 3
 };
 
 enum RegCtlCommands
@@ -239,6 +248,9 @@ enum RegCtlCommands
    rCtlClearAutoLaunchWAIT  = 16,
    rCtlNextTextFile         = 17,
    rCtlLastTextFile         = 18,
+   rCtlIOHWReInitWAIT       = 19,
+   rCtlHotKeySetLaunch      = 20,
+   rCtlNetListenInitWAIT    = 21,
 };
 
 enum regItemTypes //synch with TblItemType

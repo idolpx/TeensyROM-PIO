@@ -10,6 +10,7 @@
 USBHost myusbHost;
 USBFilesystem firstPartition(myusbHost);
 MIDIDevice usbHostMIDI(myusbHost);
+USBSerial USBHostSerial(myusbHost);   // USB Host Serial for TR Control device
 
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 

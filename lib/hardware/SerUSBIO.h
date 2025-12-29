@@ -64,12 +64,14 @@
    };
 #endif
 
-FLASHMEM void ServiceSerial();
+extern Stream *CmdChannel;
+
+FLASHMEM void ServiceSerial(Stream *ThisCmdChannel = &Serial);
 FLASHMEM void AddAndCheckSource(StructMenuItem SourceMenu, uint32_t *TotalSize, uint32_t *FileCount);
 FLASHMEM void GetDigits(uint8_t NumDigits, uint32_t *SetInt);
 FLASHMEM void PrintDebugLog();
 FLASHMEM void LaunchFile();
-FLASHMEM bool ReceiveFileName(uint32_t *SD_nUSB, char *FileNamePath);
+FLASHMEM bool ReceiveFileName(RegMenuTypes *DriveType, char *FileNamePath);
 FLASHMEM bool GetUInt(uint32_t *InVal, uint8_t NumBytes);
 FLASHMEM void SendU16(uint16_t SendVal);
 FLASHMEM void SendU32(uint32_t SendVal);
