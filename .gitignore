@@ -4,4 +4,5 @@
 compare/*
 firmware/*
 tools/*
+CLAUDE.md
 platformio.ini

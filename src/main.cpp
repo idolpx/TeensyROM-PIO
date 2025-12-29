@@ -29,6 +29,7 @@
 #include "ISRs.h"
 #include "SendMsg.h"
 #include "filesystem.h"
+#include "SerUSBIO.h"
 
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
@@ -65,15 +66,51 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(PHI2_PIN), isrPHI2, RISING);
     NVIC_SET_PRIORITY(IRQ_GPIO6789, 16); // set HW ints as high priority, otherwise ethernet int timer causes misses
 
+#ifdef MinimumBuild
+    // Minimal boot: check if we should run minimal mode or full app
+    uint32_t MagNumRead;
+    EEPROM.get(eepAdMagicNum, MagNumRead);
+
+    if (EEPROM.read(eepAdMinBootInd) != MinBootInd_ExecuteMin || ReadButton == 0)
+    {
+        // Not executing minimal boot, would jump to main app
+        // For now, continue with setup for testing
+        Serial.println("MinimalBoot: Would jump to main TR app");
+    }
+    else if (MagNumRead != eepMagicNum)
+    {
+        // EEPROM not initialized
+        Serial.println("MinimalBoot: EEPROM mismatch");
+    }
+
+    // Clear boot flag for next boot
+    EEPROM.write(eepAdMinBootInd, MinBootInd_SkipMin);
+#else
     myusbHost.begin(); // Start USBHost_t36, HUB(s) and USB devices.
 
     uint32_t MagNumRead;
     EEPROM.get(eepAdMagicNum, MagNumRead);
-#ifndef MinimumBuild
     if (MagNumRead != eepMagicNum)
         SetEEPDefaults();
 #endif
 
+#ifdef MinimumBuild
+    // MinimalBuild: simpler initialization
+    LOROM_Image = NULL;
+    HIROM_Image = NULL;
+    LOROM_Mask = HIROM_Mask = 0x1fff;
+    EmulateVicCycles = false;
+    FreeCrtChips();
+
+    BigBuf = (uint32_t *)malloc(BigBufSize * sizeof(uint32_t));
+
+    Serial.printf("\nTeensyROM minimal %s is on-line\n", strVersionNumber);
+    Serial.printf(" %luMHz  %.1fC\n", (F_CPU_ACTUAL/1000000), tempmonGetTemp());
+
+    // If we have a CRT to load, load it now
+    // (In actual minimal boot, this would load from EEPROM path)
+
+#else
     IO1 = (uint8_t *)calloc(IO1Size, sizeof(uint8_t)); // allocate IO1 space and init to 0
     IO1[rwRegStatus] = rsReady;
     IO1[rWRegCurrMenuWAIT] = rmtTeensy;
@@ -94,9 +131,7 @@ void setup()
     for (uint8_t cnt = 0; cnt < IOH_Num_Handlers; cnt++)
         PadSpace(IOHandler[cnt]->Name, IOHNameLength - 1); // done so selection shown on c64 overwrites previous
 
-#ifndef MinimumBuild
     SwiftBrowserInit();
-#endif
 
     StrSIDInfo = (char *)calloc(StrSIDInfoSize, sizeof(char)); // SID header info storage
     LatestSIDLoaded = (char *)malloc(MaxPathLength);           // Last loaded Source/SID path/filename
@@ -143,12 +178,50 @@ void setup()
             EEPROM.write(eepAdMinBootInd, MinBootInd_SkipMin);
             break;
     }
+#endif
 
     SetLEDOn; // done last as indicator of init completion
 }
 
 void loop()
 {
+#ifdef MinimumBuild
+    // MinimalBuild: simplified loop
+    if (BtnPressed)
+    {
+        Serial.print("Button detected (minimal)\n");
+        // In minimal mode, button press could trigger reboot or return to main app
+        BtnPressed = false;
+    }
+
+    if (doReset)
+    {
+        SetResetAssert;
+        Serial.println("Resetting C64");
+        Serial.flush();
+        delay(50);
+        doReset = false;
+        SetResetDeassert;
+    }
+
+    if (Serial.available())
+        ServiceSerial();
+
+#ifdef FeatTCPListen
+    if (NetListenEnable)
+    {
+        EthernetClient tcpclient = tcpServer.available();
+        if (tcpclient)
+            ServiceTCP(tcpclient);
+    }
+#endif
+
+    // handler specific polling items:
+    if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL)
+        IOHandler[CurrentIOHandler]->PollingHndlr();
+
+#else
+    // Full build loop
     if (BtnPressed)
     {
         Serial.print("Button detected\n");
@@ -190,9 +263,7 @@ void loop()
         }
         if (DefEEPReboot)
         {
-#ifndef MinimumBuild
             SetEEPDefaults();
-#endif
             REBOOT;
         }
         doReset = false;
@@ -224,4 +295,5 @@ void loop()
     // handler specific polling items:
     if (IOHandler[CurrentIOHandler]->PollingHndlr != NULL)
         IOHandler[CurrentIOHandler]->PollingHndlr();
+#endif
 }

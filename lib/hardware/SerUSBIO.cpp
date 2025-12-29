@@ -248,7 +248,7 @@ FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
             Serial.printf("RAM2 Bytes Free: %lu (%luK)\n\n", RAM2BytesFree(), RAM2BytesFree()/1024);
             memInfo();
             getFreeITCM();
- 
+
             Serial.printf("\nMem usage:\n");
             uint32_t TotalSize = 0;
             if(DriveDirMenu != NULL) 
@@ -300,7 +300,7 @@ FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
             //Serial.printf("RAM2 Blks: %luK (%lu blks)\n", NumChips*8, NumChips);
             NumChips = RAM2blocks()-1; //do it again, sometimes get one more, minus one to match reality, not clear why
             Serial.printf("RAM2 Blks: %luK (%lu blks)\n", NumChips*8, NumChips);
-           
+            
             CrtMax += NumChips*8;
             Serial.printf("  CRT Max: %luK (%lu blks) ~%luK file\n", CrtMax, CrtMax/8, (uint32_t)(CrtMax*1.004));
             //larger File size due to header info.
@@ -728,4 +728,48 @@ FLASHMEM void  getFreeITCM()
    //Serial.printf( "ITCM DWORD cnt = %u [#bytes=%u] \n", jj, jj*4);
 }
 
+#ifdef FeatTCPListen
+
+#include "SendMsg.h"
+
+// TCP server is always defined here
+EthernetServer tcpServer(80);
+
+// NetListenEnable: defined here in MinimumBuild, in IOH_TeensyROM.cpp otherwise
+#ifdef MinimumBuild
+bool NetListenEnable = false;
+#else
+extern bool NetListenEnable;
+#endif
+
+#define WaitForTCPDataStartmS   500
+
+FLASHMEM void ServiceTCP(EthernetClient &tcpclient)
+{
+   IPAddress ip = tcpclient.remoteIP();
+   Printf_dbg("New Client, IP: %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
+
+   uint32_t StartTOMillis = millis();
+   while(tcpclient.connected() && !tcpclient.available())
+   {
+      if ((millis() - StartTOMillis) > WaitForTCPDataStartmS)
+      {
+         tcpclient.stop();
+         Printf_dbg("Client Data Timeout!\n");
+         return;
+      }
+   }
+
+   Printf_dbg("  Data available in %lu mS\n", millis() - StartTOMillis);
+
+   ServiceSerial(&tcpclient);
+   CmdChannel  = &Serial; //restore to serial stream
+
+   //delay(10);
+   tcpclient.flush();
+   tcpclient.stop();
+   Printf_dbg("Client disconnected\n");
+}
+
+#endif // FeatTCPListen
 
