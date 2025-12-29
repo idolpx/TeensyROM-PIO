@@ -171,7 +171,7 @@ void HandleExecution();
 void MenuChange();
 bool LoadFile(FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem);
 void InitDriveDirMenu();
-void SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename);
+bool SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename);
 void LoadDirectory(FS *sourceFS);
 void AddDirEntry(const char *EntryString);
 void FreeDriveDirMenu();

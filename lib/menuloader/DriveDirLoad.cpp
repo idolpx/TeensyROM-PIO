@@ -498,14 +498,20 @@ void InitDriveDirMenu()
    NumDrvDirMenuItems = 0;
 }
 
-void SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename)
+bool SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename)
 {
    //malloc, copy file name and get item type from extension
    DriveDirMenu[ItemNum].Name = (char*)malloc(strlen(filename)+1);
+   if (DriveDirMenu[ItemNum].Name == NULL) 
+   {  //check for mem full
+      Serial.println("Out of mem!");
+      return false; 
+   }
+   
    strcpy(DriveDirMenu[ItemNum].Name, filename);
    
-   DriveDirMenu[ItemNum].ItemType = 
-      Assoc_Ext_ItemType(DriveDirMenu[ItemNum].Name);
+   DriveDirMenu[ItemNum].ItemType = Assoc_Ext_ItemType(DriveDirMenu[ItemNum].Name);
+   return true;
 }
 
 void LoadDirectory(FS *sourceFS) 
@@ -525,6 +531,7 @@ void LoadDirectory(FS *sourceFS)
    
    while (File entry = dir.openNextFile()) 
    {
+      //uint8_t hidey = entry.isHidden(); //check for hidden files? not in library
       filename = entry.name();
       if (entry.isDirectory())
       {
@@ -535,7 +542,7 @@ void LoadDirectory(FS *sourceFS)
       }
       else //it's a file. copy name and get item type from extension
       {
-         SetDriveDirMenuNameType(NumDrvDirMenuItems, filename);
+         if (!SetDriveDirMenuNameType(NumDrvDirMenuItems, filename)) break;
       }
       
       //Serial.printf("%d- %s\n", NumDrvDirMenuItems, DriveDirMenu[NumDrvDirMenuItems].Name); 

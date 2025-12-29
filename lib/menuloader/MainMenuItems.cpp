@@ -61,6 +61,8 @@ StructMenuItem dirMultimedia[] =
    rtDirectory, IOH_None         , (char*)UpDirString                        , NULL, 0 , //one dir level max, up Dir is always root
    rtFilePrg  , IOH_None         , (char*)"Swinth+Light Fantastic"           , (uint8_t*)swinth_LIGHT_FANTASTIC_PRG , sizeof(swinth_LIGHT_FANTASTIC_PRG) ,
    rtFilePrg  , IOH_None         , (char*)"Draw!"                            , (uint8_t*)draw01_prg                 , sizeof(draw01_prg) ,
+//   rtFilePrg  , IOH_None         , (char*)"Display Fractal"                  , (uint8_t*)disp_fract_prg             , sizeof(disp_fract_prg) ,
+//   rtFilePrg  , IOH_None         , (char*)"Ember Head"                       , (uint8_t*)ember_head_prg             , sizeof(ember_head_prg) ,
 };
 
 StructMenuItem dirSID_Files[] =
@@ -76,6 +78,7 @@ StructMenuItem dirSID_Files[] =
     rtFileSID  , IOH_None         , (char*)"Another Brick In The Wall"        , (uint8_t*)Pink_Floyd_sid             , sizeof(Pink_Floyd_sid) ,
 /**/rtFileSID  , IOH_None         , (char*)"Sleep Dirt            Frank Zappa", (uint8_t*)SleepDirt_norm_ntsc_1000_6581_sid , sizeof(SleepDirt_norm_ntsc_1000_6581_sid) ,
     rtFileSID  , IOH_None         , (char*)"Tom Sawyer            Rush"       , (uint8_t*)Tom_Sawyer_sid             , sizeof(Tom_Sawyer_sid) ,
+//    rtFileSID  , IOH_None         , (char*)"YYZ                   Rush"       , (uint8_t*)YYZ_sid                    , sizeof(YYZ_sid) ,                  //  C64 mem conflict as of 0.6.2
     rtFileSID  , IOH_None         , (char*)"Aces High             Iron Maiden", (uint8_t*)Aces_High_sid              , sizeof(Aces_High_sid) ,
     rtFileSID  , IOH_None         , (char*)"Switch 625            Def Leppard", (uint8_t*)Switch_625_sid             , sizeof(Switch_625_sid) ,
 };
@@ -133,8 +136,14 @@ StructMenuItem dirTEXT_PETSCII[] =
    rtFilePETSCII , IOH_None      , (char*)"Trains II by Yoda"                , (uint8_t*)Trains_II__Yoda______12picturedisk_6_seq       , sizeof(Trains_II__Yoda______12picturedisk_6_seq) ,
 };
 
-StructMenuItem TeensyROMMenu[] =
+//define this last:
+StructMenuItem TeensyROMMenu[] = 
 {
+//DefSIDPath should be "/" or one of these names
+
+// Ref  regItemTypes, enumIOHandlers   
+//  #    ItemType   , IOHndlrAssoc       , Name                                      , *Code_Image                          , Size ,
+
  /* 0 */ rtDirectory, IOH_None           , (char*)"/Games"                           , (uint8_t*)dirGames                   , sizeof(dirGames) ,
  /* 1 */ rtDirectory, IOH_None           , (char*)"/MIDI + ASID"                     , (uint8_t*)dirMIDI_ASID               , sizeof(dirMIDI_ASID) ,
  /* 2 */ rtDirectory, IOH_None           , (char*)"/SID Cover Tunes"                 , (uint8_t*)dirSID_Files               , sizeof(dirSID_Files) ,
