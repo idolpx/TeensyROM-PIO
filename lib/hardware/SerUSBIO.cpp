@@ -27,6 +27,7 @@
 #include "BusSnoop.h"
 #include "RemoteControl.h"
 #include "SendMsg.h"
+#include "ISRs.h"
 
 #include "Common_Defs.h"
 
@@ -36,7 +37,9 @@ FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
 {  //ThisCmdChannel->available() confirmed before calling
    CmdChannel = ThisCmdChannel;
 
+#ifndef MinimumBuild
    if (CurrentIOHandler == IOH_TR_BASIC) return; //special case, handler will take care of serial input
+#endif
 
    uint16_t inVal = CmdChannel->read();
    switch (inVal)
@@ -78,13 +81,14 @@ FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
             return;
          }
 
-
+#ifndef MinimumBuild
          if (CurrentIOHandler != IOH_TeensyROM)
          {
             SendU16(FailToken);
             CmdChannel->print("Busy!\n");
             return;
          }
+#endif
          //TeensyROM IO Handler is active...
          
          switch (inVal)
@@ -147,8 +151,12 @@ FLASHMEM void ServiceSerial(Stream *ThisCmdChannel)
          }
          break;
       case 'e': //Reset EEPROM to defaults
+#ifndef MinimumBuild
          SetEEPDefaults();
          CmdChannel->println("Applied upon reboot");
+#else
+         CmdChannel->println("Not available in minimal build");
+#endif
          break;
       case 'b': //bus analysis
          BusAnalysis();
@@ -471,12 +479,14 @@ FLASHMEM void PrintDebugLog()
       Serial.println("DbgSpecial enabled");
       LogDatavalid = true;
    #endif
-      
+
+#ifndef MinimumBuild
    if (CurrentIOHandler == IOH_Debug)
    {
       Serial.println("Debug IO Handler enabled");
       LogDatavalid = true;
-   }               
+   }
+#endif               
    
    if (!LogDatavalid)
    {

@@ -24,9 +24,13 @@
 #define nfcStateBitDisabled   1
 #define nfcStateBitPaused     2
 
+#ifndef MinimumBuild
 #include "IOH_ASID.h"
+#endif
 #include "IOH_C64GameSystem3.h"
+#ifndef MinimumBuild
 #include "IOH_Debug.h"
+#endif
 #include "IOH_Dinamic.h"
 #include "IOH_EasyFlash.h"
 #include "IOH_EpyxFastLoad.h"
@@ -34,18 +38,29 @@
 #include "IOH_GMod2.h"
 #include "IOH_MagicDesk.h"
 #include "IOH_MagicDesk2.h"
+#ifndef MinimumBuild
 #include "IOH_MIDI.h"
+#endif
 #include "IOH_None.h"
 #include "IOH_Ocean1.h"
 #include "IOH_SuperGames.h"
+#ifndef MinimumBuild
 #include "IOH_Swiftlink.h"
-#include "IOH_TeensyROM.h" 
-#include "IOH_TR_BASIC.h" 
+#include "IOH_TeensyROM.h"
+#include "IOH_TR_BASIC.h"
+#endif
 #include "IOH_ZaxxonSuper.h"
 
 
 extern stcIOHandlers* IOHandler[];  //Synch order/qty with enum enumIOHandlers
 extern uint8_t CurrentIOHandler;
+
+#ifdef MinimumBuild
+// Variables normally defined in IOH_TeensyROM.cpp, which is excluded in MinimumBuild
+extern volatile uint8_t* IO1;
+extern volatile uint8_t doReset;
+extern uint16_t NumItemsFull;
+#endif
 
 void IOHandlerNextInit();
 void IOHandlerSelectInit();

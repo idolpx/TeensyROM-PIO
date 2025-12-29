@@ -1,3 +1,4 @@
+#ifndef MinimumBuild
 // MIT License
 //
 // Copyright (c) 2023 Travis Smith
@@ -430,3 +431,4 @@ void PollingHndlr_MIDI()
     }
 }
 
+#endif

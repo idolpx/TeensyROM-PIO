@@ -1,5 +1,6 @@
+#ifndef MinimumBuild
 // MIT License
-// 
+//
 // Copyright (c) 2024 Travis Smith
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
@@ -664,7 +665,7 @@ void PollingHndlr_ASID()
    if(ASIDRxQueueUsed == 0 || FrameTimerMode) //read MIDI-in data in only if ready to send to C64 (buffer empty)
    {
       usbDevMIDI.read();
-      if(ASIDRxQueueUsed == 0 || FrameTimerMode) usbHostMIDI.read();   //Currently no use case (Hosted ASID source) 
+      if(ASIDRxQueueUsed == 0 || FrameTimerMode) usbHostMIDI.read();   //Currently no use case (Hosted ASID source)
    }
 }
-
+#endif

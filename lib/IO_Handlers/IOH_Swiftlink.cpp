@@ -1,5 +1,6 @@
+#ifndef MinimumBuild
 // MIT License
-// 
+//
 // Copyright (c) 2023 Travis Smith
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
@@ -442,4 +443,4 @@ void SetRandomSeed()
    Printf_dbg("Setting Random Seed\n");
    randomSeed(ARM_DWT_CYCCNT);
 }
-
+#endif

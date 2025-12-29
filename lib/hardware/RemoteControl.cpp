@@ -35,8 +35,10 @@
 #include <stdint.h>
 #include <EEPROM.h>
 
+#ifndef MinimumBuild
 #include "IOH_TeensyROM.h"
 #include "IOH_Swiftlink.h"
+#endif
 #include "Menu_Regs.h"
 #include "SerUSBIO.h"
 
@@ -46,6 +48,7 @@
 #include "FileParsers.h"
 #include "filesystem.h"
 #include "SendMsg.h"
+#include "eeprom_dev.h"
 
 // Global variable definitions
 bool RemoteLaunched = false;
@@ -233,7 +236,9 @@ void RemoteLaunch(RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoCa
    
    //free mem for DriveDirMenu in case current (non-tr) handler is using it all
    FreeCrtChips();
+#ifndef MinimumBuild
    FreeSwiftlinkBuffs();
+#endif
    InitDriveDirMenu();
 
    if (MenuSourceID == rmtTeensy)
@@ -310,11 +315,13 @@ void RemoteLaunch(RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoCa
    }
 
    //Get the attention of the C64 via IRQ or reset:
+#ifndef MinimumBuild
    if(CurrentIOHandler == IOH_TeensyROM)
    {
-      Printf_dbg("Interrupt/launch\n"); 
+      Printf_dbg("Interrupt/launch\n");
       if(InterruptC64(RegIRQCommands::ricmdLaunch)) return;
    }
+#endif
 
    //force reset then launch
    Printf_dbg("Reset/launch\n"); 

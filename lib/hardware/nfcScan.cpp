@@ -335,10 +335,14 @@ bool nfcReadTagLaunch(uint8_t* uid, uint8_t uidLength)
    {  
       uint16_t LocalNumItems = 0;
       StructMenuItem *LocalDirMenu;
-      
+
       Printf_dbg("Random requested\n");
+#ifndef MinimumBuild
       SetRandomSeed();
-      
+#else
+      randomSeed(ARM_DWT_CYCCNT);
+#endif
+
       pDataStart[strlen((char*)pDataStart)-1]=0; //remove the "?"
 
       //point to or load the dir contents:

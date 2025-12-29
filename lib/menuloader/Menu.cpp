@@ -8,9 +8,12 @@
 
 #include "DriveDirLoad.h"
 #include "IOHandlers.h"
+#include "FileParsers.h"
+#ifndef MinimumBuild
 #include "IOH_TeensyROM.h"
 #include "IOH_Swiftlink.h"
 #include "IOH_MIDI.h"
+#endif
 
 // Global variable definitions
 StructMenuItem *DriveDirMenu = NULL;
@@ -32,14 +35,20 @@ void SetUpMainMenuROM()
    nfcState &= ~nfcStateBitPaused; //clear paused bit in case paused by time critical function
    
    FreeCrtChips();
+#ifndef MinimumBuild
    FreeSwiftlinkBuffs();
+#endif
    RedirectEmptyDriveDirMenu();
-   free((void*)MIDIRxBuf); 
+#ifndef MinimumBuild
+   free((void*)MIDIRxBuf);
    MIDIRxBuf=NULL;
    free(TgetQueue); TgetQueue=NULL;
    free(LSFileName); LSFileName=NULL;
 
-   IOHandlerInit(IOH_TeensyROM);   
+   IOHandlerInit(IOH_TeensyROM);
+#else
+   IOHandlerInit(IOH_None);
+#endif   
    doReset = true;
 }
 

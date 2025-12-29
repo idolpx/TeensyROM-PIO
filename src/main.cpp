@@ -69,8 +69,10 @@ void setup()
 
     uint32_t MagNumRead;
     EEPROM.get(eepAdMagicNum, MagNumRead);
+#ifndef MinimumBuild
     if (MagNumRead != eepMagicNum)
         SetEEPDefaults();
+#endif
 
     IO1 = (uint8_t *)calloc(IO1Size, sizeof(uint8_t)); // allocate IO1 space and init to 0
     IO1[rwRegStatus] = rsReady;
@@ -92,7 +94,9 @@ void setup()
     for (uint8_t cnt = 0; cnt < IOH_Num_Handlers; cnt++)
         PadSpace(IOHandler[cnt]->Name, IOHNameLength - 1); // done so selection shown on c64 overwrites previous
 
+#ifndef MinimumBuild
     SwiftBrowserInit();
+#endif
 
     StrSIDInfo = (char *)calloc(StrSIDInfoSize, sizeof(char)); // SID header info storage
     LatestSIDLoaded = (char *)malloc(MaxPathLength);           // Last loaded Source/SID path/filename
@@ -186,7 +190,9 @@ void loop()
         }
         if (DefEEPReboot)
         {
+#ifndef MinimumBuild
             SetEEPDefaults();
+#endif
             REBOOT;
         }
         doReset = false;

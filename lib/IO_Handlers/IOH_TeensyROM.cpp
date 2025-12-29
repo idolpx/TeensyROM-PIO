@@ -1,5 +1,6 @@
+#ifndef MinimumBuild
 // MIT License
-// 
+//
 // Copyright (c) 2023 Travis Smith
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
@@ -998,3 +999,4 @@ void PollingHndlr_TeensyROM()
    usbHostMIDI.read();
    usbDevMIDI.read();
 }
+#endif

@@ -34,7 +34,9 @@
       uint32_t Offset; // chip swap file offsets to check for same & not reload
    };
 
-   #define Num8kSwapBuffers 4
+   #ifndef Num8kSwapBuffers
+      #define Num8kSwapBuffers 4
+   #endif
    #define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
    #define Printf_Swaps     Printf_dbg   // Serial.printf
 

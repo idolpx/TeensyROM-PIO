@@ -27,8 +27,37 @@ const unsigned char *LOROM_Image = NULL;
 uint16_t LOROM_Mask = 0, HIROM_Mask = 0;
 volatile uint8_t DMA_State = DMA_S_DisableReady;
 
+#ifdef MinimumBuild
+// Variables and stubs normally defined in IOH_TeensyROM.cpp, which is excluded in MinimumBuild
+volatile uint8_t* IO1 = NULL;
+volatile uint8_t doReset = false;
+uint16_t NumItemsFull = 0;
+StructMenuItem* MenuSource = NULL;
+uint16_t SelItemFullIdx = 0;
+uint32_t StreamOffsetAddr = 0;
+
+// Simple ASCII to PETSCII conversion table (normally in IOH_TeensyROM.cpp)
+uint8_t ASCIItoPETSCII[128] = {
+   0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+  16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
+  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
+  48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
+  64,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,
+  112,113,114,115,116,117,118,119,120,121,122,91,92,93,94,32,
+  96,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,
+  80,81,82,83,84,85,86,87,88,89,90,123,124,125,126,127
+};
+
+// Stub functions for MinimumBuild
+void MakeBuildInfo() {}
+int16_t FindTRMenuItem(StructMenuItem* SrcMenuItem, uint16_t NumSrcItems, char* SearchName) { return -1; }
+void SetSIDSpeed(bool IsNTSC, int16_t ClockAdj) {}
+void UpDirectory() {}
+#endif
+
 stcIOHandlers* IOHandler[] = {
    &IOHndlr_None,               //IOH_None,
+#ifndef MinimumBuild
    &IOHndlr_SwiftLink,          //IOH_Swiftlink,
    &IOHndlr_MIDI_Datel,         //IOH_MIDI_Datel,
    &IOHndlr_MIDI_Sequential,    //IOH_MIDI_Sequential,
@@ -37,6 +66,7 @@ stcIOHandlers* IOHandler[] = {
    &IOHndlr_Debug,              //IOH_Debug, //last manually selectable, see LastSelectableIOH
 
    &IOHndlr_TeensyROM,          //IOH_TeensyROM,
+#endif
    &IOHndlr_EpyxFastLoad,       //IOH_EpyxFastLoad,
    &IOHndlr_MagicDesk,          //IOH_MagicDesk,
    &IOHndlr_Dinamic,            //IOH_Dinamic,
@@ -46,8 +76,10 @@ stcIOHandlers* IOHandler[] = {
    &IOHndlr_C64GameSystem3,     //IOH_C64GameSystem3,
    &IOHndlr_EasyFlash,          //IOH_EasyFlash,
    &IOHndlr_ZaxxonSuper,        //IOH_ZaxxonSuper,
+#ifndef MinimumBuild
    &IOHndlr_ASID,               //IOH_ASID,
    &IOHndlr_TR_BASIC,           //IOH_TR_BASIC,
+#endif
    &IOHndlr_GMod2,              //IOH_GMod2,
    &IOHndlr_MagicDesk2,         //IOH_MagicDesk2,
 };
@@ -62,20 +94,25 @@ void IOHandlerNextInit()
 
 void IOHandlerSelectInit()
 { //called after cart loaded, PRG x-fer finished, or exit to basic (rsIOHWSelInit)
+#ifndef MinimumBuild
    if (IO1[rWRegCurrMenuWAIT] == rmtTeensy && MenuSource[SelItemFullIdx].IOHndlrAssoc != IOH_None)
    {
       Printf_dbg("IO Handler set by Teensy Menu\n");
-      IOHandlerInit(MenuSource[SelItemFullIdx].IOHndlrAssoc); 
+      IOHandlerInit(MenuSource[SelItemFullIdx].IOHndlrAssoc);
    }
-   else IOHandlerNextInit();
+   else
+#endif
+      IOHandlerNextInit();
 }
 
 void IOHandlerInit(uint8_t NewIOHandler)
 { //called from above and directly from SetUpMainMenuROM
+#ifndef MinimumBuild
    SetMIDIHandlersNULL();
    MIDIRxIRQEnabled = false;
    MIDIRxBytesToSend = 0;
    rIORegMIDIStatus = 0;
+#endif
    BigBufCount = 0;
    
    if (NewIOHandler>=IOH_Num_Handlers)
@@ -93,11 +130,12 @@ void IOHandlerInit(uint8_t NewIOHandler)
 }
 
 // F0 SysEx single call, message larger than buffer is truncated
-void NothingOnSystemExclusive(uint8_t *data, unsigned int size) 
+void NothingOnSystemExclusive(uint8_t *data, unsigned int size)
 {
    //Setting handler to NULL creates ambiguous error
 }
 
+#ifndef MinimumBuild
 void SetMIDIHandlersNULL()
 {
    usbHostMIDI.setHandleNoteOff             (NULL); // 8x
@@ -128,3 +166,4 @@ void SetMIDIHandlersNULL()
    usbDevMIDI.setHandleTuneRequest          (NULL); // F6
    usbDevMIDI.setHandleRealTimeSystem       (NULL); // F8-FF (except FD)
 }
+#endif

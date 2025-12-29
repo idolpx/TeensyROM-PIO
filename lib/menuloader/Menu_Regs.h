@@ -293,14 +293,17 @@ struct StructMenuItem
 enum enumIOHandlers //Synch order/qty with IOHandler[] (IOHandlers.h)
 {
    IOH_None,   //always 0
+#ifndef MinimumBuild
+   // only supported in full build:
    IOH_Swiftlink,
-   IOH_MIDI_Datel,      
-   IOH_MIDI_Sequential, 
-   IOH_MIDI_Passport,   
+   IOH_MIDI_Datel,
+   IOH_MIDI_Sequential,
+   IOH_MIDI_Passport,
    IOH_MIDI_NamesoftIRQ,
    IOH_Debug, //last manually selectable, see LastSelectableIOH
-   
-   IOH_TeensyROM, 
+
+   IOH_TeensyROM,
+#endif
    IOH_EpyxFastLoad,
    IOH_MagicDesk,
    IOH_Dinamic,
@@ -310,12 +313,14 @@ enum enumIOHandlers //Synch order/qty with IOHandler[] (IOHandlers.h)
    IOH_C64GameSystem3,
    IOH_EasyFlash,
    IOH_ZaxxonSuper,
+#ifndef MinimumBuild
    IOH_ASID,
    IOH_TR_BASIC,
+#endif
    IOH_GMod2,
    IOH_MagicDesk2,
-   
-   
+
+
    IOH_Num_Handlers       //always last
 };
 
