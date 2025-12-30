@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-//#include "../../include/TeensyROM.h"
 #include "nfcScan.h"
 
 #include "DriveDirLoad.h"
@@ -14,6 +13,7 @@
 #include "IOH_Swiftlink.h"
 #include "IOH_MIDI.h"
 #endif
+#include "ROMs/TeensyROMC64.h"
 
 // Global variable definitions
 StructMenuItem *DriveDirMenu = NULL;

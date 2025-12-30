@@ -43,32 +43,16 @@ stcIOHandlers IOHndlr_EasyFlash =
 uint8_t *BankDecode[NumDecodeBanks][2];
 uint8_t EZFlashRAM[256];
 
-#define Printf_Swaps     Printf_dbg   //Serial.printf  //
+
 
 #ifdef MinimumBuild
-   struct stcSwapBuffers
-   {
-      uint8_t  Image[8192]; // 8k swap image
-      uint32_t Offset; // chip swap file offsets to check for same & not reload
-   };
-
-   #ifndef Num8kSwapBuffers
-      #define Num8kSwapBuffers 4
-   #endif
-   #define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
-
    stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
 
    extern bool PathIsRoot();
    extern char DriveDirPath[];
    extern StructMenuItem *DriveDirMenu;
    extern File myFile;
-#endif
 
-
-
-
-#ifdef MinimumBuild
 void LoadBank(uint32_t SeekTo, uint8_t* ptrImage)
 {
    if(!myFile)

@@ -55,6 +55,14 @@ extern char strVersionNumber[]; //*VERSION*
                                        // 0d: 7/5/25   reduced bookmarks to 5
                                        // 0e: 7/10/25  hot key support (5)
                                        // 0f: 7/15/25  Updated EEPROM magic for v0.7
+
+#define DefSIDSource        rmtTeensy  // Default, should always be local (rmtTeensy)
+#define DefSIDPath          "/SID Cover Tunes" 
+#define DefSIDName          "Sleep Dirt            Frank Zappa" 
+
+extern char* StrSIDInfo;
+extern char* LatestSIDLoaded;
+
 enum InternalEEPROMmap
 {
    eepAdMagicNum      =    0, // (4:uint32_t)   Mismatch indicates internal EEPROM needs initialization
@@ -105,7 +113,44 @@ extern uint32_t* BigBuf;
    __attribute__((always_inline)) inline void Printf_dbg_sw(const char* format, ...) {};
 #endif
 
-#define MaxRAM_ImageSize  (144)  // RAM1 space (in kB) used for CRT & Transfer buffer
+#ifdef MinimumBuild
+   struct stcSwapBuffers
+   {
+      uint8_t  Image[8192]; // 8k swap image
+      uint32_t Offset; // chip swap file offsets to check for same & not reload
+   };
+
+#define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
+
+#define Num8kSwapBuffers  16 //space for bank swapping upper blocks of large CRTs
+                             //  Must be even number for 16k banks
+                             //  Have seen SNKvsCAP (stronger) use 14 within a scene
+                             //  Used by EZFlash and MagicDesk2 only
+                             //     Leave space (with Eth Listen on) for other cart types up to 512k that don't use it 
+                             //      (5_OceanType1 , 15_GameSystem3, 60_GMod2)
+
+#define Printf_Swaps     Printf_dbg   //Serial.printf  //
+
+#ifdef FeatTCPListen
+   #define EthernetDeduction   104  
+   //Ethernet takes this from RAM1 and another ~96k from RAM2 (when initialized/enabled), plus uses more local variables (see below)
+   // Total: ~200k of RAM needed to support Ethernet, 100k if disabled
+
+   // Test case: USB monitor *not* connected (passes when connected) crashes on startup, before full image handoff
+   //   RAM1: variables:344292, code:136168, padding:27672   free for local variables:16156 <--not enough, crash
+   //   RAM1: variables:340196, code:136168, padding:27672   free for local variables:20252 <--Fails intermittently?
+   //   RAM1: variables:336100, code:136424, padding:27416   free for local variables:24348 <--Reliable
+   //    *Need >24000 RAM1 free for local
+
+#else
+   #define EthernetDeduction    0
+#endif
+
+#define MaxRAM_ImageSize  (392-8*Num8kSwapBuffers-EthernetDeduction)  // base minus space for 8k swap blocks and ethernet needs
+#else
+#define MaxRAM_ImageSize  (128)  // RAM1 space (in kB) used for CRT & Transfer buffer
+#endif
+
 #ifdef DbgMsgs_IO  //Debug msgs mode: reduced RAM_ImageSize
    #define Printf_dbg Serial.printf
    #define RAM_ImageSize       ((MaxRAM_ImageSize-24)*1024)
@@ -115,11 +160,6 @@ extern uint32_t* BigBuf;
 #endif
 extern uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
 
-#ifdef MinimumBuild
-#define Num8kSwapBuffers  16 // space for bank swapping upper blocks of large CRTs
-                             //  Must be even number for 16k banks
-                             //  Have seen SNKvsCAP (stronger) use 14 within a scene
-#endif
 
 extern uint8_t *XferImage; //pointer to image being transfered to C64
 extern uint32_t XferSize;  //size of image being transfered to C64

@@ -40,7 +40,6 @@ extern volatile uint16_t StreamOffsetAddr, StringOffset;
 
 extern volatile uint8_t doReset;
 
-
 extern volatile uint8_t eepDataToWrite;
 extern volatile uint16_t eepAddrToWrite;
 
@@ -50,25 +49,8 @@ extern uint16_t NumItemsFull;  //Num Items in Current Menu
 
 extern uint8_t ASCIItoPETSCII[128];
 
-extern bool EthernetInit();
-extern void MenuChange();
-extern void HandleExecution();
 extern bool PathIsRoot();
-
-extern void FreeDriveDirMenu();
-extern void RedirectEmptyDriveDirMenu();
-extern void IOHandlerSelectInit();
-extern void IOHandlerNextInit();
-extern void ParseSIDHeader(const char *filename);
-extern stcIOHandlers* IOHandler[];
-
-extern uint8_t RAM_Image[];
-extern char* StrSIDInfo;
-extern char* LatestSIDLoaded;
 extern char StrMachineInfo[];
-
-extern void nfcWriteTag(const char* TxtMsg);
-extern void nfcInit();
 
 #define DecToBCD(d) ((int((d)/10)<<4) | ((d)%10))
 

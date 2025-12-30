@@ -34,6 +34,7 @@
 #include "midi2sid.h"
 #include "ethernet_dev.h"
 #include "filesystem.h"
+#include "FileParsers.h"
 
 // Global variable definitions for IOH_TeensyROM
 stcIOHandlers IOHndlr_TeensyROM =

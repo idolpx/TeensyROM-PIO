@@ -63,7 +63,7 @@ uint32_t NMIassertMicros = 0;
 volatile uint8_t SwiftTxBuf = 0, SwiftRxBuf = 0;
 volatile uint8_t SwiftRegStatus = 0, SwiftRegCommand = 0, SwiftRegControl = 0, TurboRegEnhancedSpeed = 0;
 uint8_t PlusCount = 0;
-uint32_t C64CycBetweenRx = 0, LastTxMillis = 0;
+uint32_t C64CycBetweenRx = 0, LastTxMillis = millis();
 
 // Browser mode: Buffer saved in ASCII from host, converted before sending out
 //               Uses Send...Immediate  commands for direct output
@@ -156,6 +156,19 @@ void FreeSwiftlinkBuffs()
 }
    
 
+void ResetSwiftLink()
+{
+   //Called from IO handler, be quick!
+   //Reset Swiftlink only, not "modem"
+
+   SwiftRegStatus = SwiftStatusDefault;
+   SwiftRegCommand = SwiftCmndDefault;
+   TurboRegEnhancedSpeed = 3; //default to reserved/not set
+   SwiftRegControl = Baud_2400;
+   SetBaud(Baud_2400);
+   CycleCountdown=0;
+   NMIassertMicros = 0;
+}
 
 
 //_____________________________________Handlers_____________________________________________________

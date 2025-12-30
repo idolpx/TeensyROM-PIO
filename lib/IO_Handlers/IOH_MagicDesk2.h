@@ -25,21 +25,6 @@
 #include "IOH_defs.h"
 
 #ifdef MinimumBuild
-   #include <SD.h>
-   #include "Menu_Regs.h"
-
-   struct stcSwapBuffers
-   {
-      uint8_t  Image[8192]; // 8k swap image
-      uint32_t Offset; // chip swap file offsets to check for same & not reload
-   };
-
-   #ifndef Num8kSwapBuffers
-      #define Num8kSwapBuffers 4
-   #endif
-   #define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
-   #define Printf_Swaps     Printf_dbg   // Serial.printf
-
    extern stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
    extern uint8_t* ImageCheckAssign(uint8_t* BankRequested);
    extern bool PathIsRoot();

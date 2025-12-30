@@ -144,15 +144,9 @@ extern uint32_t C64CycBetweenRx, LastTxMillis;
 // AT/regular:   Buffer saved in (usually) PETSCII from host
 //               Uses Add...ToRxQueue for direct output
 
-void ParseHTMLTag();
-void ParseEntityReference();
-void SetEthEEPDefaults();
-void SendBrowserCommandsImmediate();
-void UnPausePage();
 
 void SetBaud(uint8_t BaudNum);
 void FreeSwiftlinkBuffs();
-FLASHMEM bool EthernetInit();
-void SetRandomSeed();
+void ResetSwiftLink();
 
 #endif // IOH_SWIFTLINK_H

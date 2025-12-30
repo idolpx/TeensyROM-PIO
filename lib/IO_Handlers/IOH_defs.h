@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "../../include/TeensyROM.h"
+//#include "../../include/config.h"
 
 #define IOHNameLength 20  //limited by display location on C64
 
