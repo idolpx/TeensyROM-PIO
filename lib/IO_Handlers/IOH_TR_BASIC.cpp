@@ -47,148 +47,6 @@ uint16_t FNCount;
 uint8_t  TR_BASContRegAction, TR_BASStatRegVal, TR_BASStrAvailableRegVal;
 
 
-void InitHndlr_TR_BASIC()
-{
-   if (TgetQueue == NULL) TgetQueue = (uint8_t*)malloc(TgetQueueSize);
-   if (LSFileName == NULL) LSFileName = (uint8_t*)malloc(MaxPathLength);
-   
-   RxQueueHead = RxQueueTail = 0; //as used in Swiftlink & ASID
- 
-   TR_BASStatRegVal = TR_BASStat_Ready;
-   TR_BASContRegAction = TR_BASCont_None; //default to no action
-}   
-
-void IO1Hndlr_TR_BASIC(uint8_t Address, bool R_Wn)
-{
-   uint8_t Data;
-   if (R_Wn) //High (IO1 Read)
-   {
-      switch(Address)
-      {
-         case TR_BASDataReg:
-            if(TgetQueueUsed)
-            {
-               DataPortWriteWaitLog(TgetQueue[RxQueueTail++]);  
-               if (RxQueueTail == TgetQueueSize) RxQueueTail = 0;
-            }
-            else  //no data to send, send 0
-            {
-               DataPortWriteWaitLog(0);
-            }
-            break;
-         case TR_BASStatReg:
-            DataPortWriteWaitLog(TR_BASStatRegVal);
-            break;
-         case TR_BASStreamDataReg:
-            DataPortWriteWait(RAM_Image[StreamOffsetAddr]);
-            //inc on read, check for end:
-            if (++StreamOffsetAddr >= XferSize) TR_BASStrAvailableRegVal=0; //signal end of transfer
-            break;
-         case TR_BASStrAvailableReg:
-            DataPortWriteWait(TR_BASStrAvailableRegVal);
-         default: //used for all other IO1 reads
-            //DataPortWriteWaitLog(0); 
-            break;
-      }
-   }
-   else  // IO1 write
-   {
-      Data = DataPortWaitRead(); 
-      TraceLogAddValidData(Data);
-      switch(Address)
-      {
-         case TR_BASDataReg:
-            Serial.write(Data); //a bit risky doing this here, but seems fast enough in testing
-            break;
-            
-         case TR_BASContReg:
-            //Control reg actions:
-            switch(Data)
-            {
-               case TR_BASCont_SendFN: //file name being sent next
-                  FNCount = 0;
-                  StreamOffsetAddr = 0; //initialize for file load/save
-                  break;
-                  
-               //these commandd require action outside of interrupt: 
-               case TR_BASCont_DmaTest:    // Assert DMA for 100mS
-                  DMA_State = DMA_S_StartActive; //must start this write cycle
-                  // break keyword is not present, all the cases after the matching case are executed
-               case TR_BASCont_LoadPrep:   //load file into RAM 
-               case TR_BASCont_SaveFinish: //save file from RAM
-               case TR_BASCont_DirPrep:    // Load Dir into RAM
-                  TR_BASContRegAction = Data; //pass it to process outside of interrupt
-                  TR_BASStatRegVal = TR_BASStat_Processing; //initialize status
-                  break;
-            }
-            break;
-            
-         case TR_BASFileNameReg: //receive file name characters
-            //// PETSCII To Lcase ASSCII:
-            //Data &= 0x7f; //bit 7 is Cap in Graphics mode
-            //if (Data & 0x40) Data |= 0x20;  //conv to lower case
-            
-            // PETSCII To ASSCII:
-            if (Data & 0x80) Data &= 0x7f; //bit 7 is Cap in Graphics mode
-            else if (Data & 0x40) Data |= 0x20;  //conv to lower case
-         
-            LSFileName[FNCount++] = Data;
-            if (Data == 0)
-            {
-               Printf_dbg("Received FN: \"%s\"\n", LSFileName);
-            }
-            break;
-         case TR_BASStreamDataReg: //receive save data
-            RAM_Image[StreamOffsetAddr++] = Data;
-            break;
-      }
-   } //write
-}
-
-void PollingHndlr_TR_BASIC()
-{
-   if (TR_BASContRegAction != TR_BASCont_None)
-   {
-      switch(TR_BASContRegAction)
-      {
-         case TR_BASCont_LoadPrep:
-            TR_BASStatRegVal = ContRegAction_LoadPrep();
-            break;
-         case TR_BASCont_SaveFinish:
-            TR_BASStatRegVal = ContRegAction_SaveFinish();
-            break;
-         case TR_BASCont_DirPrep:
-            TR_BASStatRegVal = ContRegAction_DirPrep();
-            break;
-         case TR_BASCont_DmaTest:
-            TR_BASStatRegVal = ContRegAction_DmaTest();
-            break;         
-         default:
-            Printf_dbg("Unexpected TR_BASContRegAction: %d\n", TR_BASContRegAction);
-      }
-      TR_BASContRegAction = TR_BASCont_None;
-   }
-   
-   while (Serial.available())
-   {
-      uint8_t Cin = Serial.read();
-      if(TgetQueueUsed >= TgetQueueSize-1)
-      {
-         Printf_dbg("\n**Queue Full!\n");
-         //loose the char and return
-      }       
-      else
-      {
-         //add to queue:
-         Printf_dbg("#%d= %d (%c)\n", TgetQueueUsed, Cin, Cin);
-         TgetQueue[RxQueueHead++] = Cin;
-         if (RxQueueHead == TgetQueueSize) RxQueueHead = 0;
-      }
-      
-   }
-}
-
-
 
 FS *FSfromFileName(char** ptrptrLSFileName)
 {  //returns file system type (default USB) and changes pointer to skip USB:/SD:
@@ -396,5 +254,147 @@ uint8_t ContRegAction_DmaTest()
 }
 
 //__________________________________________________________________________________
+
+void InitHndlr_TR_BASIC()
+{
+   if (TgetQueue == NULL) TgetQueue = (uint8_t*)malloc(TgetQueueSize);
+   if (LSFileName == NULL) LSFileName = (uint8_t*)malloc(MaxPathLength);
+   
+   RxQueueHead = RxQueueTail = 0; //as used in Swiftlink & ASID
+ 
+   TR_BASStatRegVal = TR_BASStat_Ready;
+   TR_BASContRegAction = TR_BASCont_None; //default to no action
+}   
+
+void IO1Hndlr_TR_BASIC(uint8_t Address, bool R_Wn)
+{
+   uint8_t Data;
+   if (R_Wn) //High (IO1 Read)
+   {
+      switch(Address)
+      {
+         case TR_BASDataReg:
+            if(TgetQueueUsed)
+            {
+               DataPortWriteWaitLog(TgetQueue[RxQueueTail++]);  
+               if (RxQueueTail == TgetQueueSize) RxQueueTail = 0;
+            }
+            else  //no data to send, send 0
+            {
+               DataPortWriteWaitLog(0);
+            }
+            break;
+         case TR_BASStatReg:
+            DataPortWriteWaitLog(TR_BASStatRegVal);
+            break;
+         case TR_BASStreamDataReg:
+            DataPortWriteWait(RAM_Image[StreamOffsetAddr]);
+            //inc on read, check for end:
+            if (++StreamOffsetAddr >= XferSize) TR_BASStrAvailableRegVal=0; //signal end of transfer
+            break;
+         case TR_BASStrAvailableReg:
+            DataPortWriteWait(TR_BASStrAvailableRegVal);
+         default: //used for all other IO1 reads
+            //DataPortWriteWaitLog(0); 
+            break;
+      }
+   }
+   else  // IO1 write
+   {
+      Data = DataPortWaitRead(); 
+      TraceLogAddValidData(Data);
+      switch(Address)
+      {
+         case TR_BASDataReg:
+            Serial.write(Data); //a bit risky doing this here, but seems fast enough in testing
+            break;
+            
+         case TR_BASContReg:
+            //Control reg actions:
+            switch(Data)
+            {
+               case TR_BASCont_SendFN: //file name being sent next
+                  FNCount = 0;
+                  StreamOffsetAddr = 0; //initialize for file load/save
+                  break;
+                  
+               //these commandd require action outside of interrupt: 
+               case TR_BASCont_DmaTest:    // Assert DMA for 100mS
+                  DMA_State = DMA_S_StartActive; //must start this write cycle
+                  // break keyword is not present, all the cases after the matching case are executed
+               case TR_BASCont_LoadPrep:   //load file into RAM 
+               case TR_BASCont_SaveFinish: //save file from RAM
+               case TR_BASCont_DirPrep:    // Load Dir into RAM
+                  TR_BASContRegAction = Data; //pass it to process outside of interrupt
+                  TR_BASStatRegVal = TR_BASStat_Processing; //initialize status
+                  break;
+            }
+            break;
+            
+         case TR_BASFileNameReg: //receive file name characters
+            //// PETSCII To Lcase ASSCII:
+            //Data &= 0x7f; //bit 7 is Cap in Graphics mode
+            //if (Data & 0x40) Data |= 0x20;  //conv to lower case
+            
+            // PETSCII To ASSCII:
+            if (Data & 0x80) Data &= 0x7f; //bit 7 is Cap in Graphics mode
+            else if (Data & 0x40) Data |= 0x20;  //conv to lower case
+         
+            LSFileName[FNCount++] = Data;
+            if (Data == 0)
+            {
+               Printf_dbg("Received FN: \"%s\"\n", LSFileName);
+            }
+            break;
+         case TR_BASStreamDataReg: //receive save data
+            RAM_Image[StreamOffsetAddr++] = Data;
+            break;
+      }
+   } //write
+}
+
+void PollingHndlr_TR_BASIC()
+{
+   if (TR_BASContRegAction != TR_BASCont_None)
+   {
+      switch(TR_BASContRegAction)
+      {
+         case TR_BASCont_LoadPrep:
+            TR_BASStatRegVal = ContRegAction_LoadPrep();
+            break;
+         case TR_BASCont_SaveFinish:
+            TR_BASStatRegVal = ContRegAction_SaveFinish();
+            break;
+         case TR_BASCont_DirPrep:
+            TR_BASStatRegVal = ContRegAction_DirPrep();
+            break;
+         case TR_BASCont_DmaTest:
+            TR_BASStatRegVal = ContRegAction_DmaTest();
+            break;         
+         default:
+            Printf_dbg("Unexpected TR_BASContRegAction: %d\n", TR_BASContRegAction);
+      }
+      TR_BASContRegAction = TR_BASCont_None;
+   }
+   
+   while (Serial.available())
+   {
+      uint8_t Cin = Serial.read();
+      if(TgetQueueUsed >= TgetQueueSize-1)
+      {
+         Printf_dbg("\n**Queue Full!\n");
+         //loose the char and return
+      }       
+      else
+      {
+         //add to queue:
+         Printf_dbg("#%d= %d (%c)\n", TgetQueueUsed, Cin, Cin);
+         TgetQueue[RxQueueHead++] = Cin;
+         if (RxQueueHead == TgetQueueSize) RxQueueHead = 0;
+      }
+      
+   }
+}
+
 
 #endif

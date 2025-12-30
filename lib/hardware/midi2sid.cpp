@@ -1,4 +1,4 @@
-
+#ifndef MinimumBuild
 #include "midi2sid.h"
 
 #include <Arduino.h>
@@ -87,7 +87,7 @@ void M2SOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity)
     IO1[rRegSIDStrStart + VoiceNum * 4 + 1] = NoteName[note % 12][1];
     IO1[rRegSIDStrStart + VoiceNum * 4 + 2] = '0' + note / 12;
 
-    #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
     Serial.print ("MIDI Note On, ch=");
     Serial.print (channel);
     Serial.print (", voice=");
@@ -101,7 +101,7 @@ void M2SOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity)
     Serial.print (":");
     Serial.print (IO1[rRegSIDFreqLo1]);
     Serial.println();
-    #endif
+#endif
 }
 
 void M2SOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity)
@@ -112,10 +112,10 @@ void M2SOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity)
 
     if (VoiceNum < 0)
     {
-        #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
         Serial.print ("No voice using note ");
         Serial.println (note);
-        #endif
+#endif
         return;
     }
     Voice[VoiceNum].Available = true;
@@ -124,7 +124,7 @@ void M2SOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity)
     IO1[rRegSIDStrStart + VoiceNum * 4 + 1] = '-';
     IO1[rRegSIDStrStart + VoiceNum * 4 + 2] = ' ';
 
-    #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
     Serial.print ("MIDI Note Off, ch=");
     Serial.print (channel);
     Serial.print (", voice=");
@@ -134,12 +134,12 @@ void M2SOnNoteOff (uint8_t channel, uint8_t note, uint8_t velocity)
     Serial.print (", velocity=");
     Serial.print (velocity);
     Serial.println();
-    #endif
+#endif
 }
 
 void M2SOnControlChange (uint8_t channel, uint8_t control, uint8_t value)
 {
-    #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
     Serial.print ("MIDI Control Change, ch=");
     Serial.print (channel);
     Serial.print (", control=");
@@ -147,16 +147,18 @@ void M2SOnControlChange (uint8_t channel, uint8_t control, uint8_t value)
     Serial.print (", value=");
     Serial.print (value);
     Serial.println();
-    #endif
+#endif
 }
 
 void M2SOnPitchChange (uint8_t channel, int pitch)
 {
-    #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
     Serial.print ("Pitch Change, ch=");
     Serial.print (channel, DEC);
     Serial.print (", pitch=");
     Serial.println (pitch, DEC);
     Serial.printf ("     0-6= %02x, 7-13=%02x\n", pitch & 0x7f, (pitch >> 7) & 0x7f);
-    #endif
+#endif
 }
+
+#endif // MinimumBuild
