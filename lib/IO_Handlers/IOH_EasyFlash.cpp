@@ -24,7 +24,7 @@
 
 #ifdef MinimumBuild
    #include <SD.h>
-   File myFile;  // Global file handle for swap banks
+   extern File myFile;  // Defined in DriveDirLoad.cpp for MinimumBuild
 #endif
 
 // Global variable definitions

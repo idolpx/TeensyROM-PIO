@@ -32,6 +32,7 @@
 #include "MainMenuItems.h"
 #include "SendMsg.h"
 #include "midi2sid.h"
+#include "FileParsers.h"
 
 // Global variable definitions
 char DriveDirPath[MaxPathLength];
@@ -87,14 +88,19 @@ StructExt_ItemType_Assoc Ext_ItemType_Assoc[]=
 };
 #endif
 
-#ifdef MinimumBuild
+// Global variables used in both MinimumBuild and full build
 uint8_t NumCrtChips = 0;
 StructCrtChip CrtChips[MAX_CRT_CHIPS];
+
+#ifdef MinimumBuild
 File myFile = NULL;
+
+StructMenuItem *DriveDirMenu = NULL; //pointer for consistency with non-MinimumBuild
 
 void HandleExecution()
 {
-   StructMenuItem MenuSelCpy = DriveDirMenu; //local copy selected menu item to modify
+   if(DriveDirMenu == NULL) return;
+   StructMenuItem MenuSelCpy = *DriveDirMenu; //local copy selected menu item to modify
    
    if(!LoadFile(&MenuSelCpy, &SD)) return;     
 
@@ -153,18 +159,18 @@ void HandleExecution()
 
       BigBufCount = 0;
       
-      if (RegNextIOHndlr>=IOH_Num_Handlers)
+      if (IO1[rwRegNextIOHndlr]>=IOH_Num_Handlers)
       {
          Serial.println("***IOHandler out of range");
          return;
       }
       
-      Serial.printf("Loading IO handler: %s\n", IOHandler[RegNextIOHndlr]->Name);
+      Serial.printf("Loading IO handler: %s\n", IOHandler[IO1[rwRegNextIOHndlr]]->Name);
       
-      if (IOHandler[RegNextIOHndlr]->InitHndlr != NULL) IOHandler[RegNextIOHndlr]->InitHndlr();
+      if (IOHandler[IO1[rwRegNextIOHndlr]]->InitHndlr != NULL) IOHandler[IO1[rwRegNextIOHndlr]]->InitHndlr();
       
       Serial.flush();
-      CurrentIOHandler = RegNextIOHndlr;
+      CurrentIOHandler = IO1[rwRegNextIOHndlr];
       doReset=true;
    }
 
@@ -228,7 +234,7 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS)
          }
 
          for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read chip header
-         if (!ParseChipHeader(lclBuf)) //sends error messages
+         if (!ParseChipHeader(lclBuf, "")) //sends error messages
          {
             myFile.close();
             FreeCrtChips();
@@ -288,6 +294,17 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS)
    SendMsgPrintfln("Done");
    return true;      
 }
+
+void FreeDriveDirMenu()
+{
+   // MinimumBuild stub - single item, no dynamic allocation
+}
+
+void MenuChange()
+{
+   // MinimumBuild stub - no menu switching
+}
+
 #else // MinimumBuild
 
 void HandleExecution()

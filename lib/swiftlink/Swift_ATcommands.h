@@ -20,7 +20,7 @@
 #ifndef SWIFT_ATCOMMANDS_H
 #define SWIFT_ATCOMMANDS_H
 
-#include <Ethernet.h>
+#include <NativeEthernet.h>
 
 #include "IOH_Swiftlink.h"
 #include "eeprom_dev.h"

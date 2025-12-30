@@ -34,8 +34,6 @@
 #include "IOH_TeensyROM.h"
 
 // Global variable definitions
-uint8_t NumCrtChips = 0;
-StructCrtChip CrtChips[MAX_CRT_CHIPS];
 char* StrSIDInfo;
 char* LatestSIDLoaded;
 char StrMachineInfo[16];

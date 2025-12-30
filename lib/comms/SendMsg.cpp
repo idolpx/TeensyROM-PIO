@@ -1,4 +1,5 @@
 
+#ifndef MinimumBuild
 #include "SendMsg.h"
 
 #include <Arduino.h>
@@ -54,3 +55,5 @@ void SendMsgSerialStringBuf()
     while (millis() - beginWait < 3000) if (IO1[rwRegStatus] == rsContinue) return;
     Serial.printf ("\nTimeout!\n");
 }
+
+#endif

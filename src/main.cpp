@@ -30,6 +30,7 @@
 #include "SendMsg.h"
 #include "filesystem.h"
 #include "SerUSBIO.h"
+#include "ServiceTCP.h"
 
 
 extern "C" uint32_t set_arm_clock(uint32_t frequency);
@@ -203,6 +204,7 @@ void loop()
         doReset = false;
         SetResetDeassert;
     }
+
 
     if (Serial.available())
         ServiceSerial();

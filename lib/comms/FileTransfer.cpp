@@ -1,10 +1,11 @@
 
+#ifndef MinimumBuild
 #include "FileTransfer.h"
 
 #include <Arduino.h>
 #include <FS.h>
 #include <SD.h>
-#include <SerUSBIO.cpp>
+#include <SerUSBIO.h>
 
 #include "midi2sid.h"
 #include "MainMenuItems.h"
@@ -664,3 +665,5 @@ FLASHMEM void GetFileCommand() {
     
     SendU16(AckToken);
 }
+
+#endif // MinimumBuild

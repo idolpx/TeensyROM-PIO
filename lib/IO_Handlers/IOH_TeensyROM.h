@@ -36,7 +36,8 @@ extern stcIOHandlers IOHndlr_TeensyROM;
 extern int16_t SidSpeedAdjust;
 extern bool    SidLogConv; //true=Log, false=linear
 extern volatile uint8_t* IO1;  //io1 space/regs
-extern volatile uint16_t StreamOffsetAddr, StringOffset;
+extern volatile uint16_t StreamOffsetAddr;
+extern volatile uint16_t StringOffset;
 
 extern volatile uint8_t doReset;
 

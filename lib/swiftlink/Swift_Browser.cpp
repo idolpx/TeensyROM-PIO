@@ -20,6 +20,7 @@
 
 // Swiftlink Browser Functions
 
+#ifndef MinimumBuild
 #include "Swift_Browser.h"
 
 #include <SD.h>
@@ -1297,3 +1298,5 @@ FLASHMEM void ProcessBrowserCommand()
    }
    
 }
+
+#endif // MinimumBuild

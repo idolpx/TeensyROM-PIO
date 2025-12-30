@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2025 Travis Smith
+// Copyright (c) 2023 Travis Smith
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 // and associated documentation files (the "Software"), to deal in the Software without 
@@ -17,31 +17,14 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// https://github.com/crystalct/MagicDesk2
+#ifndef SERVICETCP_H
+#define SERVICETCP_H
 
-#ifndef IOH_MagicDesk2_H
-#define IOH_MagicDesk2_H
-
-#include "DriveDirLoad.h"
-#include "IOH_defs.h"
-#include "Common_Defs.h"
-
-#ifdef MinimumBuild
-   extern stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
-   extern uint8_t* ImageCheckAssign(uint8_t* BankRequested);
-   extern bool PathIsRoot();
-   extern char DriveDirPath[];
-   extern StructMenuItem *DriveDirMenu;
-   extern File myFile;
-
-   extern void LoadBank(uint32_t SeekTo, uint8_t* ptrImage);
+#ifdef FeatTCPListen
+#include <NativeEthernet.h>
+extern EthernetServer tcpServer;
+extern bool NetListenEnable;
+FLASHMEM void ServiceTCP(EthernetClient &tcpclient);
 #endif
 
-
-void InitHndlr_MagicDesk2();  
-void IO1Hndlr_MagicDesk2(uint8_t Address, bool R_Wn);  
-void PollingHndlr_MagicDesk2();                           
-
-extern stcIOHandlers IOHndlr_MagicDesk2;
-
-#endif // IOH_MAGICDESK2_H
+#endif // SERVICETCP_H

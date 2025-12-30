@@ -1,3 +1,5 @@
+
+#ifndef MinimumBuild
 #include "MainMenuItems.h"
 
 StructMenuItem dirGames[] =
@@ -169,3 +171,5 @@ StructMenuItem TeensyROMMenu[] =
  /* 6 */ rtDirectory, IOH_None           , (char*)"/Utilities"                       , (uint8_t*)dirUtilities               , sizeof(dirUtilities) ,
  /* 7 */ rtDirectory, IOH_None           , (char*)"/Text + PETSCII + Docs"           , (uint8_t*)dirTEXT_PETSCII            , sizeof(dirTEXT_PETSCII) ,
 };
+
+#endif // MinimumBuild

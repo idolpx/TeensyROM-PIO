@@ -21,6 +21,7 @@
 //  Copyright (c) 2023 Travis Smith <travis@sensoriumembedded.com> 
 
 
+#ifndef MinimumBuild
 #include "nfcScan.h"
 
 #include <SD.h>
@@ -499,3 +500,4 @@ FLASHMEM void nfcWriteTag(const char* TxtMsg)
    SendMsgPrintfln("Success!");
 }
 
+#endif // MinimumBuild

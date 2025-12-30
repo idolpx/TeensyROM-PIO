@@ -372,4 +372,5 @@ enum PokeColors
 extern volatile uint8_t EmulateVicCycles; //set to true to emulate VIC cycles, false to use normal C64 timing
 
 
+
 #endif // COMMON_DEFS_H

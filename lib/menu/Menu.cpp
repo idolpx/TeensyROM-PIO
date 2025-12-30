@@ -1,4 +1,4 @@
-
+#ifndef MinimumBuild
 #include "Menu.h"
 
 #include <Arduino.h>
@@ -67,3 +67,5 @@ void PadSpace(char* StrToPad, uint8_t PadToLength)
 {
    while(strlen(StrToPad)<PadToLength) strcat(StrToPad, " ");
 }
+
+#endif // MinimumBuild

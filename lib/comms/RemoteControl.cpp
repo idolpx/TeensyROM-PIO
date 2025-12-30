@@ -28,6 +28,7 @@
 //  TR: sees ack2, success/return
 // C64: Executes command
 
+#ifndef MinimumBuild
 #include "RemoteControl.h"
 
 #include "Common_Defs.h"
@@ -330,3 +331,4 @@ void RemoteLaunch(RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoCa
    
 }
 
+#endif // MinimumBuild

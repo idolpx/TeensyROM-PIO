@@ -35,6 +35,7 @@
 #include "ethernet_dev.h"
 #include "filesystem.h"
 #include "FileParsers.h"
+#include "MeatloafComm.h"
 
 // Global variable definitions for IOH_TeensyROM
 stcIOHandlers IOHndlr_TeensyROM =
@@ -53,7 +54,8 @@ int16_t SidSpeedAdjust = 0;
 bool    SidLogConv = false; //true=Log, false=linear
 bool    NetListenEnable = false;
 volatile uint8_t* IO1 = NULL;  //io1 space/regs
-volatile uint16_t StreamOffsetAddr = 0, StringOffset = 0;
+volatile uint16_t StreamOffsetAddr = 0;
+volatile uint16_t StringOffset = 0;
 
 volatile uint8_t doReset = true;
 
@@ -199,17 +201,17 @@ uint8_t ASCIItoPETSCII[128]=
 
 void (*StatusFunction[rsNumStatusTypes])() = //match RegStatusTypes order
 {
-   &MenuChange,          // rsChangeMenu
-   &HandleExecution,     // rsStartItem
-   &getNtpTime,          // rsGetTime
-   &IOHandlerSelectInit, // rsIOHWSelInit
+   &MenuChange,          // rsChangeMenu 
+   &HandleExecution,     // rsStartItem  
+   &getNtpTime,          // rsGetTime    
+   &IOHandlerSelectInit, // rsIOHWSelInit   
    &WriteEEPROM,         // rsWriteEEPROM
    &MakeBuildInfo,       // rsMakeBuildCPUInfoStr
    &UpDirectory,         // rsUpDirectory
    &SearchForLetter,     // rsSearchForLetter
    &LoadMainSIDforXfer,  // rsLoadSIDforXfer
-   &NextPicture,         // rsNextPicture
-   &LastPicture,         // rsLastPicture
+   &NextPicture,         // rsNextPicture    
+   &LastPicture,         // rsLastPicture    
    &WriteNFCTagCheck,    // rsWriteNFCTagCheck
    &WriteNFCTag,         // rsWriteNFCTag
    &NFCReEnable,         // rsNFCReEnable
@@ -219,7 +221,7 @@ void (*StatusFunction[rsNumStatusTypes])() = //match RegStatusTypes order
    &NextTextFile,        // rsNextTextFile
    &LastTextFile,        // rsLastTextFile
    &IOHandlerNextInit,   // rsIOHWNextInit
-   &IOHandlerNextInit,   // rsIOHWReInit
+   &MountDxxFile,        // rsMountDxxFile
    &HotKeySetLaunch,     // rsHotKeySetLaunch
    &NetListenInit,       // rsNetListenInit
 };
@@ -734,6 +736,7 @@ void InitHndlr_TeensyROM()
    usbDevMIDI.setHandlePitchChange   (M2SOnPitchChange);         // Ex
 }   
 
+
 void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
 {
    uint8_t Data;
@@ -861,7 +864,14 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
             {
                case rsstItemName:
                   memcpy(SerialStringBuf, MenuSource[SelItemFullIdx].Name, MaxItemDispLength);
-                  SerialStringBuf[MaxItemDispLength-1] = 0;
+                  SerialStringBuf[MaxItemDispLength-1] = 0; //Trim to length, if needed
+                  if ((IO1[rwRegPwrUpDefaults] & rpudShowExtension) == 0 &&
+                      MenuSource[SelItemFullIdx].ItemType > rtDirectory &&
+                      IO1[rWRegCurrMenuWAIT] != rmtTeensy) 
+                  { // if not show ext, not dir or unknown, not a TR Menu: terminate before extension
+                     char *pDot = strrchr(SerialStringBuf, '.'); //find last dot
+                     if (pDot != NULL) *pDot = 0; //terminate there 
+                  }
                   ptrSerialString = SerialStringBuf;
                   break;
                case rsstNextIOHndlrName:
@@ -972,8 +982,8 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
                case rCtlLastTextFile:
                   IO1[rwRegStatus] = rsLastTextFile; //work this in the main code
                   break;
-               case rCtlIOHWReInitWAIT:
-                  IO1[rwRegStatus] = rsIOHWReInit; //work this in the main code
+               case rCtlMountDxxFileWAIT:
+                  IO1[rwRegStatus] = rsMountDxxFile; //work this in the main code
                   break;
                case rCtlHotKeySetLaunch:
                   IO1[rwRegStatus] = rsHotKeySetLaunch; //work this in the main code
@@ -981,12 +991,12 @@ void IO1Hndlr_TeensyROM(uint8_t Address, bool R_Wn)
                case rCtlNetListenInitWAIT:
                   IO1[rwRegStatus] = rsNetListenInit; //work this in the main code
                   break;
-               
             }
             break;
       }
    } //write
 }
+
 
 void PollingHndlr_TeensyROM()
 {

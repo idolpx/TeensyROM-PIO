@@ -1,3 +1,4 @@
+#ifndef MinimumBuild
 // MIT License
 // 
 // Copyright (c) 2024 Travis Smith
@@ -214,3 +215,5 @@ FLASHMEM bool LoadDxxFile(StructMenuItem* MyMenuItem, FS *sourceFS)
    
    return true;   
 }
+
+#endif // MinimumBuild

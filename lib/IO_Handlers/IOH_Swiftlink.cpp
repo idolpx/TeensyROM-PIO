@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <EEPROM.h>
-#include <Ethernet.h>
+#include <NativeEthernet.h>
 
 #include "nfcScan.h"
 #include "IOHandlers.h"

@@ -34,7 +34,7 @@ volatile uint8_t doReset = false;
 uint16_t NumItemsFull = 0;
 StructMenuItem* MenuSource = NULL;
 uint16_t SelItemFullIdx = 0;
-uint32_t StreamOffsetAddr = 0;
+uint16_t StreamOffsetAddr = 0;
 
 // Simple ASCII to PETSCII conversion table (normally in IOH_TeensyROM.cpp)
 uint8_t ASCIItoPETSCII[128] = {

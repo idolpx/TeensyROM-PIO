@@ -66,12 +66,7 @@
 
 extern Stream *CmdChannel;
 
-#ifdef FeatTCPListen
-#include <NativeEthernet.h>
-extern EthernetServer tcpServer;
-extern bool NetListenEnable;
-FLASHMEM void ServiceTCP(EthernetClient &tcpclient);
-#endif
+
 
 FLASHMEM void ServiceSerial(Stream *ThisCmdChannel = &Serial);
 FLASHMEM void AddAndCheckSource(StructMenuItem SourceMenu, uint32_t *TotalSize, uint32_t *FileCount);
