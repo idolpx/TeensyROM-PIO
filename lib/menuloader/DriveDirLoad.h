@@ -166,8 +166,10 @@ struct StructExt_ItemType_Assoc
 
 #define Ext_ItemType_Assoc_Count 19
 extern StructExt_ItemType_Assoc Ext_ItemType_Assoc[Ext_ItemType_Assoc_Count];
+extern char DriveDirPath[];
 
 void HandleExecution();
+#ifndef MinimumBuild
 void MenuChange();
 bool LoadFile(FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem);
 void InitDriveDirMenu();
@@ -175,9 +177,11 @@ bool SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename);
 void LoadDirectory(FS *sourceFS);
 void AddDirEntry(const char *EntryString);
 void FreeDriveDirMenu();
-void FreeCrtChips();
 uint8_t Assoc_Ext_ItemType(char * FileName);
 
-extern char DriveDirPath[];
+#else
+bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS);
+#endif // MinimumBuild
+void FreeCrtChips();
 
 #endif // DRIVE_DIR_LOAD_H

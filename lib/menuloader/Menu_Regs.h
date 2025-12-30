@@ -219,11 +219,12 @@ enum RegStatusTypes  //rwRegStatus, match StatusFunction order
 
 };
 
-enum RegMenuTypes //must match TblMsgMenuName order/qty
+enum RegMenuTypes //must match TblMsgMenuName order/qty, also used by UI/serial for DriveType
 {
-   rmtSD        = 0,
-   rmtTeensy    = 1,
-   rmtUSBDrive  = 2,
+   rmtUSBDrive  = 0,
+   rmtSD        = 1,
+   rmtTeensy    = 2,
+   
    rmtNumTypes  = 3
 };
 
@@ -303,6 +304,8 @@ enum enumIOHandlers //Synch order/qty with IOHandler[] (IOHandlers.h)
    IOH_Debug, //last manually selectable, see LastSelectableIOH
 
    IOH_TeensyROM,
+   IOH_ASID,
+   IOH_TR_BASIC,
 #endif
    IOH_EpyxFastLoad,
    IOH_MagicDesk,
@@ -313,10 +316,6 @@ enum enumIOHandlers //Synch order/qty with IOHandler[] (IOHandlers.h)
    IOH_C64GameSystem3,
    IOH_EasyFlash,
    IOH_ZaxxonSuper,
-#ifndef MinimumBuild
-   IOH_ASID,
-   IOH_TR_BASIC,
-#endif
    IOH_GMod2,
    IOH_MagicDesk2,
 

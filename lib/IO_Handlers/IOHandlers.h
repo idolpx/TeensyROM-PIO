@@ -26,11 +26,14 @@
 
 #ifndef MinimumBuild
 #include "IOH_ASID.h"
-#endif
-#include "IOH_C64GameSystem3.h"
-#ifndef MinimumBuild
 #include "IOH_Debug.h"
+#include "IOH_MIDI.h"
+#include "IOH_Swiftlink.h"
+#include "IOH_TeensyROM.h"
+#include "IOH_TR_BASIC.h"
 #endif
+
+#include "IOH_C64GameSystem3.h"
 #include "IOH_Dinamic.h"
 #include "IOH_EasyFlash.h"
 #include "IOH_EpyxFastLoad.h"
@@ -38,17 +41,9 @@
 #include "IOH_GMod2.h"
 #include "IOH_MagicDesk.h"
 #include "IOH_MagicDesk2.h"
-#ifndef MinimumBuild
-#include "IOH_MIDI.h"
-#endif
 #include "IOH_None.h"
 #include "IOH_Ocean1.h"
 #include "IOH_SuperGames.h"
-#ifndef MinimumBuild
-#include "IOH_Swiftlink.h"
-#include "IOH_TeensyROM.h"
-#include "IOH_TR_BASIC.h"
-#endif
 #include "IOH_ZaxxonSuper.h"
 
 

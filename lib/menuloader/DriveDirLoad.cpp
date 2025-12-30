@@ -60,6 +60,7 @@ StructHWID_IOH_Assoc HWID_IOH_Assoc[]=
    (uint16_t)Cart_MagicDesk2      ,IOH_MagicDesk2,
 };
 
+#ifndef MinimumBuild
 StructExt_ItemType_Assoc Ext_ItemType_Assoc[]=
 { //Update Win UI if this changes
   //Ext ,  ItemType
@@ -84,6 +85,210 @@ StructExt_ItemType_Assoc Ext_ItemType_Assoc[]=
    "d81",  rtD81,
    //"c64",  rtFilePrg,  //makefile output, not always prg...
 };
+#endif
+
+#ifdef MinimumBuild
+uint8_t NumCrtChips = 0;
+StructCrtChip CrtChips[MAX_CRT_CHIPS];
+File myFile = NULL;
+
+void HandleExecution()
+{
+   StructMenuItem MenuSelCpy = DriveDirMenu; //local copy selected menu item to modify
+   
+   if(!LoadFile(&MenuSelCpy, &SD)) return;     
+
+   MenuSelCpy.Code_Image = RAM_Image;
+
+   //has to be distilled down to one of these by this point, only ones supported so far.
+   //Emulate ROM or prep for tranfer
+   uint8_t CartLoaded = false;
+   
+   switch(MenuSelCpy.ItemType)
+   {
+
+      case rtBin16k:
+         SetGameAssert;
+         SetExROMAssert;
+         LOROM_Image = MenuSelCpy.Code_Image;
+         HIROM_Image = MenuSelCpy.Code_Image+0x2000;
+         CartLoaded=true;
+         break;
+      case rtBin8kHi:
+         SetGameAssert;
+         SetExROMDeassert;
+         LOROM_Image = NULL;
+         HIROM_Image = MenuSelCpy.Code_Image;
+         CartLoaded=true;
+         //NVIC_DISABLE_IRQ(IRQ_ENET); //disable ethernet interrupt when emulating VIC cycles
+         //NVIC_DISABLE_IRQ(IRQ_PIT);
+         EmulateVicCycles = true;
+         break;
+      case rtBin8kLo:
+         SetGameDeassert;
+         SetExROMAssert;
+         LOROM_Image = MenuSelCpy.Code_Image;
+         HIROM_Image = NULL;
+         CartLoaded=true;
+         break;
+      case rtBinC128:
+         SetGameDeassert;
+         SetExROMDeassert;
+         LOROM_Image = MenuSelCpy.Code_Image;
+         HIROM_Image = NULL;
+         CartLoaded=true;
+         break;      
+      case rtUnknown: //had to have been marked unknown after check at start
+         //SendMsgFailed();
+         SendMsgPrintfln(" :(");
+         break;
+      default:
+         SendMsgPrintfln("Unk Item Type: %d", MenuSelCpy.ItemType);
+         break;
+   }
+   
+   if (CartLoaded)
+   {
+      //called after cart loaded
+
+      BigBufCount = 0;
+      
+      if (RegNextIOHndlr>=IOH_Num_Handlers)
+      {
+         Serial.println("***IOHandler out of range");
+         return;
+      }
+      
+      Serial.printf("Loading IO handler: %s\n", IOHandler[RegNextIOHndlr]->Name);
+      
+      if (IOHandler[RegNextIOHndlr]->InitHndlr != NULL) IOHandler[RegNextIOHndlr]->InitHndlr();
+      
+      Serial.flush();
+      CurrentIOHandler = RegNextIOHndlr;
+      doReset=true;
+   }
+
+}
+
+
+bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS) 
+{
+   char FullFilePath[MaxNamePathLength];
+   uint32_t SwapBanksDetected = 0;
+
+   if (PathIsRoot()) sprintf(FullFilePath, "%s%s", DriveDirPath, MyMenuItem->Name);  // at root
+   else sprintf(FullFilePath, "%s/%s", DriveDirPath, MyMenuItem->Name);
+      
+   SendMsgPrintfln("Loading:\r\n%s", FullFilePath);
+
+   myFile = sourceFS->open(FullFilePath, FILE_READ);
+   
+   if (!myFile) 
+   {
+      SendMsgPrintfln("File Not Found");
+      return false;
+   }
+   
+   MyMenuItem->Size = myFile.size();
+   uint32_t count=0;
+   
+   if (MyMenuItem->ItemType == rtFileCrt)
+   {  //load the CRT
+      uint8_t lclBuf[CRT_MAIN_HDR_LEN];
+      uint8_t EXROM;
+      uint8_t GAME;
+      
+      if (MyMenuItem->Size < 0x1000)
+      {
+         SendMsgPrintfln("Too Short for CRT");
+         myFile.close();
+         return false;        
+      }
+      
+      //load header and parse
+      for (count = 0; count < CRT_MAIN_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read main header
+      MyMenuItem->Code_Image = lclBuf;
+      if (!ParseCRTHeader(MyMenuItem, &EXROM, &GAME)) //sends error messages
+      {
+         myFile.close();
+         return false;        
+      }
+      
+      //process Chip Packets
+      FreeCrtChips();  //clears any previous and resets NumCrtChips
+      Printf_dbg("\n Chp# Length    Type  Bank  Addr  Size\n");
+      while (myFile.available())
+      {
+         if (NumCrtChips == MAX_CRT_CHIPS)
+         {
+            SendMsgPrintfln("More than %d CRT Chips found", MAX_CRT_CHIPS); 
+            myFile.close();
+            FreeCrtChips();
+            return false;        
+         }
+
+         for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read chip header
+         if (!ParseChipHeader(lclBuf)) //sends error messages
+         {
+            myFile.close();
+            FreeCrtChips();
+            return false;        
+         }
+         // Special case for swap-out
+         // RAM1: 0x200XXXXX,  RAM2: 0x202XXXXX,  RAM"3" = SwapSeekAddrMask
+         if (CrtChips[NumCrtChips].ChipROM == (uint8_t*)SwapSeekAddrMask)
+         {
+            CrtChips[NumCrtChips].ChipROM = (uint8_t*)(SwapSeekAddrMask + myFile.position());   
+            //Printf_dbg("upd: %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
+            //don't load it now, skip past...
+            myFile.seek(myFile.position() + CrtChips[NumCrtChips].ROMSize);
+            //for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) myFile.read();//just seek past it
+            SwapBanksDetected++;  //count to leave file open for swaps
+         }
+         else
+         {
+            for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) CrtChips[NumCrtChips].ChipROM[count]=myFile.read();//read in ROM info:
+         }
+            
+         Printf_dbg(" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
+         NumCrtChips++;
+      }
+      
+      //check configuration
+      if (!SetTypeFromCRT(MyMenuItem, EXROM, GAME)) //sends error messages
+      {
+         myFile.close();
+         FreeCrtChips();
+         return false;        
+      }
+   }
+   
+   else //non-CRT: Load the whole thing into the RAM1 buffer
+   {
+      if (MyMenuItem->Size > RAM_ImageSize)
+      {
+         SendMsgPrintfln("Non-CRT file too large");
+         myFile.close();
+         return false;
+      }
+      
+      while (myFile.available() && count < MyMenuItem->Size) RAM_Image[count++]=myFile.read();
+
+      myFile.close();
+      if (count != MyMenuItem->Size)
+      {
+         SendMsgPrintfln("Size Mismatch");
+         return false;
+      }
+   }
+   
+   if (SwapBanksDetected) SendMsgPrintfln("%d Banks Flagged For Swapping", SwapBanksDetected);
+   else myFile.close(); // close if there are no swap banks.
+   
+   SendMsgPrintfln("Done");
+   return true;      
+}
+#else // MinimumBuild
 
 void HandleExecution()
 {
@@ -374,6 +579,7 @@ void MenuChange()
    IO1[rwRegCursorItemOnPg] = 0;
 }
 
+
 bool LoadFile(FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem) 
 {
    char FullFilePath[MaxNamePathLength];
@@ -598,12 +804,6 @@ void FreeDriveDirMenu()
    }
 }
 
-void FreeCrtChips()
-{ //free chips allocated in RAM2 and reset NumCrtChips
-   for(uint16_t cnt=0; cnt < NumCrtChips; cnt++) 
-      if((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000) free(CrtChips[cnt].ChipROM);
-   NumCrtChips = 0;
-}
 
 uint8_t Assoc_Ext_ItemType(char * FileName)
 { //returns ItemType from enum regItemTypes
@@ -630,4 +830,11 @@ uint8_t Assoc_Ext_ItemType(char * FileName)
    return rtUnknown;
 }
 
+#endif // MinimumBuild
 
+void FreeCrtChips()
+{ //free chips allocated in RAM2 and reset NumCrtChips
+   for(uint16_t cnt=0; cnt < NumCrtChips; cnt++) 
+      if((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000) free(CrtChips[cnt].ChipROM);
+   NumCrtChips = 0;
+}
