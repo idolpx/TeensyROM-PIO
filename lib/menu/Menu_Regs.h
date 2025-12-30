@@ -207,10 +207,10 @@ enum RegStatusTypes  //rwRegStatus, match StatusFunction order
    rsNextTextFile       = 0x11,
    rsLastTextFile       = 0x12,
    rsIOHWNextInit       = 0x13,
-   rsIOHWReInit         = 0x14,
+   rsMountDxxFile       = 0x14,
    rsHotKeySetLaunch    = 0x15,
    rsNetListenInit      = 0x16,
-
+   
    rsNumStatusTypes     = 0x17,
 
    rsReady              = 0x5a, //FW->64 (Rd) update finished (done, abort, or otherwise)
@@ -249,7 +249,7 @@ enum RegCtlCommands
    rCtlClearAutoLaunchWAIT  = 16,
    rCtlNextTextFile         = 17,
    rCtlLastTextFile         = 18,
-   rCtlIOHWReInitWAIT       = 19,
+   rCtlMountDxxFileWAIT     = 19,
    rCtlHotKeySetLaunch      = 20,
    rCtlNetListenInitWAIT    = 21,
 };

@@ -24,11 +24,11 @@ FLASHMEM void runMainTRApp_FromMin()
 FLASHMEM void runMainTRApp() 
 {
     
-    #ifdef FeatTCPListen
-    //if ethernet is initialized, jump to main crashes.
-    //EEPROM is set up to bypass, just takes a little longer to pass through minimal again
-    if (TCPListen) REBOOT;
-    #endif
+    // #ifdef FeatTCPListen
+    // //if ethernet is initialized, jump to main crashes.
+    // //EEPROM is set up to bypass, just takes a little longer to pass through minimal again
+    // if (TCPListen) REBOOT;
+    // #endif
 
     uint32_t imageStartAddress = FLASH_BASEADDRESS + UpperAddr; //point to main TR image
 
