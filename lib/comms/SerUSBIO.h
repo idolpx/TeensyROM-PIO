@@ -67,9 +67,8 @@ PROGMEM const uint8_t TestBuf[] =
 
 extern Stream *CmdChannel;
 
-
-
 FLASHMEM void ServiceSerial (Stream *ThisCmdChannel = &Serial);
+FLASHMEM void ServiceSerial_Minimal();  // Minimal mode serial handler
 FLASHMEM void AddAndCheckSource (StructMenuItem SourceMenu, uint32_t *TotalSize, uint32_t *FileCount);
 FLASHMEM void GetDigits (uint8_t NumDigits, uint32_t *SetInt);
 FLASHMEM void PrintDebugLog();

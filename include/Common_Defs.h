@@ -114,12 +114,12 @@ extern uint32_t* BigBuf;
    __attribute__((always_inline)) inline void Printf_dbg_sw(const char* format, ...) {};
 #endif
 
-#ifdef MinimumBuild
-   struct stcSwapBuffers
-   {
-      uint8_t  Image[8192]; // 8k swap image
-      uint32_t Offset; // chip swap file offsets to check for same & not reload
-   };
+// Swap buffer structures for CRT bank swapping (used by both modes)
+struct stcSwapBuffers
+{
+   uint8_t  Image[8192]; // 8k swap image
+   uint32_t Offset; // chip swap file offsets to check for same & not reload
+};
 
 #define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
 
@@ -131,6 +131,9 @@ extern uint32_t* BigBuf;
                              //      (5_OceanType1 , 15_GameSystem3, 60_GMod2)
 
 #define Printf_Swaps     Printf_dbg   //Serial.printf  //
+
+#ifdef MinimumBuild
+// Minimum build specific configuration
 
 #ifdef FeatTCPListen
    #define EthernetDeduction   104  

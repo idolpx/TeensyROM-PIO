@@ -256,17 +256,17 @@ void setup_max()
 
 void loop()
 {
-#ifdef MinimumBuild
-    loop_min();
-#else
-    loop_max();
-#endif
+    // Runtime mode selection
+    if (!bTeensyROMRunMode)
+        loop_min();
+    else
+        loop_max();
 
     if (Serial.available())
         ServiceSerial();
 
 #ifdef FeatTCPListen
-    if (NetListenEnable)
+    if (NetListenEnable && bTeensyROMRunMode)  // TCP only in full mode
     {
         EthernetClient tcpclient = tcpServer.available();
         if (tcpclient)

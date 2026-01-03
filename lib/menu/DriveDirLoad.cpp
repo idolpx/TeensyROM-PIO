@@ -95,7 +95,17 @@ StructCrtChip CrtChips[MAX_CRT_CHIPS];
 
 File myFile = NULL;
 
-StructMenuItem *DriveDirMenu = NULL; //pointer for consistency with non-MinimumBuild
+void HandleExecution()
+{
+    if (!bTeensyROMRunMode)
+    {
+        HandleExecution_min();
+    }
+    else
+    {
+        HandleExecution_max();
+    }
+}
 
 void HandleExecution_min()
 {
@@ -126,8 +136,6 @@ void HandleExecution_min()
             LOROM_Image = NULL;
             HIROM_Image = MenuSelCpy.Code_Image;
             CartLoaded = true;
-            //NVIC_DISABLE_IRQ(IRQ_ENET); //disable ethernet interrupt when emulating VIC cycles
-            //NVIC_DISABLE_IRQ(IRQ_PIT);
             EmulateVicCycles = true;
             break;
         case rtBin8kLo:
@@ -144,8 +152,7 @@ void HandleExecution_min()
             HIROM_Image = NULL;
             CartLoaded = true;
             break;
-        case rtUnknown: //had to have been marked unknown after check at start
-            //SendMsgFailed();
+        case rtUnknown:
             SendMsgPrintfln (" :(");
             break;
         default:
@@ -155,8 +162,6 @@ void HandleExecution_min()
 
     if (CartLoaded)
     {
-        //called after cart loaded
-
         BigBufCount = 0;
 
         if (IO1[rwRegNextIOHndlr] >= IOH_Num_Handlers)
@@ -575,6 +580,9 @@ void HandleExecution_max()
 
 void MenuChange()
 {
+    // Minimal mode doesn't use menu system
+    if (!bTeensyROMRunMode) return;
+
     strcpy (DriveDirPath, "/");
     switch (IO1[rWRegCurrMenuWAIT])
     {
@@ -814,7 +822,14 @@ void AddDirEntry (const char *EntryString)
 
 void FreeDriveDirMenu()
 {
-    //free/clear prev loaded directory
+    // In minimal mode, just clear the pointer without freeing
+    if (!bTeensyROMRunMode)
+    {
+        DriveDirMenu = NULL;
+        return;
+    }
+
+    //free/clear prev loaded directory (full mode)
     if (DriveDirMenu != NULL)
     {
         Printf_dbg ("Dir info removed\n");
@@ -887,9 +902,18 @@ void LoadCRT ( const char *FileNamePath)
     NumDrvDirMenuItems = 1;
 
     // Load and execute the CRT
-    SelItemFullIdx = 0;
-    MenuSource = DriveDirMenu;
-    HandleExecution_min();
+    if (!bTeensyROMRunMode)
+    {
+        // Minimal mode: use single menu item
+        HandleExecution();
+    }
+    else
+    {
+        // Full mode: use menu system
+        SelItemFullIdx = 0;
+        MenuSource = DriveDirMenu;
+        HandleExecution();
+    }
 }
 
 void FreeCrtChips()
