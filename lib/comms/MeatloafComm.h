@@ -9,9 +9,9 @@
 #define ChunkSize              64   //bytes to send in chunk before ack
 #define ChunkAckChar          '+'   //char sent to ack chunk
 
-FLASHMEM bool HostSerialAvailabeTimeout(uint32_t TimeoutmS);
+FLASHMEM bool HostSerialAvailabeTimeout (uint32_t TimeoutmS);
 FLASHMEM void FlushUSBHostRx();
-FLASHMEM bool WaitCheckresponse(const char *Name, const char CheckChar);
+FLASHMEM bool WaitCheckresponse (const char *Name, const char CheckChar);
 FLASHMEM void MountDxxFile();
 
 #endif // MEATLOAFCOMM_H

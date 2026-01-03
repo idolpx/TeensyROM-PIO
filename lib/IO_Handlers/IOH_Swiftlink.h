@@ -1,20 +1,20 @@
 // MIT License
-// 
+//
 // Copyright (c) 2023 Travis Smith
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-// and associated documentation files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, copy, modify, merge, publish, 
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all copies or 
+//
+// The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
@@ -33,7 +33,7 @@
 
 #include "IOH_defs.h"
 
-void IO1Hndlr_SwiftLink(uint8_t Address, bool R_Wn);
+void IO1Hndlr_SwiftLink (uint8_t Address, bool R_Wn);
 void PollingHndlr_SwiftLink();
 void InitHndlr_SwiftLink();
 void CycleHndlr_SwiftLink();
@@ -70,25 +70,25 @@ extern stcIOHandlers IOHndlr_SwiftLink;
 //Control Reg baud rate settings
 enum enBaudRates
 {
-   Baud_Enhanced = 0,
-   Baud_100         ,
-   Baud_150         ,
-   Baud_219         ,
-   Baud_269         ,
-   Baud_300         , 
-   Baud_600         ,
-   Baud_1200        ,
-   Baud_2400        ,
-   Baud_3600        ,
-   Baud_4800        ,
-   Baud_7200        ,
-   Baud_9600        ,
-   Baud_14400       ,
-   Baud_19200       ,
-   Baud_38400       , //15
-   Baud_57600       ,
-   Baud_115200      ,
-   Baud_230400      ,
+    Baud_Enhanced = 0,
+    Baud_100,
+    Baud_150,
+    Baud_219,
+    Baud_269,
+    Baud_300,
+    Baud_600,
+    Baud_1200,
+    Baud_2400,
+    Baud_3600,
+    Baud_4800,
+    Baud_7200,
+    Baud_9600,
+    Baud_14400,
+    Baud_19200,
+    Baud_38400,        //15
+    Baud_57600,
+    Baud_115200,
+    Baud_230400,
 };
 
 //PETSCII Colors/Special Symbols
@@ -122,9 +122,9 @@ extern volatile uint8_t BtnPressed;
 extern void FreeDriveDirMenu();
 extern void SetRandomSeed();
 
-extern char* TxMsg;  //to hold messages (AT/browser commands) when off line
-extern char* PageLinkBuff[NumPageLinkBuffs]; //hold links from tags for user selection in browser
-extern stcURLParse* PrevURLQueue[NumPrevURLQueues]; //For browse previous
+extern char *TxMsg;  //to hold messages (AT/browser commands) when off line
+extern char *PageLinkBuff[NumPageLinkBuffs]; //hold links from tags for user selection in browser
+extern stcURLParse *PrevURLQueue[NumPrevURLQueues]; //For browse previous
 extern char CurrPageTitle[eepBMTitleSize]; //keep current page title, could move to RAM2
 
 extern uint8_t  PrevURLQueueNum;   //current/latest in the link history queue
@@ -145,7 +145,7 @@ extern uint32_t C64CycBetweenRx, LastTxMillis;
 //               Uses Add...ToRxQueue for direct output
 
 
-void SetBaud(uint8_t BaudNum);
+void SetBaud (uint8_t BaudNum);
 void FreeSwiftlinkBuffs();
 void ResetSwiftLink();
 

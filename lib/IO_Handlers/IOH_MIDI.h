@@ -29,7 +29,7 @@
 //IO Handler for MIDI (6580 ACIA interface) Emulation
 
 void MIDIinHndlrInit();
-void IO1Hndlr_MIDI(uint8_t Address, bool R_Wn);
+void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn);
 void PollingHndlr_MIDI();
 void InitHndlr_MIDI_Datel();
 void InitHndlr_MIDI_Sequential();

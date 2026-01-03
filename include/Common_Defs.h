@@ -6,7 +6,8 @@
 
 #include <Arduino.h>
 
-extern char strVersionNumber[]; //*VERSION*
+extern bool bTeensyROMRunMode;  // true=max Full TeensyROM mode, false=min Minimum TeensyROM mode
+extern char strVersionNumber[]; // *VERSION*
 
 #define UpperAddr           0x060000  //address of upper (main) TR image, from FLASH_BASEADDRESS
 #define FLASH_BASEADDRESS 0x60000000

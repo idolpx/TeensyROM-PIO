@@ -1,20 +1,20 @@
 // MIT License
-// 
+//
 // Copyright (c) 2023 Travis Smith
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-// and associated documentation files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, copy, modify, merge, publish, 
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all copies or 
+//
+// The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #ifndef DRIVE_DIR_LOAD_H
@@ -110,14 +110,14 @@
 #define Cart_MagicDesk2              79  //Supported
 
 // IO handlers only
-#define Cart_DigiMax               -100 
-#define Cart_DQBB                  -101 
-#define Cart_GeoRAM                -102 
-#define Cart_ISEPIC                -103 
-#define Cart_RAMcart               -104 
-#define Cart_REU                   -105 
-#define Cart_SFX_Sound_Expander    -106 
-#define Cart_SFX_Sound_Sampler     -107 
+#define Cart_DigiMax               -100
+#define Cart_DQBB                  -101
+#define Cart_GeoRAM                -102
+#define Cart_ISEPIC                -103
+#define Cart_RAMcart               -104
+#define Cart_REU                   -105
+#define Cart_SFX_Sound_Expander    -106
+#define Cart_SFX_Sound_Sampler     -107
 #define Cart_MIDI_Passport         -108  //Supported
 #define Cart_MIDI_Datel            -109  //Supported
 #define Cart_MIDI_Sequential       -110  //Supported
@@ -152,36 +152,38 @@ extern StructHWID_IOH_Assoc HWID_IOH_Assoc[HWID_IOH_Assoc_Count];
 
 struct StructCrtChip
 {
-   uint8_t *ChipROM;
-   uint16_t LoadAddress;
-   uint16_t ROMSize;
-   uint16_t BankNum;
+    uint8_t *ChipROM;
+    uint16_t LoadAddress;
+    uint16_t ROMSize;
+    uint16_t BankNum;
 };
 
 struct StructExt_ItemType_Assoc
 {
-   char    Extension[4];
-   uint8_t ItemType;
+    char    Extension[4];
+    uint8_t ItemType;
 };
 
 #define Ext_ItemType_Assoc_Count 19
 extern StructExt_ItemType_Assoc Ext_ItemType_Assoc[Ext_ItemType_Assoc_Count];
 extern char DriveDirPath[];
 
-void HandleExecution();
+void HandleExecution_min();
+void HandleExecution_max();
 void MenuChange();
 void FreeDriveDirMenu();
-#ifndef MinimumBuild
-bool LoadFile(FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem);
+//#ifndef MinimumBuild
+bool LoadFile (FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem);
 void InitDriveDirMenu();
-bool SetDriveDirMenuNameType(uint16_t ItemNum, const char *filename);
-void LoadDirectory(FS *sourceFS);
-void AddDirEntry(const char *EntryString);
-uint8_t Assoc_Ext_ItemType(char * FileName);
+bool SetDriveDirMenuNameType (uint16_t ItemNum, const char *filename);
+void LoadDirectory (FS *sourceFS);
+void AddDirEntry (const char *EntryString);
+uint8_t Assoc_Ext_ItemType (char * FileName);
 
-#else
-bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS);
-#endif // MinimumBuild
+//#else
+bool LoadFile (StructMenuItem* MyMenuItem, FS *sourceFS);
+void LoadCRT ( const char *FileNamePath);
+//#endif // MinimumBuild
 void FreeCrtChips();
 
 #endif // DRIVE_DIR_LOAD_H

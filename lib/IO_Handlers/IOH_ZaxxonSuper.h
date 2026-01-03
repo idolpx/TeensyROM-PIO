@@ -22,8 +22,8 @@
 
 #include "IOH_defs.h"
 
-void InitHndlr_ZaxxonSuper();                           
-void ROMLHndlr_ZaxxonSuper(uint32_t Address);  
+void InitHndlr_ZaxxonSuper();
+void ROMLHndlr_ZaxxonSuper (uint32_t Address);
 
 extern stcIOHandlers IOHndlr_ZaxxonSuper;
 

@@ -58,14 +58,14 @@
 #define FLASHUPDATE_H
 
 #include <SD.h>
-#include "FXUtil.h"		// read_ascii_line(), hex file support
+#include "FXUtil.h"     // read_ascii_line(), hex file support
 extern "C" {
-  #include "FlashTxx.h"		// TLC/T3x/T4x/TMM flash primitives
+#include "FlashTxx.h"     // TLC/T3x/T4x/TMM flash primitives
 }
 
 #include "FileParsers.h"
 
-void DoFlashUpdate(FS *sourceFS, const char *FilePathName);
+void DoFlashUpdate (FS *sourceFS, const char *FilePathName);
 
 #endif // FLASHUPDATE_H
 

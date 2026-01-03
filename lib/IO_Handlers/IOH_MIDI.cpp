@@ -38,50 +38,50 @@ uint8_t wIORegAddrMIDIControl, rIORegAddrMIDIStatus, wIORegAddrMIDITransmit, rIO
 // Global variable definitions
 stcIOHandlers IOHndlr_MIDI_Datel =
 {
-  "MIDI:Datel/Siel",           //Name of handler
-  &InitHndlr_MIDI_Datel,       //Called once at handler startup
-  &IO1Hndlr_MIDI,              //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_MIDI,          //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
+    "MIDI:Datel/Siel",           //Name of handler
+    &InitHndlr_MIDI_Datel,       //Called once at handler startup
+    &IO1Hndlr_MIDI,              //IO1 R/W handler
+    NULL,                        //IO2 R/W handler
+    NULL,                        //ROML Read handler, in addition to any ROM data sent
+    NULL,                        //ROMH Read handler, in addition to any ROM data sent
+    &PollingHndlr_MIDI,          //Polled in main routine
+    NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_Sequential =
 {
-  "MIDI:Sequential",           //Name of handler
-  &InitHndlr_MIDI_Sequential,  //Called once at handler startup
-  &IO1Hndlr_MIDI,              //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_MIDI,          //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
+    "MIDI:Sequential",           //Name of handler
+    &InitHndlr_MIDI_Sequential,  //Called once at handler startup
+    &IO1Hndlr_MIDI,              //IO1 R/W handler
+    NULL,                        //IO2 R/W handler
+    NULL,                        //ROML Read handler, in addition to any ROM data sent
+    NULL,                        //ROMH Read handler, in addition to any ROM data sent
+    &PollingHndlr_MIDI,          //Polled in main routine
+    NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_Passport =
 {
-  "MIDI:Passport/Sent",        //Name of handler
-  &InitHndlr_MIDI_Passport,    //Called once at handler startup
-  &IO1Hndlr_MIDI,              //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_MIDI,          //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
+    "MIDI:Passport/Sent",        //Name of handler
+    &InitHndlr_MIDI_Passport,    //Called once at handler startup
+    &IO1Hndlr_MIDI,              //IO1 R/W handler
+    NULL,                        //IO2 R/W handler
+    NULL,                        //ROML Read handler, in addition to any ROM data sent
+    NULL,                        //ROMH Read handler, in addition to any ROM data sent
+    &PollingHndlr_MIDI,          //Polled in main routine
+    NULL,                        //called at the end of EVERY c64 cycle
 };
 
 stcIOHandlers IOHndlr_MIDI_NamesoftIRQ =
 {
-  "MIDI:Namesoft IRQ",         //Name of handler
-  &InitHndlr_MIDI_NamesoftIRQ, //Called once at handler startup
-  &IO1Hndlr_MIDI,              //IO1 R/W handler
-  NULL,                        //IO2 R/W handler
-  NULL,                        //ROML Read handler, in addition to any ROM data sent
-  NULL,                        //ROMH Read handler, in addition to any ROM data sent
-  &PollingHndlr_MIDI,          //Polled in main routine
-  NULL,                        //called at the end of EVERY c64 cycle
+    "MIDI:Namesoft IRQ",         //Name of handler
+    &InitHndlr_MIDI_NamesoftIRQ, //Called once at handler startup
+    &IO1Hndlr_MIDI,              //IO1 R/W handler
+    NULL,                        //IO2 R/W handler
+    NULL,                        //ROML Read handler, in addition to any ROM data sent
+    NULL,                        //ROMH Read handler, in addition to any ROM data sent
+    &PollingHndlr_MIDI,          //Polled in main routine
+    NULL,                        //called at the end of EVERY c64 cycle
 };
 
 // MIDI input handlers for HW Emulation _________________________________________________________________________
@@ -97,7 +97,7 @@ void SetMidiIRQ()
     else
     {
         MIDIRxBytesToSend = 0;
-      if ((MIDIRxBuf[0] & 0xf0) != 0xf0) Printf_dbg("IRQ off\n"); //don't print on real-time inputs (there are lots)
+        if ((MIDIRxBuf[0] & 0xf0) != 0xf0) Printf_dbg ("IRQ off\n"); //don't print on real-time inputs (there are lots)
     }
 }
 
@@ -179,12 +179,12 @@ void HWEOnSystemExclusive (uint8_t *data, unsigned int size)
 {
     // data already contains starting f0 and ending f7
     // just have to reverse the order to the RxBuf "stack"
-    for(uint16_t Cnt=0; Cnt<size; Cnt++) MIDIRxBuf[size-Cnt-1]=data[Cnt];
+    for (uint16_t Cnt = 0; Cnt < size; Cnt++) MIDIRxBuf[size - Cnt - 1] = data[Cnt];
     MIDIRxBytesToSend = size;
     SetMidiIRQ();
 
 #ifdef DbgMsgs_IO
-    if (data[0]!=0xf0 || data[size-1]!=0xf7) Printf_dbg("Bad SysEx: %d %02x %02x\n", size, data[0], data[size-1]);
+    if (data[0] != 0xf0 || data[size - 1] != 0xf7) Printf_dbg ("Bad SysEx: %d %02x %02x\n", size, data[0], data[size - 1]);
 #endif
 }
 
@@ -232,7 +232,7 @@ void HWEOnRealTimeSystem (uint8_t realtimebyte)
 
 void MIDIinHndlrInit()
 {
-    if (MIDIRxBuf==NULL) MIDIRxBuf = (uint8_t*)malloc(MIDIRxBufSize);
+    if (MIDIRxBuf == NULL) MIDIRxBuf = (uint8_t * )malloc (MIDIRxBufSize);
     // for (uint8_t ContNum=0; ContNum < NumMIDIControls;) MIDIControlVals[ContNum++]=63;
 
     // MIDI USB Host input handlers
@@ -315,7 +315,8 @@ void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn)
         {
             DataPortWriteWaitLog (rIORegMIDIStatus);
         }
-      else if (Address == rIORegAddrMIDIReceive) //MIDI-in from USB kbd (interrupt driven)
+        else
+            if (Address == rIORegAddrMIDIReceive) //MIDI-in from USB kbd (interrupt driven)
             {
                 if (MIDIRxBytesToSend)
                 {
@@ -331,10 +332,11 @@ void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn)
                     rIORegMIDIStatus &= ~ (MIDIStatusRxFull | MIDIStatusIRQReq);
                     SetIRQDeassert;
                 }
-        } else
-        {
-            DataPortWriteWaitLog (0); // read 0s from all other regs in IO1
-        }
+            }
+            else
+            {
+                DataPortWriteWaitLog (0); // read 0s from all other regs in IO1
+            }
     }
     else // IO1 write    -------------------------------------------------
     {
@@ -360,13 +362,14 @@ void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn)
                 rIORegMIDIStatus |= MIDIStatusTxRdy;
             }
         }
-      else if (Address == wIORegAddrMIDITransmit) //Tx MIDI out to USB instrument
+        else
+            if (Address == wIORegAddrMIDITransmit) //Tx MIDI out to USB instrument
             {
                 if (MIDITxBytesReceived < 3) // make sure there's not a full packet already in progress
                 {
                     if ((Data & 0x80) == 0x80) // header byte, start new packet
                     {
-               if(MIDITxBytesReceived) Printf_dbg("drop %d\n", MIDITxBytesReceived); //had another in progress
+                        if (MIDITxBytesReceived) Printf_dbg ("drop %d\n", MIDITxBytesReceived); //had another in progress
                         MIDITxBytesReceived = 0;
                         switch (Data)
                         {
@@ -396,18 +399,19 @@ void IO1Hndlr_MIDI (uint8_t Address, bool R_Wn)
                         {
                             MIDITxBuf[MIDITxBytesReceived++] = Data;
                             if (MIDITxBytesReceived == 2 && ((MIDITxBuf[0] & 0xf0) == 0xc0 || (MIDITxBuf[0] & 0xf0) == 0xd0 || MIDITxBuf[0] == 0xf1 || MIDITxBuf[0] == 0xf3))
-                            { //single extra byte commands, send now
+                            {
+                                //single extra byte commands, send now
                                 MIDITxBuf[2] = 0;
                                 MIDITxBytesReceived = 3;
                             }
                         }
-                        else Printf_dbg("igd: %02x\n", Data);
+                        else Printf_dbg ("igd: %02x\n", Data);
                     }
                     rIORegMIDIStatus &= ~MIDIStatusIRQReq;
-                    if(MIDITxBytesReceived == 3) rIORegMIDIStatus &= ~MIDIStatusTxRdy; //not ready, waiting for USB transmit
+                    if (MIDITxBytesReceived == 3) rIORegMIDIStatus &= ~MIDIStatusTxRdy; //not ready, waiting for USB transmit
+                }
+                else Printf_dbg ("Miss!\n");
             }
-            else Printf_dbg("Miss!\n");
-        }
         TraceLogAddValidData (Data);
     }
 }
@@ -417,13 +421,13 @@ void PollingHndlr_MIDI()
     if (MIDIRxBytesToSend == 0) // read MIDI-in data in only if ready to send to C64 (buffer empty)
     {
         usbHostMIDI.read();
-      if (MIDIRxBytesToSend == 0) usbDevMIDI.read(); //dito, giving hosted device priority
+        if (MIDIRxBytesToSend == 0) usbDevMIDI.read(); //dito, giving hosted device priority
     }
 
     if (MIDITxBytesReceived == 3) // Transmit MIDI-out data if buffer full/ready from C64
     {
-        if (MIDITxBuf[0]<0xf0) usbHostMIDI.send(MIDITxBuf[0] & 0xf0, MIDITxBuf[1], MIDITxBuf[2], MIDITxBuf[0] & 0x0f);
-        else usbHostMIDI.send(MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2], 0);
+        if (MIDITxBuf[0] < 0xf0) usbHostMIDI.send (MIDITxBuf[0] & 0xf0, MIDITxBuf[1], MIDITxBuf[2], MIDITxBuf[0] & 0x0f);
+        else usbHostMIDI.send (MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2], 0);
 
         Printf_dbg ("Mout: %02x %02x %02x\n", MIDITxBuf[0], MIDITxBuf[1], MIDITxBuf[2]);
         MIDITxBytesReceived = 0;

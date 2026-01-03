@@ -1,12 +1,13 @@
 #include "Common_Defs.h"
 
 // Global variable definitions
+bool bTeensyROMRunMode = true; //true=full TeensyROM app, false=MinimalBoot app
 char strVersionNumber[] = FIRMWARE_VERSION; //*VERSION*
 
-bool (*fBusSnoop)(uint16_t Address, bool R_Wn) = NULL;
+bool (*fBusSnoop) (uint16_t Address, bool R_Wn) = NULL;
 
 uint16_t BigBufCount = 0;
-uint32_t* BigBuf = NULL;
+uint32_t *BigBuf = NULL;
 
 uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
 

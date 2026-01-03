@@ -22,11 +22,11 @@
 
 #include "IOH_defs.h"
 
-void InitHndlr_SuperGames();                           
-void IO2Hndlr_SuperGames(uint8_t Address, bool R_Wn);  
+void InitHndlr_SuperGames();
+void IO2Hndlr_SuperGames (uint8_t Address, bool R_Wn);
 
 extern stcIOHandlers IOHndlr_SuperGames;
 
-extern bool WPLatched; 
+extern bool WPLatched;
 
 #endif // IOH_SUPERGAMES_H

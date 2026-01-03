@@ -8,9 +8,9 @@
 
 // Global variable definitions
 USBHost myusbHost;
-USBFilesystem firstPartition(myusbHost);
-MIDIDevice usbHostMIDI(myusbHost);
-USBSerial USBHostSerial(myusbHost);   // USB Host Serial for TR Control device
+USBFilesystem firstPartition (myusbHost);
+MIDIDevice usbHostMIDI (myusbHost);
+USBSerial USBHostSerial (myusbHost);  // USB Host Serial for TR Control device
 
 // MIDI input/voice handlers for MIDI2SID _________________________________________________________________________
 
@@ -61,9 +61,9 @@ void M2SOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity)
     if (VoiceNum < 0)
     {
         IO1[rRegSIDOutOfVoices] = 'x';
-        #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
         Serial.println ("Out of Voices!");
-        #endif
+#endif
         return;
     }
 
@@ -72,9 +72,9 @@ void M2SOnNoteOn (uint8_t channel, uint8_t note, uint8_t velocity)
 
     if (RegVal > 0xffff)
     {
-        #ifdef DbgMsgs_M2S
+#ifdef DbgMsgs_M2S
         Serial.println ("Too high!");
-        #endif
+#endif
         return;
     }
 

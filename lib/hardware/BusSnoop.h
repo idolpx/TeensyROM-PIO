@@ -13,6 +13,6 @@ extern volatile uint32_t BusSampleCount;
 #define NumBusBits             25
 
 FLASHMEM void BusAnalysis();
-bool BusCount(uint16_t Address, bool R_Wn);
+bool BusCount (uint16_t Address, bool R_Wn);
 
 #endif // BUS_SNOOP_H_
