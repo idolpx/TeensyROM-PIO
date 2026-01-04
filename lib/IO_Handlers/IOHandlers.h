@@ -49,6 +49,7 @@
 
 extern stcIOHandlers *IOHandler[];  //Synch order/qty with enum enumIOHandlers
 extern uint8_t CurrentIOHandler;
+extern uint8_t NextIOHandlerIndex;  // Used by minimal mode for CRT loading
 
 #ifdef MinimumBuild
 // Variables normally defined in IOH_TeensyROM.cpp, which is excluded in MinimumBuild

@@ -6,6 +6,7 @@
 #include "Menu_Regs.h"
 
 extern StructMenuItem *DriveDirMenu;
+extern StructMenuItem DriveDirMenu_Minimal;  // Single struct for minimal mode
 extern uint16_t NumDrvDirMenuItems;
 
 void SetUpMainMenuROM();

@@ -17,6 +17,7 @@
 
 // Global variable definitions
 StructMenuItem *DriveDirMenu = NULL;
+StructMenuItem DriveDirMenu_Minimal;  // Single struct for minimal mode
 uint16_t NumDrvDirMenuItems = 0;
 
 void SetUpMainMenuROM()

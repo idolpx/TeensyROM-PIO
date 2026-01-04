@@ -26,8 +26,6 @@
 #include "IOH_defs.h"
 #include "Common_Defs.h"
 
-#ifdef MinimumBuild
-extern stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
 extern uint8_t *ImageCheckAssign (uint8_t* BankRequested);
 extern bool PathIsRoot();
 extern char DriveDirPath[];
@@ -35,7 +33,6 @@ extern StructMenuItem *DriveDirMenu;
 extern File myFile;
 
 extern void LoadBank (uint32_t SeekTo, uint8_t* ptrImage);
-#endif
 
 
 void InitHndlr_MagicDesk2();

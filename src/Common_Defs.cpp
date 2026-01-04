@@ -9,7 +9,7 @@ bool (*fBusSnoop) (uint16_t Address, bool R_Wn) = NULL;
 uint16_t BigBufCount = 0;
 uint32_t *BigBuf = NULL;
 
-uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
+uint8_t *RAM_Image = NULL; // Main RAM1 file storage buffer (dynamically allocated)
 
 uint8_t *XferImage = NULL; //pointer to image being transfered to C64
 uint32_t XferSize = 0;  //size of image being transfered to C64

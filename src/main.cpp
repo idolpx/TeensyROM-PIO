@@ -79,7 +79,7 @@ void setup()
     attachInterrupt ( digitalPinToInterrupt (Reset_Btn_In_PIN), isrButton, FALLING );
     attachInterrupt ( digitalPinToInterrupt (PHI2_PIN), isrPHI2, RISING );
     NVIC_SET_PRIORITY (IRQ_GPIO6789, 16); //set HW ints as high priority, otherwise ethernet int timer causes misses
-    // Minimal boot: check if we should run minimal mode or full app
+
 #ifdef Dbg_TestMin
 
     //EEPwriteStr(eepAdCrtBootName, "/OneLoad v5/Main- MagicDesk CRTs/Auriga.crt");
@@ -103,19 +103,19 @@ void setup()
     //EEPwriteStr(eepAdCrtBootName, "/validation/crts/32_EasyFlash/Other-Large/svc64_update2.crt");  //SNK vs CAPCOM,  swaps quickly during play                                //   Lots!
     //EEPwriteStr(eepAdCrtBootName, "/svc64_md2.crt");
     //EEPwriteStr(eepAdCrtBootName, "/validation/FileSize/Very Large CRTs/svc64_md2.crt");  //SNK vs CAPCOM Strong Edition: Magic Desk 2
-    EEPwriteStr (eepAdCrtBootName, "/validation/FileSize/Very Large CRTs/SNKvsCap/svc64_stronger.crt"); //SNK vs CAPCOM Strong Edition: Magic Desk 2
+    //EEPwriteStr (eepAdCrtBootName, "/validation/FileSize/Very Large CRTs/SNKvsCap/svc64_stronger.crt"); //SNK vs CAPCOM Strong Edition: Magic Desk 2
+    //EEPwriteStr(eepAdCrtBootName, "/content/cartridge/crt/apigsquest.crt");                            //  some     no fails observed
 
-    EEPROM.write (eepAdMinBootInd, MinBootInd_ExecuteMin);
+    //EEPROM.write (eepAdMinBootInd, MinBootInd_ExecuteMin);
 #endif
 
     // Determine which mode to run based on EEPROM setting
     bTeensyROMRunMode = true; // Default to full TeensyROM mode
     uint32_t MagNumRead;
     EEPROM.get (eepAdMagicNum, MagNumRead);
-    if (MagNumRead == eepMagicNum) // valid EEPROM
+    if (MagNumRead == eepMagicNum) // EEPROM is valid/initialized
     {
-        // EEPROM not initialized
-        if (EEPROM.read (eepAdMinBootInd) == MinBootInd_ExecuteMin || ReadButton == 0)
+        if (EEPROM.read (eepAdMinBootInd) == MinBootInd_ExecuteMin && ReadButton != 0)
         {
             bTeensyROMRunMode = false; // MinimalBoot mode
         }
@@ -127,12 +127,26 @@ void setup()
     else
         setup_max();
 
+#ifdef Dbg_TestMin
+    //calc/show free RAM space for CRT:
+    uint32_t RAM_ImageSize_Used = bTeensyROMRunMode ? RAM_ImageSize_Max : RAM_ImageSize_Min;
+    uint32_t CrtMax = (RAM_ImageSize_Used & 0xffffe000) / 1024; //round down to k bytes rounded to nearest 8k
+    Serial.printf (" RAM1    Buffer: %luK (%lu blks)\n", CrtMax, CrtMax / 8);
+    Serial.printf (" RAM1 Swap Blks: %luK (%lu blks)\n", Num8kSwapBuffers * 8, Num8kSwapBuffers);
+    uint8_t NumChips = RAM2blocks();
+    //Serial.printf("RAM2 Blks: %luK (%lu blks)\n", NumChips*8, NumChips);
+    NumChips = RAM2blocks() - 1; //do it again, sometimes get one more, minus one to match reality, not clear why
+    Serial.printf (" RAM2      Blks: %luK (%lu blks)\n", NumChips * 8, NumChips);
+    CrtMax += NumChips * 8 + Num8kSwapBuffers * 8;
+    Serial.printf (" %luk max RAM for CRT w/o swaps\n", (uint32_t) (CrtMax * 1.004)); //larger File size due to header info.
+#endif
+
     SetLEDOn; // done last as indicator of init completion
 }
     //     setup_min();
 void setup_min()
 {
-    EEPROM.write (eepAdMinBootInd, MinBootInd_SkipMin);
+    EEPROM.write (eepAdMinBootInd, MinBootInd_SkipMin); //clear the boot flag for next boot default, in case power is lost
 
     // MinimalBuild: simpler initialization
     LOROM_Image = NULL;
@@ -144,23 +158,24 @@ void setup_min()
     strcpy (DriveDirPath, "/");
     SD.begin (BUILTIN_SDCARD); // refresh, takes 3 seconds for fail/unpopulated, 20-200mS populated
 
+    // Dynamically allocate RAM_Image for minimal mode (larger size for CRT files)
+    RAM_Image = (uint8_t *)malloc(RAM_ImageSize_Min);
+    if (!RAM_Image) {
+        Serial.printf("FATAL: Failed to allocate RAM_Image (%d bytes)\n", RAM_ImageSize_Min);
+        REBOOT;
+    }
+
+    // Dynamically allocate SwapBuffers for minimal mode (16 * 8KB each)
+    SwapBuffers = (stcSwapBuffers *)malloc(Num8kSwapBuffers * sizeof(stcSwapBuffers));
+    if (!SwapBuffers) {
+        Serial.printf("FATAL: Failed to allocate SwapBuffers (%d bytes)\n", Num8kSwapBuffers * sizeof(stcSwapBuffers));
+        REBOOT;
+    }
+
     BigBuf = (uint32_t *)malloc (BigBufSize * sizeof (uint32_t));
 
     Serial.printf ("\nTeensyROM minimal %s is on-line\n", strVersionNumber);
-    Serial.printf (" %luMHz  %.1fC\n", (F_CPU_ACTUAL / 1000000), tempmonGetTemp());
-
-#ifdef Dbg_TestMin
-    //calc/show free RAM space for CRT:
-    uint32_t CrtMax = (RAM_ImageSize & 0xffffe000) / 1024; //round down to k bytes rounded to nearest 8k
-    Serial.printf (" RAM1    Buffer: %luK (%lu blks)\n", CrtMax, CrtMax / 8);
-    Serial.printf (" RAM1 Swap Blks: %luK (%lu blks)\n", Num8kSwapBuffers * 8, Num8kSwapBuffers);
-    uint8_t NumChips = RAM2blocks();
-    //Serial.printf("RAM2 Blks: %luK (%lu blks)\n", NumChips*8, NumChips);
-    NumChips = RAM2blocks() - 1; //do it again, sometimes get one more, minus one to match reality, not clear why
-    Serial.printf (" RAM2      Blks: %luK (%lu blks)\n", NumChips * 8, NumChips);
-    CrtMax += NumChips * 8 + Num8kSwapBuffers * 8;
-    Serial.printf (" %luk max RAM for CRT w/o swaps\n", (uint32_t) (CrtMax * 1.004)); //larger File size due to header info.
-#endif
+    Serial.printf(" %luMHz  %.1fC\n FW: %s, %s\n", (F_CPU_ACTUAL/1000000), tempmonGetTemp(), __DATE__, __TIME__);
 
     // assuming it's a .crt file, and present on SD drive (verified in main image)
     char *CrtBootNamePath = (char*)malloc (MaxPathLength);
@@ -170,12 +185,23 @@ void setup_min()
     if (!doReset)
     {
         Serial.print ("CRT not loaded, Abort!\n");
-        bTeensyROMRunMode = true; //safety
+        EEPROM.write (eepAdMinBootInd, MinBootInd_FromMin);
+        delay (10);
+        Serial.flush();
+        REBOOT; // Reboot and let it run in full mode
     }
 }
 
 void setup_max()
 {
+    // Allocate RAM_Image for full mode (smaller to leave room for features)
+    RAM_Image = (uint8_t *)malloc(RAM_ImageSize_Max);
+    if (RAM_Image == NULL)
+    {
+        Serial.println("FATAL: Failed to allocate RAM_Image for full mode");
+        REBOOT;
+    }
+
     myusbHost.begin(); // Start USBHost_t36, HUB(s) and USB devices.
 
     uint32_t MagNumRead;
@@ -212,6 +238,7 @@ void setup_max()
 
     MakeBuildInfo();
     Serial.printf ("\n%s\nTeensyROM %s is on-line\n", SerialStringBuf, strVersionNumber);
+    Serial.printf(" %luMHz  %.1fC\n FW: %s, %s\n", (F_CPU_ACTUAL/1000000), tempmonGetTemp(), __DATE__, __TIME__);
     Printf_dbg ("Debug messages enabled!\n");
     Printf_dbg_sw ("Swiftlink debug messages enabled!\n");
 
@@ -284,9 +311,17 @@ void loop_min()
     // MinimalBuild: simplified loop
     if (BtnPressed)
     {
-        Serial.print ("Button detected (minimal)\n");
-        // In minimal mode, button press could trigger reboot or return to main app
-        BtnPressed = false;
+#ifdef Dbg_TestMin
+        Serial.print ("Button detected (minimal) - Rebooting\\n");
+        Serial.flush();
+        REBOOT;  // button does a restart in test min mode
+#else
+        Serial.print ("Button detected (minimal) - Switching to max mode\\n");
+        EEPROM.write (eepAdMinBootInd, MinBootInd_FromMin);
+        delay (10);
+        Serial.flush();
+        REBOOT; // Reboot and run in max mode
+#endif
     }
 
     if (doReset)
@@ -297,6 +332,9 @@ void loop_min()
         delay (50);
         doReset = false;
         SetResetDeassert;
+#ifdef DbgSignalSenseReset
+        attachInterrupt ( digitalPinToInterrupt (DotClk_Debug_PIN), isrButton, FALLING );
+#endif
     }
 }
 

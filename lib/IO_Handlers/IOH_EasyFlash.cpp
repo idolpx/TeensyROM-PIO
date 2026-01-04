@@ -21,11 +21,9 @@
 
 #include "Common_Defs.h"
 #include "FileParsers.h"
-
-#ifdef MinimumBuild
 #include <SD.h>
-extern File myFile;  // Defined in DriveDirLoad.cpp for MinimumBuild
-#endif
+
+extern File myFile;  // Defined in DriveDirLoad.cpp for minimal mode
 
 // Global variable definitions
 stcIOHandlers IOHndlr_EasyFlash =
@@ -43,10 +41,7 @@ stcIOHandlers IOHndlr_EasyFlash =
 uint8_t *BankDecode[NumDecodeBanks][2];
 uint8_t EZFlashRAM[256];
 
-
-
-#ifdef MinimumBuild
-stcSwapBuffers SwapBuffers[Num8kSwapBuffers];
+stcSwapBuffers *SwapBuffers = NULL; // Dynamically allocated in setup_min()
 
 extern bool PathIsRoot();
 extern char DriveDirPath[];
@@ -81,11 +76,9 @@ void LoadBank (uint32_t SeekTo, uint8_t* ptrImage)
     //myFile.close();
     //Printf_dbg("\n %lu mS Load ", millis()-Startms);
 }
-#endif
 
 void InitHndlr_EasyFlash()
 {
-
     //initialize bank decode pointers
     for (uint8_t BankNum = 0; BankNum < NumDecodeBanks; BankNum++)
     {
@@ -102,28 +95,29 @@ void InitHndlr_EasyFlash()
 
     memset (EZFlashRAM, 0, 256);
 
-#ifdef MinimumBuild
-    //initialize/invalidate swap buffer, pre-load first swappable chips
-    uint8_t ChipNum = 0;
-    for (uint8_t BuffNum = 0; BuffNum < Num8kSwapBuffers; BuffNum++)
+    if (!bTeensyROMRunMode)
     {
-        SwapBuffers[BuffNum].Offset = 0; //default to zero/invalid
-        //find next chip marked as swappable
-        while (ChipNum < NumCrtChips)
+        //initialize/invalidate swap buffer, pre-load first swappable chips
+        uint8_t ChipNum = 0;
+        for (uint8_t BuffNum = 0; BuffNum < Num8kSwapBuffers; BuffNum++)
         {
-            if (((uint32_t)CrtChips[ChipNum].ChipROM & SwapSeekAddrMask) == SwapSeekAddrMask)
+            SwapBuffers[BuffNum].Offset = 0; //default to zero/invalid
+            //find next chip marked as swappable
+            while (ChipNum < NumCrtChips)
             {
-                //pre-load and update
-                LoadBank ((uint32_t)CrtChips[ChipNum].ChipROM & ~SwapSeekAddrMask, SwapBuffers[BuffNum].Image);
-                SwapBuffers[BuffNum].Offset = (uint32_t)CrtChips[ChipNum].ChipROM;
-                Printf_Swaps ("Pre%d: %08x\n", BuffNum, (uint32_t) SwapBuffers[BuffNum].Offset & ~SwapSeekAddrMask);
+                if (((uint32_t)CrtChips[ChipNum].ChipROM & SwapSeekAddrMask) == SwapSeekAddrMask)
+                {
+                    //pre-load and update
+                    LoadBank ((uint32_t)CrtChips[ChipNum].ChipROM & ~SwapSeekAddrMask, SwapBuffers[BuffNum].Image);
+                    SwapBuffers[BuffNum].Offset = (uint32_t)CrtChips[ChipNum].ChipROM;
+                    Printf_Swaps ("Pre%d: %08x\n", BuffNum, (uint32_t) SwapBuffers[BuffNum].Offset & ~SwapSeekAddrMask);
+                    ChipNum++;
+                    break;  //exit while
+                }
                 ChipNum++;
-                break;  //exit while
             }
-            ChipNum++;
         }
     }
-#endif
 
     //start with Bank 0:
     LOROM_Image = BankDecode[0][0];
@@ -139,7 +133,6 @@ void InitHndlr_EasyFlash()
     EmulateVicCycles = false;
 }
 
-#ifdef MinimumBuild
 uint8_t *ImageCheckAssign (uint8_t* BankRequested)
 {
     //Printf_dbg(" Ad %08x", (uint32_t)BankRequested);
@@ -160,7 +153,6 @@ uint8_t *ImageCheckAssign (uint8_t* BankRequested)
     //Printf_dbg(" \n");
     return BankRequested;
 }
-#endif
 
 void IO1Hndlr_EasyFlash (uint8_t Address, bool R_Wn)
 {
@@ -173,15 +165,17 @@ void IO1Hndlr_EasyFlash (uint8_t Address, bool R_Wn)
             case 0x00:   // Register $DE00 – EasyFlash Bank (write-only)
                 Data &= 0x3f;
 
-#ifdef MinimumBuild
-                //check if swapped bank is being selected, check for same or initiate swap
-                LOROM_Image = ImageCheckAssign (BankDecode[Data][0]);
-                HIROM_Image = ImageCheckAssign (BankDecode[Data][1]);
-#else
-                LOROM_Image = BankDecode[Data][0];
-                HIROM_Image = BankDecode[Data][1];
-#endif
-
+                if (!bTeensyROMRunMode)
+                {
+                    //check if swapped bank is being selected, check for same or initiate swap
+                    LOROM_Image = ImageCheckAssign (BankDecode[Data][0]);
+                    HIROM_Image = ImageCheckAssign (BankDecode[Data][1]);
+                }
+                else
+                {
+                    LOROM_Image = BankDecode[Data][0];
+                    HIROM_Image = BankDecode[Data][1];
+                }
                 break;
             case 0x02:   // Register $DE02 – EasyFlash Control (write-only)
                 if (Data & 0x80) SetLEDOn; //Status LED, 1 = on
@@ -213,8 +207,7 @@ void IO2Hndlr_EasyFlash (uint8_t Address, bool R_Wn)
 
 void PollingHndlr_EasyFlash()
 {
-#ifdef MinimumBuild
-    if (DMA_State == DMA_S_ActiveReady)
+    if (!bTeensyROMRunMode && DMA_State == DMA_S_ActiveReady)
     {
         //DMA asserted, paused for bank swap from SD
         uint32_t Startms = millis();
@@ -250,5 +243,4 @@ void PollingHndlr_EasyFlash()
         Serial.flush();
         DMA_State = DMA_S_StartDisable;
     }
-#endif
 }

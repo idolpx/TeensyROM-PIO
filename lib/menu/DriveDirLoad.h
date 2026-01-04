@@ -173,16 +173,14 @@ void HandleExecution_max();
 void MenuChange();
 void FreeDriveDirMenu();
 //#ifndef MinimumBuild
-bool LoadFile (FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem);
+bool LoadFile (StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath = NULL);
 void InitDriveDirMenu();
 bool SetDriveDirMenuNameType (uint16_t ItemNum, const char *filename);
 void LoadDirectory (FS *sourceFS);
 void AddDirEntry (const char *EntryString);
 uint8_t Assoc_Ext_ItemType (char * FileName);
 
-//#else
-bool LoadFile (StructMenuItem* MyMenuItem, FS *sourceFS);
-void LoadCRT ( const char *FileNamePath);
+void LoadCRT (const char *FileNamePath);
 //#endif // MinimumBuild
 void FreeCrtChips();
 

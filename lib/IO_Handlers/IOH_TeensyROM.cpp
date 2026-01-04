@@ -668,7 +668,7 @@ FLASHMEM void LoadMainSIDforXfer()
         MyMenuItem.Name = LatestSIDName;
         MyMenuItem.ItemType = rtFileSID;
 
-        if (!LoadFile (sourceFS, LatestSIDLoaded + 1, &MyMenuItem))
+        if (!LoadFile (&MyMenuItem, sourceFS, LatestSIDLoaded + 1))
         {
             //error, load default from TR
             Printf_dbg ("Ld Err, Default SID\n");

@@ -200,7 +200,7 @@ FLASHMEM bool LoadDxxFile (StructMenuItem* MyMenuItem, FS *sourceFS)
         uint32_t CurTSOffset = DxxOffset (DiskType, Track, Sector);
         Printf_dbg ("Track:%d  Sector:%d = D64Offset:$%06x\n", Track, Sector, CurTSOffset);
 
-        if (MyMenuItem->Size + 254 > RAM_ImageSize)
+        if (MyMenuItem->Size + 254 > RAM_ImageSize())
         {
             SendMsgPrintfln ("File too large");
             myFile.close();

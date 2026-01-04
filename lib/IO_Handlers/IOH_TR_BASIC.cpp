@@ -239,7 +239,7 @@ uint8_t ContRegAction_DirPrep()
         Printf_dbg ("%s\n", filename);
 
         entry.close();
-        if (XferSize >= RAM_ImageSize - 80)
+        if (XferSize >= RAM_ImageSize() - 80)
         {
             AddToRAM_Image ("*** Too many files!\r");
             break;

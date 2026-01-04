@@ -32,6 +32,7 @@
 #include "Common_Defs.h"
 
 #include "IOH_TeensyROM.h"
+#include "IOHandlers.h"
 
 // Global variable definitions
 char *StrSIDInfo;
@@ -110,6 +111,7 @@ bool ParseCRTHeader (StructMenuItem* MyMenuItem, uint8_t *EXROM, uint8_t *GAME)
     return true;
 }
 
+
 bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
 {
     static uint8_t *ptrRAM_ImageEnd = NULL;
@@ -133,7 +135,7 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
     if (NumCrtChips == 0) ptrRAM_ImageEnd = RAM_Image; //init RAM1 Buffer pointer
 
     //First try RAM1:
-    if (CrtChips[NumCrtChips].ROMSize + (uint32_t)ptrRAM_ImageEnd - (uint32_t)RAM_Image <= RAM_ImageSize)
+    if (CrtChips[NumCrtChips].ROMSize + (uint32_t)ptrRAM_ImageEnd - (uint32_t)RAM_Image <= RAM_ImageSize())
     {
         CrtChips[NumCrtChips].ChipROM = ptrRAM_ImageEnd;
         ptrRAM_ImageEnd += CrtChips[NumCrtChips].ROMSize;
@@ -173,17 +175,28 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
                //      return false;
                //  }
 
-                if (FullFilePath[0] == 0)
+                if (!bTeensyROMRunMode)
                 {
-                    SendMsgPrintfln ("Must run this crt from SD");
-                    return false;
+                    if (FullFilePath[0] == 0)
+                    {
+                        SendMsgPrintfln ("Must run this crt from SD");
+                        return false;
+                    }
+
+                    SendMsgPrintfln ("Rebooting Teensy to Minimal");
+                    EEPwriteStr (eepAdCrtBootName, FullFilePath);
+                    EEPROM.write (eepAdMinBootInd, MinBootInd_ExecuteMin);
+                    REBOOT;
                 }
-
-                SendMsgPrintfln ("Rebooting Teensy to Minimal");
-                EEPwriteStr (eepAdCrtBootName, FullFilePath);
-                EEPROM.write (eepAdMinBootInd, MinBootInd_ExecuteMin);
-                REBOOT;
-
+                else
+                {
+                    //No room in RAM2, Have to swap!
+                    Printf_dbg("S");
+                    //SendMsgPrintfln("Not enough room: %d", NumCrtChips); 
+                    //return false;       
+                
+                    CrtChips[NumCrtChips].ChipROM = (uint8_t*)SwapSeekAddrMask;
+                }
             }
             else
             {
@@ -450,14 +463,14 @@ bool SetTypeFromCRT (StructMenuItem* MyMenuItem, uint8_t EXROM, uint8_t GAME)
         return true;
     }
 
-    if (                                     CrtChips[0].ROMSize == 0x2000 && EXROM == 1 && GAME == 0)
+    if (CrtChips[0].ROMSize == 0x2000 && EXROM == 1 && GAME == 0)
     {
         MyMenuItem->ItemType = rtBin8kHi;
         SendMsgPrintfln (" 8kHi/Ultimax config");
         return true;
     }
 
-    if (CrtChips[0].LoadAddress == 0x8000                                  && EXROM == 0 && GAME == 0) //Zaxxon ROMSize is 0x1000, all others 0x4000
+    if (CrtChips[0].LoadAddress == 0x8000 && EXROM == 0 && GAME == 0) //Zaxxon ROMSize is 0x1000, all others 0x4000
     {
         MyMenuItem->ItemType = rtBin16k;
         SendMsgPrintfln (" 16k config");
@@ -500,7 +513,9 @@ bool AssocHWID_IOH (uint16_t HWType)
     {
         if (HWType == HWID_IOH_Assoc[Num].HWID)
         {
-            IO1[rwRegNextIOHndlr] = HWID_IOH_Assoc[Num].IOH;
+            NextIOHandlerIndex = HWID_IOH_Assoc[Num].IOH;  // Store for both modes
+            if (bTeensyROMRunMode && IO1 != NULL)
+                IO1[rwRegNextIOHndlr] = HWID_IOH_Assoc[Num].IOH;
             return true;
         }
         Num++;

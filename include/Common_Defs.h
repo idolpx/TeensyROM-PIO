@@ -127,42 +127,47 @@ struct stcSwapBuffers
                              //  Must be even number for 16k banks
                              //  Have seen SNKvsCAP (stronger) use 14 within a scene
                              //  Used by EZFlash and MagicDesk2 only
-                             //     Leave space (with Eth Listen on) for other cart types up to 512k that don't use it 
+                             //     Leave space (with Eth Listen on) for other cart types up to 512k that don't use it
+
+#ifdef __cplusplus
+extern stcSwapBuffers *SwapBuffers; // Dynamically allocated for minimal mode (NULL in full mode) 
                              //      (5_OceanType1 , 15_GameSystem3, 60_GMod2)
+#endif
 
 #define Printf_Swaps     Printf_dbg   //Serial.printf  //
 
-#ifdef MinimumBuild
-// Minimum build specific configuration
-
+// RAM allocation for both modes - allocate maximum size (minimal mode)
+// Minimal mode needs more RAM for large CRT files
 #ifdef FeatTCPListen
    #define EthernetDeduction   104  
-   //Ethernet takes this from RAM1 and another ~96k from RAM2 (when initialized/enabled), plus uses more local variables (see below)
+   //Ethernet takes this from RAM1 and another ~96k from RAM2 (when initialized/enabled), plus uses more local variables
    // Total: ~200k of RAM needed to support Ethernet, 100k if disabled
-
-   // Test case: USB monitor *not* connected (passes when connected) crashes on startup, before full image handoff
-   //   RAM1: variables:344292, code:136168, padding:27672   free for local variables:16156 <--not enough, crash
-   //   RAM1: variables:340196, code:136168, padding:27672   free for local variables:20252 <--Fails intermittently?
-   //   RAM1: variables:336100, code:136424, padding:27416   free for local variables:24348 <--Reliable
-   //    *Need >24000 RAM1 free for local
-
 #else
    #define EthernetDeduction    0
 #endif
 
-#define MaxRAM_ImageSize  (392-8*Num8kSwapBuffers-EthernetDeduction)  // base minus space for 8k swap blocks and ethernet needs
-#else
-#define MaxRAM_ImageSize  (128)  // RAM1 space (in kB) used for CRT & Transfer buffer
-#endif
+// MaxRAM_ImageSize for each mode
+#define MaxRAM_ImageSize_Min  (392-8*Num8kSwapBuffers-EthernetDeduction)  // Minimal mode: base minus swap blocks and ethernet
+#define MaxRAM_ImageSize_Max  (128)  // Full mode: RAM1 space (in kB) used for CRT & Transfer buffer
+
+// Allocate the maximum size (minimal mode needs more)
+#define MaxRAM_ImageSize  MaxRAM_ImageSize_Min
 
 #ifdef DbgMsgs_IO  //Debug msgs mode: reduced RAM_ImageSize
    #define Printf_dbg Serial.printf
-   #define RAM_ImageSize       ((MaxRAM_ImageSize-24)*1024)
+   #define RAM_ImageSize_Min       ((MaxRAM_ImageSize_Min-24)*1024)
+   #define RAM_ImageSize_Max       ((MaxRAM_ImageSize_Max-24)*1024)
 #else //Normal mode: maximize RAM_ImageSize
    __attribute__((always_inline)) inline void Printf_dbg(const char* format, ...) {};
-   #define RAM_ImageSize       (MaxRAM_ImageSize*1024)
+   #define RAM_ImageSize_Min       (MaxRAM_ImageSize_Min*1024)
+   #define RAM_ImageSize_Max       (MaxRAM_ImageSize_Max*1024)
 #endif
-extern uint8_t RAM_Image[RAM_ImageSize]; // Main RAM1 file storage buffer
+extern uint8_t *RAM_Image; // Main RAM1 file storage buffer (dynamically allocated based on mode)
+
+// Helper to get current RAM_Image size based on run mode
+inline uint32_t RAM_ImageSize() {
+    return bTeensyROMRunMode ? RAM_ImageSize_Max : RAM_ImageSize_Min;
+}
 
 
 extern uint8_t *XferImage; //pointer to image being transfered to C64

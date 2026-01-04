@@ -40,9 +40,10 @@ stcIOHandlers IOHndlr_MagicDesk2 =
 
 void InitHndlr_MagicDesk2()
 {
-#ifdef MinimumBuild
-    //initialize/invalidate swap buffer, pre-load first swappable chips
-    uint8_t ChipNum = 0;
+    if (!bTeensyROMRunMode)
+    {
+        //initialize/invalidate swap buffer, pre-load first swappable chips
+        uint8_t ChipNum = 0;
     for (uint8_t BuffNum = 0; BuffNum < Num8kSwapBuffers; BuffNum++)
     {
         SwapBuffers[BuffNum].Offset = 0; //default to zero/invalid
@@ -67,7 +68,7 @@ void InitHndlr_MagicDesk2()
             ChipNum++;
         }
     }
-#endif
+    }
 
     //start with Bank 0:
     LOROM_Image = CrtChips[0].ChipROM;
@@ -91,22 +92,24 @@ void IO1Hndlr_MagicDesk2 (uint8_t Address, bool R_Wn)
             //Printf_dbg("B:%d", Data);
             Data &= 0x7f;
 
-#ifdef MinimumBuild
-            //check if swapped bank is being selected, check for same or initiate swap
-            LOROM_Image = ImageCheckAssign (CrtChips[Data].ChipROM);
-            HIROM_Image = ImageCheckAssign (CrtChips[Data].ChipROM + 0x2000);
-#else
-            LOROM_Image = CrtChips[Data].ChipROM;
-            HIROM_Image = CrtChips[Data].ChipROM + 0x2000;
-#endif
+            if (!bTeensyROMRunMode)
+            {
+                //check if swapped bank is being selected, check for same or initiate swap
+                LOROM_Image = ImageCheckAssign (CrtChips[Data].ChipROM);
+                HIROM_Image = ImageCheckAssign (CrtChips[Data].ChipROM + 0x2000);
+            }
+            else
+            {
+                LOROM_Image = CrtChips[Data].ChipROM;
+                HIROM_Image = CrtChips[Data].ChipROM + 0x2000;
+            }
         }
     }
 }
 
 void PollingHndlr_MagicDesk2()
 {
-#ifdef MinimumBuild
-    if (DMA_State == DMA_S_ActiveReady)
+    if (!bTeensyROMRunMode && DMA_State == DMA_S_ActiveReady)
     {
         //DMA asserted, paused for bank swap from SD
         uint32_t Startms = millis();
@@ -132,5 +135,4 @@ void PollingHndlr_MagicDesk2()
         Serial.flush();
         DMA_State = DMA_S_StartDisable;
     }
-#endif
 }

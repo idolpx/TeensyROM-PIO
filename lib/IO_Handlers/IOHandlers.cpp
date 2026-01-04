@@ -26,6 +26,7 @@ const unsigned char *HIROM_Image = NULL;
 const unsigned char *LOROM_Image = NULL;
 uint16_t LOROM_Mask = 0, HIROM_Mask = 0;
 volatile uint8_t DMA_State = DMA_S_DisableReady;
+uint8_t NextIOHandlerIndex = IOH_None;  // Used by minimal mode for CRT loading
 
 stcIOHandlers *IOHandler[] =
 {

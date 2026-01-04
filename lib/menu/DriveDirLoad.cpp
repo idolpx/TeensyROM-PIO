@@ -41,24 +41,24 @@ StructHWID_IOH_Assoc HWID_IOH_Assoc[] =
 {
     //HWID                  IOH
 #ifndef MinimumBuild
-    (uint16_t)Cart_MIDI_Datel,      IOH_MIDI_Datel,
-    (uint16_t)Cart_MIDI_Sequential, IOH_MIDI_Sequential,
-    (uint16_t)Cart_MIDI_Passport,   IOH_MIDI_Passport,
-    (uint16_t)Cart_MIDI_Namesoft,   IOH_MIDI_NamesoftIRQ,
-    (uint16_t)Cart_SwiftLink,       IOH_Swiftlink,
-    (uint16_t)Cart_Turbo232,        IOH_Swiftlink,
+    (uint16_t)Cart_MIDI_Datel,          IOH_MIDI_Datel,
+    (uint16_t)Cart_MIDI_Sequential,     IOH_MIDI_Sequential,
+    (uint16_t)Cart_MIDI_Passport,       IOH_MIDI_Passport,
+    (uint16_t)Cart_MIDI_Namesoft,       IOH_MIDI_NamesoftIRQ,
+    (uint16_t)Cart_SwiftLink,           IOH_Swiftlink,
+    (uint16_t)Cart_Turbo232,            IOH_Swiftlink,
 #endif
-    (uint16_t)Cart_EpyxFastload,    IOH_EpyxFastLoad,
-    (uint16_t)Cart_MagicDesk,       IOH_MagicDesk,
-    (uint16_t)Cart_Dinamic,         IOH_Dinamic,
-    (uint16_t)Cart_Oceantype1,      IOH_Ocean1,
-    (uint16_t)Cart_FunPlayPowerPlay, IOH_FunPlay,
-    (uint16_t)Cart_SuperGames, IOH_SuperGames,
-    (uint16_t)Cart_C64GameSystem3, IOH_C64GameSystem3,
-    (uint16_t)Cart_EasyFlash, IOH_EasyFlash,
-    (uint16_t)Cart_ZaxxonSuper, IOH_ZaxxonSuper,
-    (uint16_t)Cart_GMod2, IOH_GMod2,
-    (uint16_t)Cart_MagicDesk2, IOH_MagicDesk2,
+    (uint16_t)Cart_EpyxFastload,        IOH_EpyxFastLoad,
+    (uint16_t)Cart_MagicDesk,           IOH_MagicDesk,
+    (uint16_t)Cart_Dinamic,             IOH_Dinamic,
+    (uint16_t)Cart_Oceantype1,          IOH_Ocean1,
+    (uint16_t)Cart_FunPlayPowerPlay,    IOH_FunPlay,
+    (uint16_t)Cart_SuperGames,          IOH_SuperGames,
+    (uint16_t)Cart_C64GameSystem3,      IOH_C64GameSystem3,
+    (uint16_t)Cart_EasyFlash,           IOH_EasyFlash,
+    (uint16_t)Cart_ZaxxonSuper,         IOH_ZaxxonSuper,
+    (uint16_t)Cart_GMod2,               IOH_GMod2,
+    (uint16_t)Cart_MagicDesk2,          IOH_MagicDesk2,
 };
 
 #ifndef MinimumBuild
@@ -110,6 +110,7 @@ void HandleExecution()
 void HandleExecution_min()
 {
     if (DriveDirMenu == NULL) return;
+    Printf_dbg ("HandleExecution_min\n");
     StructMenuItem MenuSelCpy = *DriveDirMenu; //local copy selected menu item to modify
 
     if (!LoadFile (&MenuSelCpy, &SD)) return;
@@ -164,142 +165,28 @@ void HandleExecution_min()
     {
         BigBufCount = 0;
 
-        if (IO1[rwRegNextIOHndlr] >= IOH_Num_Handlers)
+        // Minimal mode: Use NextIOHandlerIndex set by CRT parser
+        // IO1 array is not available in minimal mode
+        if (NextIOHandlerIndex >= IOH_Num_Handlers)
         {
             Serial.println ("***IOHandler out of range");
-            return;
+            NextIOHandlerIndex = IOH_None;
         }
 
-        Serial.printf ("Loading IO handler: %s\n", IOHandler[IO1[rwRegNextIOHndlr]]->Name);
+        Serial.printf ("Loading IO handler: %s\n", IOHandler[NextIOHandlerIndex]->Name);
 
-        if (IOHandler[IO1[rwRegNextIOHndlr]]->InitHndlr != NULL) IOHandler[IO1[rwRegNextIOHndlr]]->InitHndlr();
+        if (IOHandler[NextIOHandlerIndex]->InitHndlr != NULL) 
+            IOHandler[NextIOHandlerIndex]->InitHndlr();
 
         Serial.flush();
-        CurrentIOHandler = IO1[rwRegNextIOHndlr];
+        CurrentIOHandler = NextIOHandlerIndex;
         doReset = true;
     }
 
 }
 
 
-bool LoadFile (StructMenuItem* MyMenuItem, FS *sourceFS)
-{
-    char FullFilePath[MaxNamePathLength];
-    uint32_t SwapBanksDetected = 0;
 
-    if (PathIsRoot()) sprintf (FullFilePath, "%s%s", DriveDirPath, MyMenuItem->Name); // at root
-    else sprintf (FullFilePath, "%s/%s", DriveDirPath, MyMenuItem->Name);
-
-    SendMsgPrintfln ("Loading:\r\n%s", FullFilePath);
-
-    myFile = sourceFS->open (FullFilePath, FILE_READ);
-
-    if (!myFile)
-    {
-        SendMsgPrintfln ("File Not Found");
-        return false;
-    }
-
-    MyMenuItem->Size = myFile.size();
-    uint32_t count = 0;
-
-    if (MyMenuItem->ItemType == rtFileCrt)
-    {
-        //load the CRT
-        uint8_t lclBuf[CRT_MAIN_HDR_LEN];
-        uint8_t EXROM;
-        uint8_t GAME;
-
-        if (MyMenuItem->Size < 0x1000)
-        {
-            SendMsgPrintfln ("Too Short for CRT");
-            myFile.close();
-            return false;
-        }
-
-        //load header and parse
-        for (count = 0; count < CRT_MAIN_HDR_LEN; count++) lclBuf[count] = myFile.read(); //Read main header
-        MyMenuItem->Code_Image = lclBuf;
-        if (!ParseCRTHeader (MyMenuItem, &EXROM, &GAME)) //sends error messages
-        {
-            myFile.close();
-            return false;
-        }
-
-        //process Chip Packets
-        FreeCrtChips();  //clears any previous and resets NumCrtChips
-        Printf_dbg ("\n Chp# Length    Type  Bank  Addr  Size\n");
-        while (myFile.available())
-        {
-            if (NumCrtChips == MAX_CRT_CHIPS)
-            {
-                SendMsgPrintfln ("More than %d CRT Chips found", MAX_CRT_CHIPS);
-                myFile.close();
-                FreeCrtChips();
-                return false;
-            }
-
-            for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count] = myFile.read(); //Read chip header
-            if (!ParseChipHeader (lclBuf, "")) //sends error messages
-            {
-                myFile.close();
-                FreeCrtChips();
-                return false;
-            }
-            // Special case for swap-out
-            // RAM1: 0x200XXXXX,  RAM2: 0x202XXXXX,  RAM"3" = SwapSeekAddrMask
-            if (CrtChips[NumCrtChips].ChipROM == (uint8_t * )SwapSeekAddrMask)
-            {
-                CrtChips[NumCrtChips].ChipROM = (uint8_t*) (SwapSeekAddrMask + myFile.position());
-                //Printf_dbg("upd: %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
-                //don't load it now, skip past...
-                myFile.seek (myFile.position() + CrtChips[NumCrtChips].ROMSize);
-                //for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) myFile.read();//just seek past it
-                SwapBanksDetected++;  //count to leave file open for swaps
-            }
-            else
-            {
-                for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) CrtChips[NumCrtChips].ChipROM[count] = myFile.read(); //read in ROM info:
-            }
-
-            Printf_dbg (" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
-            NumCrtChips++;
-        }
-
-        //check configuration
-        if (!SetTypeFromCRT (MyMenuItem, EXROM, GAME)) //sends error messages
-        {
-            myFile.close();
-            FreeCrtChips();
-            return false;
-        }
-    }
-
-    else //non-CRT: Load the whole thing into the RAM1 buffer
-    {
-        if (MyMenuItem->Size > RAM_ImageSize)
-        {
-            SendMsgPrintfln ("Non-CRT file too large");
-            myFile.close();
-            return false;
-        }
-
-        while (myFile.available() && count < MyMenuItem->Size) RAM_Image[count++] = myFile.read();
-
-        myFile.close();
-        if (count != MyMenuItem->Size)
-        {
-            SendMsgPrintfln ("Size Mismatch");
-            return false;
-        }
-    }
-
-    if (SwapBanksDetected) SendMsgPrintfln ("%d Banks Flagged For Swapping", SwapBanksDetected);
-    else myFile.close(); // close if there are no swap banks.
-
-    SendMsgPrintfln ("Done");
-    return true;
-}
 
 
 void HandleExecution_max()
@@ -374,7 +261,7 @@ void HandleExecution_max()
             }
             else
             {
-                if (!LoadFile (sourceFS, DriveDirPath, &MenuSelCpy)) return;
+                if (!LoadFile (&MenuSelCpy, sourceFS, DriveDirPath)) return;
             }
 
             MenuSelCpy.Code_Image = RAM_Image;
@@ -604,40 +491,48 @@ void MenuChange()
 }
 
 
-bool LoadFile (FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem)
+bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
 {
     char FullFilePath[MaxNamePathLength];
+    uint32_t SwapBanksDetected = 0;
 
     //PathIsRoot() uses DriveDirPath directly
-    if (strlen (FilePath) == 1 && FilePath[0] == '/') sprintf (FullFilePath, "%s%s", FilePath, MyMenuItem->Name); // at root
-    else sprintf (FullFilePath, "%s/%s", FilePath, MyMenuItem->Name);
-
-    SendMsgPrintfln ("Loading:\r\n%s", FullFilePath);
-
-    File myFile = sourceFS->open (FullFilePath, FILE_READ);
-
-    if (sourceFS != &SD) FullFilePath[0] = 0; //terminate if not SD
-
-    if (!myFile)
+    if (FilePath)
     {
-        SendMsgPrintfln ("File Not Found");
+        if (strlen(FilePath) == 1 && FilePath[0] == '/') sprintf(FullFilePath, "%s%s", FilePath, MyMenuItem->Name);  // at root
+        else sprintf(FullFilePath, "%s/%s", FilePath, MyMenuItem->Name);
+    }
+    else
+    {
+        if (PathIsRoot()) sprintf(FullFilePath, "%s%s", DriveDirPath, MyMenuItem->Name);  // at root
+        else sprintf(FullFilePath, "%s/%s", DriveDirPath, MyMenuItem->Name);
+    }
+
+    SendMsgPrintfln("Loading:\r\n%s", FullFilePath);
+
+    File myFile = sourceFS->open(FullFilePath, FILE_READ);
+
+    if (!bTeensyROMRunMode && sourceFS != &SD) FullFilePath[0] = 0; //terminate if not SD
+
+    if (!myFile) 
+    {
+        SendMsgPrintfln("File Not Found");
         return false;
     }
 
     MyMenuItem->Size = myFile.size();
-    uint32_t count = 0;
+    uint32_t count=0;
 
     if (MyMenuItem->ItemType == rtFileCrt)
-    {
-        //load the CRT
+    {  //load the CRT
 
         // No longer enforcing this, swap out if too large:
         //if(MyMenuItem->Size > MaxCRTKB*1024)
         //{
-        //   SendMsgPrintfln("Not enough room");
-        //   SendMsgPrintfln("  Size: %luk, Max CRT: %luk", MyMenuItem->Size/1024, MaxCRTKB);
+        //   SendMsgPrintfln("Not enough room"); 
+        //   SendMsgPrintfln("  Size: %luk, Max CRT: %luk", MyMenuItem->Size/1024, MaxCRTKB); 
         //   myFile.close();
-        //   return false;
+        //   return false;         
         //}
 
         uint8_t lclBuf[CRT_MAIN_HDR_LEN];
@@ -646,72 +541,95 @@ bool LoadFile (FS *sourceFS, const char* FilePath, StructMenuItem* MyMenuItem)
 
         if (MyMenuItem->Size < 0x1000)
         {
-            SendMsgPrintfln ("Too Short for CRT");
+            SendMsgPrintfln("Too Short for CRT");
             myFile.close();
-            return false;
+            return false;        
         }
 
         //load header and parse
-        for (count = 0; count < CRT_MAIN_HDR_LEN; count++) lclBuf[count] = myFile.read(); //Read main header
+        for (count = 0; count < CRT_MAIN_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read main header
         MyMenuItem->Code_Image = lclBuf;
-        if (!ParseCRTHeader (MyMenuItem, &EXROM, &GAME)) //sends error messages
+        if (!ParseCRTHeader(MyMenuItem, &EXROM, &GAME)) //sends error messages
         {
             myFile.close();
-            return false;
+            return false;        
         }
 
         //IO1[rwRegNextIOHndlr] is now assigned from crt!
         //process Chip Packets
         FreeCrtChips();  //clears any previous and resets NumCrtChips
-        Printf_dbg ("\n Chp# Length    Type  Bank  Addr  Size\n");
+        Printf_dbg("\n Chp# Length    Type  Bank  Addr  Size\n");
         while (myFile.available())
         {
-            for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count] = myFile.read(); //Read chip header
-            if (!ParseChipHeader (lclBuf, FullFilePath)) //sends error messages
+            if (NumCrtChips == MAX_CRT_CHIPS)
+            {
+                SendMsgPrintfln("More than %d CRT Chips found", MAX_CRT_CHIPS); 
+                myFile.close();
+                FreeCrtChips();
+                return false;
+            }
+
+            for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read chip header
+            if (!ParseChipHeader(lclBuf, FullFilePath)) //sends error messages
             {
                 myFile.close();
                 FreeCrtChips();
-                IO1[rwRegNextIOHndlr] = EEPROM.read (eepAdNextIOHndlr); //in case it was over-ridden by .crt
+                IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
                 RedirectEmptyDriveDirMenu();
                 return false;
             }
-            for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) CrtChips[NumCrtChips].ChipROM[count] = myFile.read(); //read in ROM info:
+            // Special case for swap-out
+            // RAM1: 0x200XXXXX,  RAM2: 0x202XXXXX,  RAM"3" = SwapSeekAddrMask
+            if (CrtChips[NumCrtChips].ChipROM == (uint8_t*)SwapSeekAddrMask)
+            {
+                CrtChips[NumCrtChips].ChipROM = (uint8_t*)(SwapSeekAddrMask + myFile.position());   
+                //Printf_dbg("upd: %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
+                //don't load it now, skip past...
+                myFile.seek(myFile.position() + CrtChips[NumCrtChips].ROMSize);
+                //for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) myFile.read();//just seek past it
+                SwapBanksDetected++;  //count to leave file open for swaps
+            }
+            else
+            {
+                for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) CrtChips[NumCrtChips].ChipROM[count]=myFile.read();//read in ROM info:
+            }
             NumCrtChips++;
         }
 
         //check configuration
-        if (!SetTypeFromCRT (MyMenuItem, EXROM, GAME)) //sends error messages
+        if (!SetTypeFromCRT(MyMenuItem, EXROM, GAME)) //sends error messages
         {
             myFile.close();
             FreeCrtChips();
-            IO1[rwRegNextIOHndlr] = EEPROM.read (eepAdNextIOHndlr); //in case it was over-ridden by .crt
+            IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
             RedirectEmptyDriveDirMenu();
-            return false;
+            return false;        
         }
     }
-
     else //non-CRT: Load the whole thing into the RAM1 buffer
     {
-        if (MyMenuItem->Size > RAM_ImageSize)
+        if (MyMenuItem->Size > RAM_ImageSize())
         {
-            SendMsgPrintfln ("Non-CRT file too large");
-            SendMsgPrintfln ("  Size: %luk, Max: %luk", MyMenuItem->Size / 1024, RAM_ImageSize / 1024);
+            SendMsgPrintfln("Non-CRT file too large");
+            SendMsgPrintfln("  Size: %luk, Max: %luk", MyMenuItem->Size/1024, RAM_ImageSize()/1024); 
             myFile.close();
             return false;
         }
 
-        while (myFile.available() && count < MyMenuItem->Size) RAM_Image[count++] = myFile.read();
+        while (myFile.available() && count < MyMenuItem->Size) RAM_Image[count++]=myFile.read();
 
         myFile.close();
         if (count != MyMenuItem->Size)
         {
-            SendMsgPrintfln ("Size Mismatch");
-            myFile.close();
+            SendMsgPrintfln("Size Mismatch");
             return false;
         }
     }
 
-    SendMsgPrintfln ("Done");
+    if (SwapBanksDetected) SendMsgPrintfln("%d Banks Flagged For Swapping", SwapBanksDetected);
+    else myFile.close(); // close if there are no swap banks.
+
+    SendMsgPrintfln("Done");
     myFile.close();
     return true;
 }
@@ -868,9 +786,7 @@ uint8_t Assoc_Ext_ItemType (char * FileName)
 
 void LoadCRT ( const char *FileNamePath)
 {
-    //Launch (emulate) .crt file - Full build version
-
-    IO1[rWRegCurrMenuWAIT] = rmtSD;
+    // Minimal mode: use single static struct, don't access IO1
     SD.begin (BUILTIN_SDCARD); // refresh, takes 3 seconds for fail/unpopulated, 20-200mS populated
 
     //set path & filename
@@ -889,37 +805,33 @@ void LoadCRT ( const char *FileNamePath)
         ptrFilename++; //inc to point to filename
     }
 
-    // Initialize directory menu
-    InitDriveDirMenu();
-    
-    // Set up menu item for the CRT file
-    if (!SetDriveDirMenuNameType (0, ptrFilename))
-    {
-        SendMsgPrintfln ("Failed to allocate menu item");
-        return;
-    }
-    DriveDirMenu[0].ItemType = rtFileCrt;
-    NumDrvDirMenuItems = 1;
+    // Set up single menu item for minimal mode
+    DriveDirMenu_Minimal.Name = ptrFilename;
+    DriveDirMenu_Minimal.ItemType = rtFileCrt;
+    DriveDirMenu_Minimal.IOHndlrAssoc = IOH_None;
+    DriveDirMenu_Minimal.Code_Image = NULL;
+    DriveDirMenu_Minimal.Size = 0;
+    DriveDirMenu = &DriveDirMenu_Minimal;  // Point to the single struct
 
-    // Load and execute the CRT
-    if (!bTeensyROMRunMode)
-    {
-        // Minimal mode: use single menu item
-        HandleExecution();
-    }
-    else
-    {
-        // Full mode: use menu system
-        SelItemFullIdx = 0;
-        MenuSource = DriveDirMenu;
-        HandleExecution();
-    }
+    Printf_dbg ("Loading CRT: %s/%s\n", DriveDirPath, ptrFilename);
+
+    HandleExecution();
 }
 
 void FreeCrtChips()
 {
     //free chips allocated in RAM2 and reset NumCrtChips
     for (uint16_t cnt = 0; cnt < NumCrtChips; cnt++)
-        if ((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000) free (CrtChips[cnt].ChipROM);
+        if (!bTeensyROMRunMode)
+        {   // Minimal mode: only free if allocated in RAM2
+            if((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000 && (uint32_t)CrtChips[cnt].ChipROM < SwapSeekAddrMask)
+                free(CrtChips[cnt].ChipROM);
+        }
+        else
+        {   // Full mode: free if allocated in RAM2
+            if ((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000)
+                free (CrtChips[cnt].ChipROM);
+        }
+
     NumCrtChips = 0;
 }
