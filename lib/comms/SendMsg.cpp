@@ -1,5 +1,4 @@
 
-#ifndef MinimumBuild
 #include "SendMsg.h"
 
 #include <Arduino.h>
@@ -56,4 +55,3 @@ void SendMsgSerialStringBuf()
     Serial.printf ("\nTimeout!\n");
 }
 
-#endif

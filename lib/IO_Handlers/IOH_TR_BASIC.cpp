@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 // MIT License
 //
 // Copyright (c) 2024 Travis Smith
@@ -405,5 +404,3 @@ void PollingHndlr_TR_BASIC()
     }
 }
 
-
-#endif

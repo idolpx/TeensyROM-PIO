@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 // MIT License
 //
 // Copyright (c) 2023 Travis Smith
@@ -480,4 +479,3 @@ void SetRandomSeed()
     Printf_dbg ("Setting Random Seed\n");
     randomSeed (ARM_DWT_CYCCNT);
 }
-#endif

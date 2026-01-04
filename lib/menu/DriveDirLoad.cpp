@@ -40,14 +40,12 @@ char DriveDirPath[MaxPathLength];
 StructHWID_IOH_Assoc HWID_IOH_Assoc[] =
 {
     //HWID                  IOH
-#ifndef MinimumBuild
     (uint16_t)Cart_MIDI_Datel,          IOH_MIDI_Datel,
     (uint16_t)Cart_MIDI_Sequential,     IOH_MIDI_Sequential,
     (uint16_t)Cart_MIDI_Passport,       IOH_MIDI_Passport,
     (uint16_t)Cart_MIDI_Namesoft,       IOH_MIDI_NamesoftIRQ,
     (uint16_t)Cart_SwiftLink,           IOH_Swiftlink,
     (uint16_t)Cart_Turbo232,            IOH_Swiftlink,
-#endif
     (uint16_t)Cart_EpyxFastload,        IOH_EpyxFastLoad,
     (uint16_t)Cart_MagicDesk,           IOH_MagicDesk,
     (uint16_t)Cart_Dinamic,             IOH_Dinamic,
@@ -61,7 +59,6 @@ StructHWID_IOH_Assoc HWID_IOH_Assoc[] =
     (uint16_t)Cart_MagicDesk2,          IOH_MagicDesk2,
 };
 
-#ifndef MinimumBuild
 StructExt_ItemType_Assoc Ext_ItemType_Assoc[] =
 {
     //Update Win UI if this changes
@@ -87,9 +84,8 @@ StructExt_ItemType_Assoc Ext_ItemType_Assoc[] =
     "d81",  rtD81,
     //"c64",  rtFilePrg,  //makefile output, not always prg...
 };
-#endif
 
-// Global variables used in both MinimumBuild and full build
+// Global variables used in both modes
 uint8_t NumCrtChips = 0;
 StructCrtChip CrtChips[MAX_CRT_CHIPS];
 

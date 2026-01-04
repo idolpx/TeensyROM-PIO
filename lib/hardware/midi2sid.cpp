@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 #include "midi2sid.h"
 
 #include <Arduino.h>
@@ -160,5 +159,3 @@ void M2SOnPitchChange (uint8_t channel, int pitch)
     Serial.printf ("     0-6= %02x, 7-13=%02x\n", pitch & 0x7f, (pitch >> 7) & 0x7f);
 #endif
 }
-
-#endif // MinimumBuild

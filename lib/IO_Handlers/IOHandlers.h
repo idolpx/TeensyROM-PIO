@@ -24,14 +24,12 @@
 #define nfcStateBitDisabled   1
 #define nfcStateBitPaused     2
 
-#ifndef MinimumBuild
 #include "IOH_ASID.h"
 #include "IOH_Debug.h"
 #include "IOH_MIDI.h"
 #include "IOH_Swiftlink.h"
 #include "IOH_TeensyROM.h"
 #include "IOH_TR_BASIC.h"
-#endif
 
 #include "IOH_C64GameSystem3.h"
 #include "IOH_Dinamic.h"
@@ -50,13 +48,6 @@
 extern stcIOHandlers *IOHandler[];  //Synch order/qty with enum enumIOHandlers
 extern uint8_t CurrentIOHandler;
 extern uint8_t NextIOHandlerIndex;  // Used by minimal mode for CRT loading
-
-#ifdef MinimumBuild
-// Variables normally defined in IOH_TeensyROM.cpp, which is excluded in MinimumBuild
-extern volatile uint8_t *IO1;
-extern volatile uint8_t doReset;
-extern uint16_t NumItemsFull;
-#endif
 
 void IOHandlerNextInit();
 void IOHandlerSelectInit();

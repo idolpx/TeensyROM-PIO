@@ -53,7 +53,7 @@
 #include "ROMs/TeensyROMC64.h"
 //#include "ROMs/Terminator_2.crt.h" //can require minimal build if Ethernet, etc enabled
 //#include "ROMs/ember_head.prg.h"   //now /Pics/T_Ember_Head.kla
-//#include "ROMs/disp_fract.prg.h"   //now /Pics/T_BlackHole.kla
+#include "ROMs/disp_fract.prg.h"   //now /Pics/T_BlackHole.kla
 //#include "SIDs/YYZ.sid.h"          //mem conflict with TR app
 
 #include "PETSCII/Text_Viewer_Instructions.seq.h"

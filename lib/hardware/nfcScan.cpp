@@ -21,7 +21,6 @@
 //  Copyright (c) 2023 Travis Smith <travis@sensoriumembedded.com>
 
 
-#ifndef MinimumBuild
 #include "nfcScan.h"
 
 #include <SD.h>
@@ -350,11 +349,7 @@ bool nfcReadTagLaunch (uint8_t* uid, uint8_t uidLength)
         StructMenuItem *LocalDirMenu;
 
         Printf_dbg ("Random requested\n");
-#ifndef MinimumBuild
         SetRandomSeed();
-#else
-        randomSeed (ARM_DWT_CYCCNT);
-#endif
 
         pDataStart[strlen ((char*)pDataStart) -1] = 0; //remove the "?"
 
@@ -518,5 +513,3 @@ FLASHMEM void nfcWriteTag (const char* TxtMsg)
 
     SendMsgPrintfln ("Success!");
 }
-
-#endif // MinimumBuild

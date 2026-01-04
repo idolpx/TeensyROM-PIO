@@ -1,5 +1,4 @@
 
-#ifndef MinimumBuild
 #include "FileTransfer.h"
 
 #include <Arduino.h>
@@ -674,5 +673,3 @@ FLASHMEM void GetFileCommand()
 
     SendU16 (AckToken);
 }
-
-#endif // MinimumBuild

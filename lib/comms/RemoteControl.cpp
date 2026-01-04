@@ -28,7 +28,6 @@
 //  TR: sees ack2, success/return
 // C64: Executes command
 
-#ifndef MinimumBuild
 #include "RemoteControl.h"
 
 #include "Common_Defs.h"
@@ -36,10 +35,8 @@
 #include <stdint.h>
 #include <EEPROM.h>
 
-#ifndef MinimumBuild
 #include "IOH_TeensyROM.h"
 #include "IOH_Swiftlink.h"
-#endif
 #include "Menu_Regs.h"
 #include "SerUSBIO.h"
 
@@ -244,9 +241,10 @@ void RemoteLaunch (RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoC
 
     //free mem for DriveDirMenu in case current (non-tr) handler is using it all
     FreeCrtChips();
-#ifndef MinimumBuild
-    FreeSwiftlinkBuffs();
-#endif
+    if (bTeensyROMRunMode)
+    {
+        FreeSwiftlinkBuffs();
+    }
     InitDriveDirMenu();
 
     if (MenuSourceID == rmtTeensy)
@@ -325,13 +323,11 @@ void RemoteLaunch (RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoC
     }
 
     //Get the attention of the C64 via IRQ or reset:
-#ifndef MinimumBuild
-    if (CurrentIOHandler == IOH_TeensyROM)
+    if (bTeensyROMRunMode && CurrentIOHandler == IOH_TeensyROM)
     {
         Printf_dbg ("Interrupt/launch\n");
         if (InterruptC64 (RegIRQCommands::ricmdLaunch)) return;
     }
-#endif
 
     //force reset then launch
     Printf_dbg ("Reset/launch\n");
@@ -339,5 +335,3 @@ void RemoteLaunch (RegMenuTypes MenuSourceID, const char *FileNamePath, bool DoC
     SetUpMainMenuROM(); //includes DoReset flag set
 
 }
-
-#endif // MinimumBuild

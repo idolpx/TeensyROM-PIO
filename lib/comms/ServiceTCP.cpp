@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 #ifdef FeatTCPListen
 
 #include "ServiceTCP.h"
@@ -9,7 +8,7 @@
 // TCP server is always defined here
 EthernetServer tcpServer (80);
 
-// NetListenEnable: defined here in MinimumBuild, in IOH_TeensyROM.cpp otherwise
+// NetListenEnable: defined in IOH_TeensyROM.cpp
 extern bool NetListenEnable;
 
 #define WaitForTCPDataStartmS   500
@@ -42,5 +41,3 @@ FLASHMEM void ServiceTCP (EthernetClient &tcpclient)
 }
 
 #endif // FeatTCPListen
-
-#endif // MinimumBuild

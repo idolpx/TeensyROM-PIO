@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 #include "Menu.h"
 
 #include <Arduino.h>
@@ -8,11 +7,9 @@
 #include "DriveDirLoad.h"
 #include "IOHandlers.h"
 #include "FileParsers.h"
-#ifndef MinimumBuild
 #include "IOH_TeensyROM.h"
 #include "IOH_Swiftlink.h"
 #include "IOH_MIDI.h"
-#endif
 #include "ROMs/TeensyROMC64.h"
 
 // Global variable definitions
@@ -36,22 +33,26 @@ void SetUpMainMenuROM()
     nfcState &= ~nfcStateBitPaused; //clear paused bit in case paused by time critical function
 
     FreeCrtChips();
-#ifndef MinimumBuild
-    FreeSwiftlinkBuffs();
-#endif
+    if (bTeensyROMRunMode)
+    {
+        FreeSwiftlinkBuffs();
+    }
     RedirectEmptyDriveDirMenu();
-#ifndef MinimumBuild
-    free ((void*)MIDIRxBuf);
-    MIDIRxBuf = NULL;
-    free (TgetQueue);
-    TgetQueue = NULL;
-    free (LSFileName);
-    LSFileName = NULL;
+    if (bTeensyROMRunMode)
+    {
+        free ((void*)MIDIRxBuf);
+        MIDIRxBuf = NULL;
+        free (TgetQueue);
+        TgetQueue = NULL;
+        free (LSFileName);
+        LSFileName = NULL;
 
-    IOHandlerInit (IOH_TeensyROM);
-#else
-    IOHandlerInit (IOH_None);
-#endif
+        IOHandlerInit (IOH_TeensyROM);
+    }
+    else
+    {
+        IOHandlerInit (IOH_None);
+    }
     doReset = true;
 }
 
@@ -70,5 +71,3 @@ void PadSpace (char* StrToPad, uint8_t PadToLength)
 {
     while (strlen (StrToPad) < PadToLength) strcat (StrToPad, " ");
 }
-
-#endif // MinimumBuild

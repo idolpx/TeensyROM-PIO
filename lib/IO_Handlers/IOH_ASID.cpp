@@ -1,4 +1,3 @@
-#ifndef MinimumBuild
 // MIT License
 //
 // Copyright (c) 2024 Travis Smith
@@ -678,4 +677,4 @@ void PollingHndlr_ASID()
         if (ASIDRxQueueUsed == 0 || FrameTimerMode) usbHostMIDI.read();  //Currently no use case (Hosted ASID source)
     }
 }
-#endif
+

@@ -20,7 +20,6 @@
 
 // Swiftlink Rx Queue Functions
 
-#ifndef MinimumBuild
 #include "Swift_RxQueue.h"
 
 #include <EEPROM.h>
@@ -245,5 +244,3 @@ bool inet_aton (const char* address, IPAddress& result)
     result[3] = acc;
     return true;
 }
-
-#endif // MinimumBuild

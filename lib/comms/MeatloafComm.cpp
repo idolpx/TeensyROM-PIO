@@ -1,6 +1,4 @@
 
-#ifndef MinimumBuild
-
 #include "MeatloafComm.h"
 
 #include <CRC32.h>
@@ -158,5 +156,3 @@ FLASHMEM void MountDxxFile()
     SendMsgPrintfln (" Finished\r\rLOAD\"*\",8,1 and RUN? (y/n) ");
     IO1[rwRegScratch] = 1; //Success indicator, prompt for load/run
 }
-
-#endif // MinimumBuild
