@@ -122,7 +122,7 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
         return false;
     }
 
-    //clutters C64 disaply, just send to serial/debug
+    //clutters C64 display, just send to serial/debug
     Printf_dbg (" #%03d $%08x $%04x $%04x $%04x $%04x in RAM",
                 NumCrtChips, toU32 (ChipHeader + 0x04), toU16 (ChipHeader + 0x08), toU16 (ChipHeader + 0x0A),
                 toU16 (ChipHeader + 0x0C), toU16 (ChipHeader + 0x0E));
@@ -143,69 +143,46 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
     }
     else //then try RAM2
     {
-        while (NULL == (CrtChips[NumCrtChips].ChipROM = (uint8_t * )malloc (CrtChips[NumCrtChips].ROMSize)))
+        if (!bTeensyROMRunMode)
         {
-            if (DriveDirMenu == NULL)
+            if(NULL == (CrtChips[NumCrtChips].ChipROM = (uint8_t*)malloc(CrtChips[NumCrtChips].ROMSize)))
             {
-               //  //we've used up all of ram1 & 2 now, too big for main image, have to boot minimal image
-               //  //SendMsgPrintfln("Too large for main image...");
-
-               //  //check for minimal image present by seeing if there's an image (this one) at higher address
-               //  // These two image checks provided by AndyA via the PJRC forum
-               //  // https://forum.pjrc.com/index.php?threads/teensy-4-1-dual-boot-capability.74479/post-339451
-               //  uint32_t imageStartAddress = FLASH_BASEADDRESS + UpperAddr; //point to main TR image
-
-               //  // check For Valid Image: SPIFlashConfigMagicWord and VectorTableMagicWord
-               //  if ((* ((uint32_t * )imageStartAddress) != 0x42464346) || (* ((uint32_t * ) (imageStartAddress + 0x1000)) != 0x432000D1))
-               //  {
-               //      SendMsgPrintfln ("Dual boot image not found (NoMagNums)");
-               //      return false;
-               //  }
-
-               //  // ivt starts 0x1000 after the start of flash. Address of start of code is 2nd vector in table.
-               //  uint32_t firstInstructionPtr = imageStartAddress + 0x1000 + sizeof (uint32_t);
-               //  uint32_t firstInstructionAddr = * (uint32_t*)firstInstructionPtr;
-
-               //  // very basic sanity check, code should start after the ivt but not too far into the image.
-               //  Printf_dbg ("First instruction ptr: 0x%08X  addr: 0x%08X\n", firstInstructionPtr, firstInstructionAddr);
-               //  if ( (firstInstructionAddr < (imageStartAddress + 0x1000)) || (firstInstructionAddr > (imageStartAddress + 0x3000)) )
-               //  {
-               //      // Address of first instruction isn't sensible for location in flash. Image was probably incorrectly built
-               //      SendMsgPrintfln ("Dual boot image not found (NoFirstInst)");
-               //      return false;
-               //  }
-
-                if (!bTeensyROMRunMode)
-                {
+                //No room in RAM2, Have to swap!
+                Printf_dbg("S");
+                //SendMsgPrintfln("Not enough room: %d", NumCrtChips); 
+                //return false;       
+            
+                CrtChips[NumCrtChips].ChipROM = (uint8_t*)SwapSeekAddrMask;
+            }
+        }
+        else
+        {
+            while(NULL == (CrtChips[NumCrtChips].ChipROM = (uint8_t*)malloc(CrtChips[NumCrtChips].ROMSize)))
+            {
+                if (DriveDirMenu == NULL)
+                {  
+                    //we've used up all of ram1 & 2 now, too big for main image, have to boot minimal image    
                     if (FullFilePath[0] == 0)
                     {
-                        SendMsgPrintfln ("Must run this crt from SD");
+                        SendMsgPrintfln("Must run this crt from SD"); 
                         return false;
                     }
 
-                    SendMsgPrintfln ("Rebooting Teensy to Minimal");
-                    EEPwriteStr (eepAdCrtBootName, FullFilePath);
-                    EEPROM.write (eepAdMinBootInd, MinBootInd_ExecuteMin);
+                    SendMsgPrintfln("Rebooting Teensy to Minimal"); 
+                    EEPwriteStr(eepAdCrtBootName, FullFilePath);
+                    EEPROM.write(eepAdMinBootInd, MinBootInd_ExecuteMin);
                     REBOOT;
                 }
                 else
                 {
-                    //No room in RAM2, Have to swap!
-                    Printf_dbg("S");
-                    //SendMsgPrintfln("Not enough room: %d", NumCrtChips); 
-                    //return false;       
-                
-                    CrtChips[NumCrtChips].ChipROM = (uint8_t*)SwapSeekAddrMask;
+                    FreeDriveDirMenu(); //free/clear prev loaded directory to make space
                 }
-            }
-            else
-            {
-                FreeDriveDirMenu(); //free/clear prev loaded directory to make space
             }
         }
         Printf_dbg ("2");
     }
-    Printf_dbg (" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
+
+    //Printf_dbg (" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
     return true;
 }
 

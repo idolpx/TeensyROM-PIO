@@ -105,11 +105,11 @@ void HandleExecution()
 
 void HandleExecution_min()
 {
-    if (DriveDirMenu == NULL) return;
-    Printf_dbg ("HandleExecution_min\n");
-    StructMenuItem MenuSelCpy = *DriveDirMenu; //local copy selected menu item to modify
+    Serial.println ("HandleExecution_min");
+    StructMenuItem MenuSelCpy = DriveDirMenu[0]; //local copy selected menu item to modify
 
-    if (!LoadFile (&MenuSelCpy, &SD)) return;
+    Serial.printf ("Loading Item: dir[%s] file[%s] type[%d]\n", DriveDirPath, MenuSelCpy.Name, MenuSelCpy.ItemType);
+    if (!LoadFile (&MenuSelCpy, &SD, DriveDirPath)) return;
 
     MenuSelCpy.Code_Image = RAM_Image;
 
@@ -119,7 +119,6 @@ void HandleExecution_min()
 
     switch (MenuSelCpy.ItemType)
     {
-
         case rtBin16k:
             SetGameAssert;
             SetExROMAssert;
@@ -288,6 +287,7 @@ void HandleExecution_max()
 
                 //load header and parse (sends error messages)
                 if (!ParseCRTHeader (&MenuSelCpy, &EXROM, &GAME)) return;
+                Printf_dbg ("CRT Header Parsed\n");
 
                 //IO1[rwRegNextIOHndlr] is now assigned from crt!
                 //process Chip Packets
@@ -493,28 +493,20 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
     uint32_t SwapBanksDetected = 0;
 
     //PathIsRoot() uses DriveDirPath directly
-    if (FilePath)
-    {
-        if (strlen(FilePath) == 1 && FilePath[0] == '/') sprintf(FullFilePath, "%s%s", FilePath, MyMenuItem->Name);  // at root
-        else sprintf(FullFilePath, "%s/%s", FilePath, MyMenuItem->Name);
-    }
-    else
-    {
-        if (PathIsRoot()) sprintf(FullFilePath, "%s%s", DriveDirPath, MyMenuItem->Name);  // at root
-        else sprintf(FullFilePath, "%s/%s", DriveDirPath, MyMenuItem->Name);
-    }
+    if (strlen(FilePath) == 1 && FilePath[0] == '/') sprintf(FullFilePath, "%s%s", FilePath, MyMenuItem->Name);  // at root
+    else sprintf(FullFilePath, "%s/%s", FilePath, MyMenuItem->Name);
 
     SendMsgPrintfln("Loading:\r\n%s", FullFilePath);
 
-    File myFile = sourceFS->open(FullFilePath, FILE_READ);
-
-    if (!bTeensyROMRunMode && sourceFS != &SD) FullFilePath[0] = 0; //terminate if not SD
+    myFile = sourceFS->open(FullFilePath, FILE_READ);
 
     if (!myFile) 
     {
         SendMsgPrintfln("File Not Found");
+        Serial.printf("Failed to open: %s\n", FullFilePath);
         return false;
     }
+    Serial.printf("File opened, size: %lu bytes\n", myFile.size());
 
     MyMenuItem->Size = myFile.size();
     uint32_t count=0;
@@ -565,7 +557,9 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
                 return false;
             }
 
-            for (count = 0; count < CRT_CHIP_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read chip header
+            for (count = 0; count < CRT_CHIP_HDR_LEN; count++)
+                lclBuf[count] = myFile.read(); //Read chip header
+
             if (!ParseChipHeader(lclBuf, FullFilePath)) //sends error messages
             {
                 myFile.close();
@@ -587,7 +581,8 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
             }
             else
             {
-                for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) CrtChips[NumCrtChips].ChipROM[count]=myFile.read();//read in ROM info:
+                for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) 
+                    CrtChips[NumCrtChips].ChipROM[count] = myFile.read(); //read in ROM info:
             }
             NumCrtChips++;
         }
@@ -597,8 +592,11 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
         {
             myFile.close();
             FreeCrtChips();
-            IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
-            RedirectEmptyDriveDirMenu();
+            if ( !bTeensyROMRunMode )
+            {
+                IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
+                RedirectEmptyDriveDirMenu();
+            }
             return false;        
         }
     }
@@ -612,7 +610,8 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
             return false;
         }
 
-        while (myFile.available() && count < MyMenuItem->Size) RAM_Image[count++]=myFile.read();
+        while (myFile.available() && count < MyMenuItem->Size)
+            RAM_Image[count++]=myFile.read();
 
         myFile.close();
         if (count != MyMenuItem->Size)
@@ -626,7 +625,6 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
     else myFile.close(); // close if there are no swap banks.
 
     SendMsgPrintfln("Done");
-    myFile.close();
     return true;
 }
 
@@ -782,9 +780,8 @@ uint8_t Assoc_Ext_ItemType (char * FileName)
 
 void LoadCRT ( const char *FileNamePath)
 {
-    // Minimal mode: use single static struct, don't access IO1
-    SD.begin (BUILTIN_SDCARD); // refresh, takes 3 seconds for fail/unpopulated, 20-200mS populated
-
+    // Minimal mode: SD card already initialized in setup_min()
+    
     //set path & filename
     strcpy (DriveDirPath, FileNamePath);
     char *ptrFilename = strrchr (DriveDirPath, '/'); //pointer file name, find last slash
@@ -802,21 +799,36 @@ void LoadCRT ( const char *FileNamePath)
     }
 
     // Set up single menu item for minimal mode
-    DriveDirMenu_Minimal.Name = ptrFilename;
-    DriveDirMenu_Minimal.ItemType = rtFileCrt;
-    DriveDirMenu_Minimal.IOHndlrAssoc = IOH_None;
-    DriveDirMenu_Minimal.Code_Image = NULL;
-    DriveDirMenu_Minimal.Size = 0;
-    DriveDirMenu = &DriveDirMenu_Minimal;  // Point to the single struct
+    if (DriveDirMenu == NULL)
+    {
+        DriveDirMenu = (StructMenuItem*)malloc(sizeof(StructMenuItem));
+        if (DriveDirMenu == NULL)
+        {
+            Serial.println("Failed to allocate DriveDirMenu");
+            return;
+        }
+    }
+    
+    // Allocate and copy filename
+    DriveDirMenu[0].Name = (char*)malloc(strlen(ptrFilename) + 1);
+    if (DriveDirMenu[0].Name == NULL)
+    {
+        Serial.println("Failed to allocate filename");
+        return;
+    }
+    strcpy(DriveDirMenu[0].Name, ptrFilename);
+    DriveDirMenu[0].ItemType = rtFileCrt;
+    DriveDirMenu[0].Code_Image = NULL;
+    DriveDirMenu[0].Size = 0;
+    NumDrvDirMenuItems = 1;
 
-    Printf_dbg ("Loading CRT: %s/%s\n", DriveDirPath, ptrFilename);
-
-    HandleExecution();
+    HandleExecution_min();
 }
 
 void FreeCrtChips()
 {
     //free chips allocated in RAM2 and reset NumCrtChips
+    SendMsgPrintfln ("Freeing %d CRT Chips\n", NumCrtChips);
     for (uint16_t cnt = 0; cnt < NumCrtChips; cnt++)
         if (!bTeensyROMRunMode)
         {   // Minimal mode: only free if allocated in RAM2

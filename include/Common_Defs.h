@@ -58,8 +58,9 @@ extern char strVersionNumber[]; // *VERSION*
                                        // 0f: 7/15/25  Updated EEPROM magic for v0.7
 
 #define DefSIDSource        rmtTeensy  // Default, should always be local (rmtTeensy)
-#define DefSIDPath          "/SID Cover Tunes" 
-#define DefSIDName          "Sleep Dirt            Frank Zappa" 
+#define DefSIDPath          "/SID Cover Tunes"
+//#define DefSIDName          "Sleep Dirt            Frank Zappa"
+#define DefSIDName          "Another Brick In The Wall"
 
 extern char* StrSIDInfo;
 extern char* LatestSIDLoaded;
@@ -131,7 +132,7 @@ struct stcSwapBuffers
 
 #ifdef __cplusplus
 extern stcSwapBuffers *SwapBuffers; // Dynamically allocated for minimal mode (NULL in full mode) 
-                             //      (5_OceanType1 , 15_GameSystem3, 60_GMod2)
+                                    //      (5_OceanType1 , 15_GameSystem3, 60_GMod2)
 #endif
 
 #define Printf_Swaps     Printf_dbg   //Serial.printf  //
@@ -139,11 +140,11 @@ extern stcSwapBuffers *SwapBuffers; // Dynamically allocated for minimal mode (N
 // RAM allocation for both modes - allocate maximum size (minimal mode)
 // Minimal mode needs more RAM for large CRT files
 #ifdef FeatTCPListen
-   #define EthernetDeduction   104  
-   //Ethernet takes this from RAM1 and another ~96k from RAM2 (when initialized/enabled), plus uses more local variables
-   // Total: ~200k of RAM needed to support Ethernet, 100k if disabled
+    #define EthernetDeduction   104  
+    //Ethernet takes this from RAM1 and another ~96k from RAM2 (when initialized/enabled), plus uses more local variables
+    // Total: ~200k of RAM needed to support Ethernet, 100k if disabled
 #else
-   #define EthernetDeduction    0
+    #define EthernetDeduction    0
 #endif
 
 // MaxRAM_ImageSize for each mode
@@ -154,13 +155,13 @@ extern stcSwapBuffers *SwapBuffers; // Dynamically allocated for minimal mode (N
 #define MaxRAM_ImageSize  MaxRAM_ImageSize_Min
 
 #ifdef DbgMsgs_IO  //Debug msgs mode: reduced RAM_ImageSize
-   #define Printf_dbg Serial.printf
-   #define RAM_ImageSize_Min       ((MaxRAM_ImageSize_Min-24)*1024)
-   #define RAM_ImageSize_Max       ((MaxRAM_ImageSize_Max-24)*1024)
+    #define Printf_dbg Serial.printf
+    #define RAM_ImageSize_Min       ((MaxRAM_ImageSize_Min-24)*1024)
+    #define RAM_ImageSize_Max       ((MaxRAM_ImageSize_Max-24)*1024)
 #else //Normal mode: maximize RAM_ImageSize
-   __attribute__((always_inline)) inline void Printf_dbg(const char* format, ...) {};
-   #define RAM_ImageSize_Min       (MaxRAM_ImageSize_Min*1024)
-   #define RAM_ImageSize_Max       (MaxRAM_ImageSize_Max*1024)
+    __attribute__((always_inline)) inline void Printf_dbg(const char* format, ...) {};
+    #define RAM_ImageSize_Min       (MaxRAM_ImageSize_Min*1024)
+    #define RAM_ImageSize_Max       (MaxRAM_ImageSize_Max*1024)
 #endif
 extern uint8_t *RAM_Image; // Main RAM1 file storage buffer (dynamically allocated based on mode)
 
@@ -179,9 +180,9 @@ extern uint32_t XferSize;  //size of image being transfered to C64
 #define DbgSpecialData      0x80000
 
 #ifdef DbgIOTraceLog
-   __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data) {BigBuf[BigBufCount] |= (data<<8) | IOTLDataValid;};
+    __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data) {BigBuf[BigBufCount] |= (data<<8) | IOTLDataValid;};
 #else
-   __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data, ...) {};
+    __attribute__((always_inline)) inline void TraceLogAddValidData(uint8_t data, ...) {};
 #endif
 
 #define MaxItemNameLength   100
@@ -195,30 +196,30 @@ extern uint32_t XferSize;  //size of image being transfered to C64
 
 
 extern volatile uint32_t StartCycCnt, LastCycCnt;
-   
+
 #define PHI2_PIN            1  
 #define Reset_Btn_In_PIN    31 
 #define DotClk_Debug_PIN    28 
 const uint8_t InputPins[] = {
-   19,18,14,15,40,41,17,16,22,23,20,21,38,39,26,27,  //address bus
-   2, 3, 4, 5, PHI2_PIN, 0,   // IO1n, IO2n, ROML, ROMH, PHI2_PIN, R_Wn
-   29, Reset_Btn_In_PIN,  // BA, Reset button
-   };
+    19,18,14,15,40,41,17,16,22,23,20,21,38,39,26,27,  //address bus
+    2, 3, 4, 5, PHI2_PIN, 0,    // IO1n, IO2n, ROML, ROMH, PHI2_PIN, R_Wn
+    29, Reset_Btn_In_PIN,       // BA, Reset button
+};
 
 const uint8_t OutputPins[] = {
-   35, 9, 32,   // DataCEn, ExROM, Game
-   30, 25, 24,  // DMA, NMI, IRQ
-   34, 33, 6,    // LED, debug(0.2)/RnW(0.3), Reset_Out_PIN,
-   };
+    35, 9, 32,      // DataCEn, ExROM, Game
+    30, 25, 24,     // DMA, NMI, IRQ
+    34, 33, 6,      // LED, debug(0.2)/RnW(0.3), Reset_Out_PIN,
+};
 
 #ifdef DbgFab0_3plus
-   #define SetDebugAssert      CORE_PIN28_PORTSET = CORE_PIN28_BITMASK
-   #define SetDebugDeassert    CORE_PIN28_PORTCLEAR = CORE_PIN28_BITMASK 
+    #define SetDebugAssert      CORE_PIN28_PORTSET = CORE_PIN28_BITMASK
+    #define SetDebugDeassert    CORE_PIN28_PORTCLEAR = CORE_PIN28_BITMASK 
 #else  //fab 0.2x
-   //debug on pin 33, but could be blue-wired to drive DataBufIn/Out as on fab 0.3
-   //   let it be driven as SetDataBufIn/Out for blue-wired 0.2x boards
-   #define SetDebugAssert      {} //CORE_PIN33_PORTSET = CORE_PIN33_BITMASK
-   #define SetDebugDeassert    {} //CORE_PIN33_PORTCLEAR = CORE_PIN33_BITMASK 
+    //debug on pin 33, but could be blue-wired to drive DataBufIn/Out as on fab 0.3
+    //   let it be driven as SetDataBufIn/Out for blue-wired 0.2x boards
+    #define SetDebugAssert      {} //CORE_PIN33_PORTSET = CORE_PIN33_BITMASK
+    #define SetDebugDeassert    {} //CORE_PIN33_PORTCLEAR = CORE_PIN33_BITMASK 
 #endif
 
 #define ReadGPIO6           (*(volatile uint32_t *)IMXRT_GPIO6_ADDRESS)
@@ -283,7 +284,7 @@ const uint8_t OutputPins[] = {
                                  //       12/12/24 v0.6.3+T390: Set to 390 special build for a Reloaded Mk2 using FW 20180227 from CryzleR/Frank.  V20231101 (latest) still fails below ~385  https://wiki.icomp.de/wiki/C64_reloaded_mk2#Firmware_updates
                                  //                             Also: Digitalman saw Mega65 improvements on Fiendish Freddy & Orbitz
                                  //       12/31/24 v0.6.4:      365 to 390 release build to accomodate all. Measurement show this is the max for staying within the Phi2 half cycle
-                                 
+
 // Times from Phi2 falling:
 #define Def_nS_VICStart     210  //    delay from Phi2 falling to look for ROMH.  Too long or short will manifest as general screen noise (missing data) on ROMH games such as JupiterLander and RadarRatRace
 #define Def_nS_VICDHold     365  //    On a C64 VIC cycle read, when to stop driving the data bus.  Higher breaks UltiMax carts on NTSC
@@ -298,44 +299,44 @@ extern uint32_t nS_VICDHold;
 
 __attribute__((always_inline)) inline void DataPortWriteWait(uint8_t Data)
 {  // for "normal" (non-VIC) C64 read cycles only
-   DataBufEnable; 
-   uint32_t RegBits = (Data & 0x0F) | ((Data & 0xF0) << 12);
-   CORE_PIN7_PORTSET = RegBits;
-   CORE_PIN7_PORTCLEAR = ~RegBits & GP7_DataMask;
-   
-   //WaitUntil_nS(nS_DataHold);  
-   uint32_t Cyc_DataHold = nSToCyc(nS_DataHold); //avoid calculating every time
-   while((ARM_DWT_CYCCNT-StartCycCnt) < Cyc_DataHold)
-      if(!GP6_Phi2(ReadGPIO6)) break; //make sure Phi2 is still high, about 50nS of overshoot into VIC cycle if detected
-   
-   DataBufDisable;
+    DataBufEnable; 
+    uint32_t RegBits = (Data & 0x0F) | ((Data & 0xF0) << 12);
+    CORE_PIN7_PORTSET = RegBits;
+    CORE_PIN7_PORTCLEAR = ~RegBits & GP7_DataMask;
+    
+    //WaitUntil_nS(nS_DataHold);  
+    uint32_t Cyc_DataHold = nSToCyc(nS_DataHold); //avoid calculating every time
+    while((ARM_DWT_CYCCNT-StartCycCnt) < Cyc_DataHold)
+        if(!GP6_Phi2(ReadGPIO6)) break; //make sure Phi2 is still high, about 50nS of overshoot into VIC cycle if detected
+    
+    DataBufDisable;
 }
 
 __attribute__((always_inline)) inline void DataPortWriteWaitVIC(uint8_t Data)
 {  // for C64 VIC read cycles only
-   DataBufEnable; 
-   uint32_t RegBits = (Data & 0x0F) | ((Data & 0xF0) << 12);
-   CORE_PIN7_PORTSET = RegBits;
-   CORE_PIN7_PORTCLEAR = ~RegBits & GP7_DataMask;
-   WaitUntil_nS(nS_VICDHold);  
-   DataBufDisable;
+    DataBufEnable; 
+    uint32_t RegBits = (Data & 0x0F) | ((Data & 0xF0) << 12);
+    CORE_PIN7_PORTSET = RegBits;
+    CORE_PIN7_PORTCLEAR = ~RegBits & GP7_DataMask;
+    WaitUntil_nS(nS_VICDHold);  
+    DataBufDisable;
 }
 
 __attribute__((always_inline)) inline void DataPortWriteWaitLog(uint8_t Data)
 {  // for "normal" (non-VIC) C64 read cycles only
-   DataPortWriteWait(Data);
-   TraceLogAddValidData(Data);
+    DataPortWriteWait(Data);
+    TraceLogAddValidData(Data);
 }
 
 __attribute__((always_inline)) inline uint8_t DataPortWaitRead()
 {  // for "normal" (non-VIC) C64 write cycles
-   SetDataPortDirIn; //set data ports to inputs         //data port set to read previously
-   DataBufEnable; //enable external buffer
-   WaitUntil_nS(nS_DataSetup);  //could poll Phi2 for falling edge...  only 30nS typ hold time
-   uint32_t DataIn = ReadGPIO7;
-   DataBufDisable;
-   SetDataPortDirOut; //set data ports to outputs (default)
-   return ((DataIn & 0x0F) | ((DataIn >> 12) & 0xF0));
+    SetDataPortDirIn; //set data ports to inputs         //data port set to read previously
+    DataBufEnable; //enable external buffer
+    WaitUntil_nS(nS_DataSetup);  //could poll Phi2 for falling edge...  only 30nS typ hold time
+    uint32_t DataIn = ReadGPIO7;
+    DataBufDisable;
+    SetDataPortDirOut; //set data ports to outputs (default)
+    return ((DataIn & 0x0F) | ((DataIn >> 12) & 0xF0));
 }
 
 // reboot is the same for all ARM devices
@@ -346,22 +347,22 @@ __attribute__((always_inline)) inline uint8_t DataPortWaitRead()
 //C64 specific:
 enum PokeColors
 {
-   PokeBlack   = 0 ,
-   PokeWhite   = 1 ,
-   PokeRed     = 2 ,
-   PokeCyan    = 3 ,
-   PokePurple  = 4 ,
-   PokeGreen   = 5 ,
-   PokeBlue    = 6 ,
-   PokeYellow  = 7 ,
-   PokeOrange  = 8 ,
-   PokeBrown   = 9 ,
-   PokeLtRed   = 10,
-   PokeDrkGrey = 11,
-   PokeMedGrey = 12,
-   PokeLtGreen = 13,
-   PokeLtBlue  = 14,
-   PokeLtGrey  = 15,
+    PokeBlack   = 0 ,
+    PokeWhite   = 1 ,
+    PokeRed     = 2 ,
+    PokeCyan    = 3 ,
+    PokePurple  = 4 ,
+    PokeGreen   = 5 ,
+    PokeBlue    = 6 ,
+    PokeYellow  = 7 ,
+    PokeOrange  = 8 ,
+    PokeBrown   = 9 ,
+    PokeLtRed   = 10,
+    PokeDrkGrey = 11,
+    PokeMedGrey = 12,
+    PokeLtGreen = 13,
+    PokeLtBlue  = 14,
+    PokeLtGrey  = 15,
 };
 
 #define NumPageLinkBuffs    99

@@ -121,7 +121,6 @@ void setup()
         }
     }
 
-
     if (!bTeensyROMRunMode)
         setup_min();
     else
@@ -143,20 +142,27 @@ void setup()
 
     SetLEDOn; // done last as indicator of init completion
 }
-    //     setup_min();
+
 void setup_min()
 {
     EEPROM.write (eepAdMinBootInd, MinBootInd_SkipMin); //clear the boot flag for next boot default, in case power is lost
+
+    strcpy (DriveDirPath, "/");
+    SD.begin (BUILTIN_SDCARD); // refresh, takes 3 seconds for fail/unpopulated, 20-200mS populated
+    if (!SDFullInit())
+    {
+        Serial.print ("SD init failed, Abort!\n");
+        delay (10);
+        Serial.flush();
+        REBOOT; // Reboot and let it run in full mode
+    }
 
     // MinimalBuild: simpler initialization
     LOROM_Image = NULL;
     HIROM_Image = NULL;
     LOROM_Mask = HIROM_Mask = 0x1fff;
     EmulateVicCycles = false;
-    FreeCrtChips();
-
-    strcpy (DriveDirPath, "/");
-    SD.begin (BUILTIN_SDCARD); // refresh, takes 3 seconds for fail/unpopulated, 20-200mS populated
+    //FreeCrtChips();
 
     // Dynamically allocate RAM_Image for minimal mode (larger size for CRT files)
     RAM_Image = (uint8_t *)malloc(RAM_ImageSize_Min);
@@ -190,6 +196,7 @@ void setup_min()
         Serial.flush();
         REBOOT; // Reboot and let it run in full mode
     }
+    Serial.print ("CRT loaded, starting C64\n");
 }
 
 void setup_max()

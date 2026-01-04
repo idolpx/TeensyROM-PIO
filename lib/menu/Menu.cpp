@@ -14,7 +14,6 @@
 
 // Global variable definitions
 StructMenuItem *DriveDirMenu = NULL;
-StructMenuItem DriveDirMenu_Minimal;  // Single struct for minimal mode
 uint16_t NumDrvDirMenuItems = 0;
 
 void SetUpMainMenuROM()
@@ -27,32 +26,19 @@ void SetUpMainMenuROM()
     LOROM_Image = TeensyROMC64_bin;
     HIROM_Image = NULL;
     LOROM_Mask = HIROM_Mask = 0x1fff;
-    NVIC_ENABLE_IRQ (IRQ_ENET); //make sure ethernet interrupt is back on
-    NVIC_ENABLE_IRQ (IRQ_PIT);
+    NVIC_ENABLE_IRQ(IRQ_ENET); //make sure ethernet interrupt is back on
+    NVIC_ENABLE_IRQ(IRQ_PIT);
     EmulateVicCycles = false;
     nfcState &= ~nfcStateBitPaused; //clear paused bit in case paused by time critical function
-
+    
     FreeCrtChips();
-    if (bTeensyROMRunMode)
-    {
-        FreeSwiftlinkBuffs();
-    }
+    FreeSwiftlinkBuffs();
     RedirectEmptyDriveDirMenu();
-    if (bTeensyROMRunMode)
-    {
-        free ((void*)MIDIRxBuf);
-        MIDIRxBuf = NULL;
-        free (TgetQueue);
-        TgetQueue = NULL;
-        free (LSFileName);
-        LSFileName = NULL;
+    free((void*)MIDIRxBuf); MIDIRxBuf=NULL;
+    free(TgetQueue); TgetQueue=NULL;
+    free(LSFileName); LSFileName=NULL;
 
-        IOHandlerInit (IOH_TeensyROM);
-    }
-    else
-    {
-        IOHandlerInit (IOH_None);
-    }
+    IOHandlerInit(IOH_TeensyROM);   
     doReset = true;
 }
 
