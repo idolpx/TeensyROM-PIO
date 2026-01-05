@@ -28,9 +28,4 @@ void IO1Hndlr_MagicDesk (uint8_t Address, bool R_Wn);
 
 extern stcIOHandlers IOHndlr_MagicDesk;
 
-extern StructCrtChip CrtChips[];
-extern uint8_t NumCrtChips;
-
-extern uint8_t BankReg;
-
 #endif // IOH_MAGICDESK_H

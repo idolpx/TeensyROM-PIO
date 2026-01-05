@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "IOH_MagicDesk.h"
+#include "FileParsers.h"
 
 // Global variable definitions
 stcIOHandlers IOHndlr_MagicDesk =

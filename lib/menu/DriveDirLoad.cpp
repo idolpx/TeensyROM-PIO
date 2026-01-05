@@ -85,9 +85,7 @@ StructExt_ItemType_Assoc Ext_ItemType_Assoc[] =
     //"c64",  rtFilePrg,  //makefile output, not always prg...
 };
 
-// Global variables used in both modes
-uint8_t NumCrtChips = 0;
-StructCrtChip CrtChips[MAX_CRT_CHIPS];
+
 
 File myFile = NULL;
 
@@ -497,16 +495,12 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
     else sprintf(FullFilePath, "%s/%s", FilePath, MyMenuItem->Name);
 
     SendMsgPrintfln("Loading:\r\n%s", FullFilePath);
-
     myFile = sourceFS->open(FullFilePath, FILE_READ);
-
     if (!myFile) 
     {
         SendMsgPrintfln("File Not Found");
-        Serial.printf("Failed to open: %s\n", FullFilePath);
         return false;
     }
-    Serial.printf("File opened, size: %lu bytes\n", myFile.size());
 
     MyMenuItem->Size = myFile.size();
     uint32_t count=0;
@@ -531,16 +525,18 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
         {
             SendMsgPrintfln("Too Short for CRT");
             myFile.close();
-            return false;        
+            return false;
         }
 
         //load header and parse
-        for (count = 0; count < CRT_MAIN_HDR_LEN; count++) lclBuf[count]=myFile.read(); //Read main header
+        for (count = 0; count < CRT_MAIN_HDR_LEN; count++) 
+            lclBuf[count]=myFile.read(); //Read main header
+
         MyMenuItem->Code_Image = lclBuf;
         if (!ParseCRTHeader(MyMenuItem, &EXROM, &GAME)) //sends error messages
         {
             myFile.close();
-            return false;        
+            return false;
         }
 
         //IO1[rwRegNextIOHndlr] is now assigned from crt!
@@ -549,12 +545,15 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
         Printf_dbg("\n Chp# Length    Type  Bank  Addr  Size\n");
         while (myFile.available())
         {
-            if (NumCrtChips == MAX_CRT_CHIPS)
+            if (bTeensyROMRunMode)
             {
-                SendMsgPrintfln("More than %d CRT Chips found", MAX_CRT_CHIPS); 
-                myFile.close();
-                FreeCrtChips();
-                return false;
+                if (NumCrtChips == MAX_CRT_CHIPS)
+                {
+                    SendMsgPrintfln("More than %d CRT Chips found", MAX_CRT_CHIPS); 
+                    myFile.close();
+                    FreeCrtChips();
+                    return false;
+                }
             }
 
             for (count = 0; count < CRT_CHIP_HDR_LEN; count++)
@@ -564,8 +563,11 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
             {
                 myFile.close();
                 FreeCrtChips();
-                IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
-                RedirectEmptyDriveDirMenu();
+                if (bTeensyROMRunMode)
+                {
+                    IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
+                    RedirectEmptyDriveDirMenu();
+                }
                 return false;
             }
             // Special case for swap-out
@@ -584,6 +586,8 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
                 for (count = 0; count < CrtChips[NumCrtChips].ROMSize; count++) 
                     CrtChips[NumCrtChips].ChipROM[count] = myFile.read(); //read in ROM info:
             }
+
+            Printf_dbg(" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);
             NumCrtChips++;
         }
 
@@ -592,12 +596,12 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
         {
             myFile.close();
             FreeCrtChips();
-            if ( !bTeensyROMRunMode )
+            if (bTeensyROMRunMode)
             {
                 IO1[rwRegNextIOHndlr] = EEPROM.read(eepAdNextIOHndlr);  //in case it was over-ridden by .crt
                 RedirectEmptyDriveDirMenu();
             }
-            return false;        
+            return false;
         }
     }
     else //non-CRT: Load the whole thing into the RAM1 buffer
@@ -617,6 +621,7 @@ bool LoadFile(StructMenuItem* MyMenuItem, FS *sourceFS, const char* FilePath)
         if (count != MyMenuItem->Size)
         {
             SendMsgPrintfln("Size Mismatch");
+            myFile.close();
             return false;
         }
     }
@@ -828,18 +833,18 @@ void LoadCRT ( const char *FileNamePath)
 void FreeCrtChips()
 {
     //free chips allocated in RAM2 and reset NumCrtChips
-    SendMsgPrintfln ("Freeing %d CRT Chips\n", NumCrtChips);
+    //Serial.printf ("Freeing %d CRT Chips\n", NumCrtChips);
     for (uint16_t cnt = 0; cnt < NumCrtChips; cnt++)
-        if (!bTeensyROMRunMode)
+        //if (!bTeensyROMRunMode)
         {   // Minimal mode: only free if allocated in RAM2
             if((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000 && (uint32_t)CrtChips[cnt].ChipROM < SwapSeekAddrMask)
                 free(CrtChips[cnt].ChipROM);
         }
-        else
-        {   // Full mode: free if allocated in RAM2
-            if ((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000)
-                free (CrtChips[cnt].ChipROM);
-        }
+        // else
+        // {   // Full mode: free if allocated in RAM2
+        //     if ((uint32_t)CrtChips[cnt].ChipROM >= 0x20200000)
+        //         free (CrtChips[cnt].ChipROM);
+        // }
 
     NumCrtChips = 0;
 }

@@ -4,6 +4,8 @@
 #include <Arduino.h>
 
 #include "IOH_TeensyROM.h"
+#include "Common_Defs.h"
+#include "FileParsers.h"
 
 // Global variable definitions
 volatile char    *ptrSerialString = NULL; //pointer to selected serialstring
@@ -46,12 +48,23 @@ void SendMsgPrintf (const char *Fmt, ...)
 void SendMsgSerialStringBuf()
 {
     // SerialStringBuf already populated
-    Serial.printf ("%s<--", SerialStringBuf);
-    Serial.flush();
-    IO1[rwRegStatus] = rsC64Message; // tell C64 there's a message
-    uint32_t beginWait = millis();
-    // wait up to 3 sec for C64 to read message:
-    while (millis() - beginWait < 3000) if (IO1[rwRegStatus] == rsContinue) return;
-    Serial.printf ("\nTimeout!\n");
+    Printf_dbg ("%s<--", SerialStringBuf);
+    
+    // In minimal mode, IO1 is not available - just print to serial
+    if (!bTeensyROMRunMode) return;
+    
+    if (SendC64Msgs)
+    {
+        Serial.flush();
+        IO1[rwRegStatus] = rsC64Message; // tell C64 there's a message
+        uint32_t beginWait = millis();
+        // wait up to 3 sec for C64 to read message:
+        while (millis() - beginWait < 3000) if (IO1[rwRegStatus] == rsContinue) return;
+        Serial.printf ("\nTimeout!\n");
+    }
+    else
+    {
+        Printf_dbg("X");  //Indicates *not* sent to C64
+    }
 }
 

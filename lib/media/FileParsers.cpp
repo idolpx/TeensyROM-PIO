@@ -40,6 +40,9 @@ char *LatestSIDLoaded;
 char StrMachineInfo[16];
 bool SendC64Msgs = true;
 
+uint8_t NumCrtChips = 0;
+StructCrtChip CrtChips[MAX_CRT_CHIPS];
+
 void ParseP00File (StructMenuItem* MyMenuItem)
 {
     //update .ItemType(rtUnknown or rtFilePrg) & .Code_Image
@@ -153,7 +156,7 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
                 //return false;       
             
                 CrtChips[NumCrtChips].ChipROM = (uint8_t*)SwapSeekAddrMask;
-            }
+            } else Printf_dbg("2");
         }
         else
         {
@@ -178,8 +181,8 @@ bool ParseChipHeader (uint8_t* ChipHeader, const char *FullFilePath)
                     FreeDriveDirMenu(); //free/clear prev loaded directory to make space
                 }
             }
+            Printf_dbg ("2");
         }
-        Printf_dbg ("2");
     }
 
     //Printf_dbg (" %08x\n", (uint32_t)CrtChips[NumCrtChips].ChipROM);

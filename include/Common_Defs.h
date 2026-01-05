@@ -122,7 +122,8 @@ struct stcSwapBuffers
    uint32_t Offset; // chip swap file offsets to check for same & not reload
 };
 
-#define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
+//#define SwapSeekAddrMask 0xF0000000  // High bits used to indicate swap bank
+#define SwapSeekAddrMask   0xef000000   //virtual address mask/marker for swap-out blocks, or-ed with file seek address (minimal build only)
 
 #define Num8kSwapBuffers  16 //space for bank swapping upper blocks of large CRTs
                              //  Must be even number for 16k banks

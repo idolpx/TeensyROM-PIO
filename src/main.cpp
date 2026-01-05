@@ -42,6 +42,7 @@ void setup_max();
 void loop_min();
 void loop_max();
 
+
 void setup()
 {
     set_arm_clock (816000000); //slight overclocking, no cooling required
@@ -132,9 +133,7 @@ void setup()
     uint32_t CrtMax = (RAM_ImageSize_Used & 0xffffe000) / 1024; //round down to k bytes rounded to nearest 8k
     Serial.printf (" RAM1    Buffer: %luK (%lu blks)\n", CrtMax, CrtMax / 8);
     Serial.printf (" RAM1 Swap Blks: %luK (%lu blks)\n", Num8kSwapBuffers * 8, Num8kSwapBuffers);
-    uint8_t NumChips = RAM2blocks();
-    //Serial.printf("RAM2 Blks: %luK (%lu blks)\n", NumChips*8, NumChips);
-    NumChips = RAM2blocks() - 1; //do it again, sometimes get one more, minus one to match reality, not clear why
+    uint8_t NumChips = RAM2blocks() - 1;
     Serial.printf (" RAM2      Blks: %luK (%lu blks)\n", NumChips * 8, NumChips);
     CrtMax += NumChips * 8 + Num8kSwapBuffers * 8;
     Serial.printf (" %luk max RAM for CRT w/o swaps\n", (uint32_t) (CrtMax * 1.004)); //larger File size due to header info.
@@ -182,7 +181,7 @@ void setup_min()
 
     Serial.printf ("\nTeensyROM minimal %s is on-line\n", strVersionNumber);
     Serial.printf(" %luMHz  %.1fC\n FW: %s, %s\n", (F_CPU_ACTUAL/1000000), tempmonGetTemp(), __DATE__, __TIME__);
-
+    
     // assuming it's a .crt file, and present on SD drive (verified in main image)
     char *CrtBootNamePath = (char*)malloc (MaxPathLength);
     EEPreadNBuf (eepAdCrtBootName, (uint8_t*)CrtBootNamePath, MaxPathLength); //load the source/path/name from EEPROM
